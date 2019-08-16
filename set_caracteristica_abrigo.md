@@ -1,0 +1,11 @@
+UPDATE pontos SET caracteristica_abrigo_id = 1 WHERE caracteristica_abrigo = 'Baixio';
+UPDATE pontos SET caracteristica_abrigo_id = 2 WHERE caracteristica_abrigo = 'Canteiro central';
+UPDATE pontos SET caracteristica_abrigo_id = 3 WHERE caracteristica_abrigo = 'Marquise de propriedade comercial ativa';
+UPDATE pontos SET caracteristica_abrigo_id = 4 WHERE caracteristica_abrigo = 'Marquise de propriedade comercial ativa - bancos';
+UPDATE pontos SET caracteristica_abrigo_id = 5 WHERE caracteristica_abrigo = 'Marquise de propriedade comercial inativa';
+UPDATE pontos SET caracteristica_abrigo_id = 6 WHERE caracteristica_abrigo = 'Na propriedade privada';
+UPDATE pontos SET caracteristica_abrigo_id = 7 WHERE caracteristica_abrigo = 'Na propriedade pública';
+UPDATE pontos SET caracteristica_abrigo_id = 8 WHERE caracteristica_abrigo = 'Passeio em frente a propriedade privada';
+UPDATE pontos SET caracteristica_abrigo_id = 9 WHERE caracteristica_abrigo = 'Passeio em frente a propriedade pública';
+UPDATE pontos SET caracteristica_abrigo_id = 10 WHERE caracteristica_abrigo = 'Pista de rolamento';
+UPDATE pontos SET caracteristica_abrigo_id = 11 WHERE caracteristica_abrigo = 'Praça Pública';
