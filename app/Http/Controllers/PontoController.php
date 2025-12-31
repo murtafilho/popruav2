@@ -34,7 +34,7 @@ class PontoController extends Controller
 
         // Filtros
         if ($request->filled('bairro')) {
-            $query->where('e.bairro', 'like', '%' . $request->bairro . '%');
+            $query->where('e.bairro', 'like', '%'.$request->bairro.'%');
         }
 
         if ($request->filled('regional')) {
@@ -47,7 +47,7 @@ class PontoController extends Controller
 
         $pontos = $query->orderBy('e.logradouro')
             ->orderBy('p.numero')
-            ->paginate(50);
+            ->paginate(10);
 
         // Dados para filtros
         $bairros = DB::table('ender')
@@ -101,7 +101,7 @@ class PontoController extends Controller
             ->where('p.id', $id)
             ->first();
 
-        if (!$ponto) {
+        if (! $ponto) {
             abort(404, 'Ponto não encontrado');
         }
 
@@ -130,6 +130,78 @@ class PontoController extends Controller
         return view('pontos.show', [
             'ponto' => $ponto,
             'vistorias' => $vistorias,
+        ]);
+    }
+
+    public function naoGeorreferenciados(Request $request): View
+    {
+        $query = DB::table('pontos as p')
+            ->join('ender as e', 'e.id', '=', 'p.endereco_id')
+            ->leftJoin(DB::raw('(SELECT ponto_id, MAX(id) as ultima_vistoria_id FROM vistorias GROUP BY ponto_id) as uv'), 'uv.ponto_id', '=', 'p.id')
+            ->leftJoin('vistorias as v', 'v.id', '=', 'uv.ultima_vistoria_id')
+            ->leftJoin('resultados_acoes as ra', 'ra.id', '=', 'v.resultado_acao_id')
+            ->select([
+                'p.id',
+                'p.numero',
+                'p.complemento',
+                'p.lat',
+                'p.lng',
+                'e.logradouro',
+                'e.bairro',
+                'e.regional',
+                'e.tipo',
+                'v.resultado_acao_id',
+                'ra.resultado as resultado_acao',
+                DB::raw('(SELECT COUNT(*) FROM vistorias WHERE ponto_id = p.id) as total_vistorias'),
+            ])
+            ->where(function ($q) {
+                $q->whereNull('p.lat')
+                    ->orWhereNull('p.lng')
+                    ->orWhere('p.lat', '=', 0)
+                    ->orWhere('p.lng', '=', 0);
+            });
+
+        // Filtros
+        if ($request->filled('bairro')) {
+            $query->where('e.bairro', 'like', '%'.$request->bairro.'%');
+        }
+
+        if ($request->filled('regional')) {
+            $query->where('e.regional', $request->regional);
+        }
+
+        if ($request->filled('resultado')) {
+            $query->where('v.resultado_acao_id', $request->resultado);
+        }
+
+        $pontos = $query->orderBy('e.logradouro')
+            ->orderBy('p.numero')
+            ->paginate(10);
+
+        // Dados para filtros
+        $bairros = DB::table('ender')
+            ->select('bairro')
+            ->distinct()
+            ->whereNotNull('bairro')
+            ->orderBy('bairro')
+            ->pluck('bairro');
+
+        $regionais = DB::table('ender')
+            ->select('regional')
+            ->distinct()
+            ->whereNotNull('regional')
+            ->orderBy('regional')
+            ->pluck('regional');
+
+        $resultados = DB::table('resultados_acoes')
+            ->orderBy('id')
+            ->get();
+
+        return view('pontos.nao-georreferenciados', [
+            'pontos' => $pontos,
+            'bairros' => $bairros,
+            'regionais' => $regionais,
+            'resultados' => $resultados,
         ]);
     }
 }

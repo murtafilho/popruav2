@@ -67,7 +67,7 @@ class GeoController extends Controller
             ->select('id', 'area_km2', 'perimetro_m', 'geometry')
             ->first();
 
-        if (!$limite) {
+        if (! $limite) {
             return response()->json(['error' => 'Limite não encontrado'], 404);
         }
 

@@ -12,7 +12,16 @@
             <h1 class="text-lg font-semibold">POPRUA</h1>
         </a>
     </div>
-    <button id="btn-menu" class="p-2 rounded-lg hover:bg-white/10 transition">
+    <div class="flex items-center gap-2">
+        <button onclick="toggleDarkMode()" class="p-2 rounded-lg hover:bg-white/10 transition" title="Alternar tema">
+            <svg data-light-icon class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+            </svg>
+            <svg data-dark-icon class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+            </svg>
+        </button>
+        <button id="btn-menu" class="p-2 rounded-lg hover:bg-white/10 transition">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
         </svg>
@@ -24,14 +33,14 @@
     <div id="map"></div>
 
     <!-- Indicador de Zoom -->
-    <div id="zoom-indicator" class="absolute bottom-20 left-4 z-[1000] bg-white/90 text-gray-700 px-2 py-1 rounded shadow text-xs font-mono">
+    <div id="zoom-indicator" class="absolute bottom-20 left-4 z-[1000] bg-white/90 dark:bg-gray-800/90 text-gray-200 dark:text-gray-200 px-2 py-1 rounded shadow text-xs font-mono transition-colors duration-200">
         Zoom: <span id="zoom-level">12</span>
     </div>
 
     <!-- FAB - Minha Localização -->
     <button
         id="btn-my-location"
-        class="absolute bottom-20 right-4 z-[1000] w-12 h-12 bg-white text-gray-700 rounded-full shadow-lg flex items-center justify-center hover:bg-gray-100 transition active:scale-95"
+        class="absolute bottom-20 right-4 z-[1000] w-12 h-12 bg-white dark:bg-gray-800 text-gray-200 dark:text-gray-200 rounded-full shadow-lg flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 transition active:scale-95"
         title="Minha localização"
     >
         <svg id="location-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -45,83 +54,83 @@
     </button>
 
     <!-- Layers Panel (abre pelo menu) -->
-    <div id="layers-panel" class="absolute top-14 right-2 z-[1000] bg-white rounded-lg shadow-lg p-3 hidden max-h-[80vh] overflow-y-auto">
-        <h4 class="text-sm font-semibold mb-2 text-gray-700">Mapa Base</h4>
+    <div id="layers-panel" class="absolute top-14 right-2 z-[1000] bg-white dark:bg-gray-800 rounded-lg shadow-lg dark:shadow-gray-900/50 p-3 hidden max-h-[80vh] overflow-y-auto transition-colors duration-200">
+        <h4 class="text-sm font-semibold mb-2 text-white">Mapa Base</h4>
         <div class="space-y-1 mb-3">
             <label class="flex items-center gap-2 text-sm cursor-pointer">
                 <input type="radio" name="base-layer" id="base-street" class="text-primary">
-                <span>Ruas</span>
+                <span class="text-white">Ruas</span>
             </label>
             <label class="flex items-center gap-2 text-sm cursor-pointer">
                 <input type="radio" name="base-layer" id="base-satellite" class="text-primary" checked>
-                <span>Satélite</span>
+                <span class="text-white">Satélite</span>
             </label>
         </div>
 
-        <h4 class="text-sm font-semibold mb-2 text-gray-700 border-t pt-2">Camadas</h4>
+        <h4 class="text-sm font-semibold mb-2 text-white border-t dark:border-gray-700 pt-2">Camadas</h4>
         <div class="space-y-2 mb-3">
             <label class="flex items-center gap-2 text-sm cursor-pointer">
                 <input type="checkbox" id="layer-regionais" class="rounded text-primary">
-                <span>Regionais</span>
+                <span class="text-white">Regionais</span>
             </label>
             <label class="flex items-center gap-2 text-sm cursor-pointer">
                 <input type="checkbox" id="layer-bairros" class="rounded text-primary">
-                <span>Bairros</span>
+                <span class="text-white">Bairros</span>
             </label>
             <label class="flex items-center gap-2 text-sm cursor-pointer">
                 <input type="checkbox" id="layer-limite" class="rounded text-primary" checked>
-                <span>Limite Municipal</span>
+                <span class="text-white">Limite Municipal</span>
             </label>
             <label class="flex items-center gap-2 text-sm cursor-pointer">
                 <input type="checkbox" id="layer-pontos" class="rounded text-primary" checked>
-                <span>Pontos</span>
+                <span class="text-white">Pontos</span>
             </label>
         </div>
 
-        <h4 class="text-sm font-semibold mb-2 text-gray-700 border-t pt-2">Filtrar por Resultado</h4>
+        <h4 class="text-sm font-semibold mb-2 text-white border-t dark:border-gray-700 pt-2">Filtrar por Resultado</h4>
         <div class="space-y-1 text-xs">
             <label class="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" data-resultado="1" class="filter-resultado rounded" checked>
                 <span class="w-3 h-3 rounded-full bg-[#dc2626]"></span>
-                <span>Fenômeno persiste</span>
+                <span class="text-white">Fenômeno persiste</span>
             </label>
             <label class="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" data-resultado="2" class="filter-resultado rounded" checked>
                 <span class="w-3 h-3 rounded-full bg-[#f97316]"></span>
-                <span>Impactado parcialmente</span>
+                <span class="text-white">Impactado parcialmente</span>
             </label>
             <label class="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" data-resultado="3" class="filter-resultado rounded">
                 <span class="w-3 h-3 rounded-full bg-[#1f2937]"></span>
-                <span>Fenômeno Extinto</span>
+                <span class="text-white">Fenômeno Extinto</span>
             </label>
             <label class="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" data-resultado="4" class="filter-resultado rounded" checked>
                 <span class="w-3 h-3 rounded-full bg-[#6b7280]"></span>
-                <span>PSR ausente</span>
+                <span class="text-white">PSR ausente</span>
             </label>
             <label class="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" data-resultado="5" class="filter-resultado rounded">
                 <span class="w-3 h-3 rounded-full bg-[#3b82f6]"></span>
-                <span>Não constatado</span>
+                <span class="text-white">Não constatado</span>
             </label>
             <label class="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" data-resultado="6" class="filter-resultado rounded" checked>
                 <span class="w-3 h-3 rounded-full bg-[#10b981]"></span>
-                <span>Em Conformidade</span>
+                <span class="text-white">Em Conformidade</span>
             </label>
             <label class="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" data-resultado="null" class="filter-resultado rounded" checked>
                 <span class="w-3 h-3 rounded-full bg-[#a855f7]"></span>
-                <span>Sem vistoria</span>
+                <span class="text-white">Sem vistoria</span>
             </label>
         </div>
     </div>
 
     <!-- Bottom Sheet - Point Info -->
-    <div id="bottom-sheet" class="absolute bottom-0 left-0 right-0 z-[1000] bg-white rounded-t-2xl shadow-2xl transform translate-y-full transition-transform duration-300">
+    <div id="bottom-sheet" class="absolute bottom-0 left-0 right-0 z-[1000] bg-white dark:bg-gray-800 rounded-t-2xl shadow-2xl transform translate-y-full transition-all duration-300">
         <div class="p-4">
-            <div class="w-12 h-1 bg-gray-300 rounded-full mx-auto mb-4"></div>
+            <div class="w-12 h-1 bg-gray-300 dark:bg-gray-600 rounded-full mx-auto mb-4"></div>
             <div id="sheet-content">
                 <!-- Content will be dynamically inserted -->
             </div>
@@ -143,7 +152,7 @@
             </svg>
             <span>Vistoria</span>
         </button>
-        <a href="{{ route('profile.edit') }}" class="flex flex-col items-center text-gray-500 text-xs py-1 hover:text-gray-700 transition">
+        <a href="{{ route('profile.edit') }}" class="flex flex-col items-center text-gray-500 text-xs py-1 hover:text-gray-200 transition">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
             </svg>
@@ -164,6 +173,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const lat = urlParams.get('lat');
     const lng = urlParams.get('lng');
     const zoom = urlParams.get('zoom') ? parseInt(urlParams.get('zoom')) : DEFAULT_ZOOM;
+    const pontoId = urlParams.get('ponto_id');
+    const geocoded = urlParams.get('geocoded') === '1';
 
     // Initialize map
     const map = L.map('map', {
@@ -206,16 +217,27 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Adicionar marcador no ponto após o mapa carregar
         map.whenReady(() => {
+            const markerColor = geocoded ? '#10b981' : '#3b82f6';
+            const markerTitle = geocoded ? 'Localização encontrada via geocodificação (OSM)' : 'Ponto selecionado';
+            
             selectedPointMarker = L.circleMarker([pointLat, pointLng], {
                 radius: 12,
-                fillColor: '#3b82f6',
+                fillColor: markerColor,
                 color: '#fff',
                 weight: 3,
                 opacity: 1,
                 fillOpacity: 1
             }).addTo(map);
             
-            selectedPointMarker.bindPopup('Ponto selecionado').openPopup();
+            let popupContent = markerTitle;
+            if (geocoded) {
+                popupContent += '<br><small class="text-gray-600">Coordenadas obtidas do OpenStreetMap</small>';
+                if (pontoId) {
+                    popupContent += `<br><a href="/pontos/${pontoId}" class="text-blue-600 hover:underline text-sm">Ver detalhes do ponto</a>`;
+                }
+            }
+            
+            selectedPointMarker.bindPopup(popupContent).openPopup();
         });
     } else {
         map.setView(BH_CENTER, DEFAULT_ZOOM);
@@ -658,7 +680,7 @@ document.addEventListener('DOMContentLoaded', function() {
                    class="block w-full bg-primary text-white py-3 rounded-lg font-medium text-center hover:bg-primary-dark transition">
                     Registrar Vistoria
                 </a>
-                <button onclick="hideBottomSheet()" class="w-full bg-gray-200 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-300 transition">
+                <button onclick="hideBottomSheet()" class="w-full bg-gray-200 text-gray-200 py-3 rounded-lg font-medium hover:bg-gray-300 transition">
                     Cancelar
                 </button>
             </div>
@@ -667,6 +689,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Expor hideBottomSheet globalmente para o onclick inline
     window.hideBottomSheet = hideBottomSheet;
+
+    // Solicitar localização automaticamente se vier de "Nova Vistoria"
+    if (urlParams.get('nova_vistoria') === '1') {
+        // Aguarda o mapa estar totalmente carregado
+        map.whenReady(() => {
+            // Pequeno delay para garantir que tudo está pronto
+            setTimeout(() => {
+                // Simula o clique no botão de localização
+                const btn = document.getElementById('btn-my-location');
+                if (btn) {
+                    btn.click();
+                }
+            }, 500);
+        });
+    }
 });
 </script>
 @endpush

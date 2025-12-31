@@ -27,14 +27,14 @@
         <table class="w-full">
             <thead class="bg-gray-50">
                 <tr>
-                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Nome</th>
-                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Email</th>
-                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Role</th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-200">Nome</th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-200">Email</th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-200">Role</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200">
                 @forelse($users as $user)
-                    <tr>
+                    <tr class="odd:bg-gray-50 hover:bg-gray-100">
                         <td class="px-4 py-3 font-medium">{{ $user->name }}</td>
                         <td class="px-4 py-3 text-gray-600 text-sm">{{ $user->email }}</td>
                         <td class="px-4 py-3">

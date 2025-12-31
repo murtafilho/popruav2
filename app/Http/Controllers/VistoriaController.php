@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Vistoria;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -69,7 +70,7 @@ class VistoriaController extends Controller
 
         // Filtros
         if ($request->filled('bairro')) {
-            $query->where('e.bairro', 'like', '%' . $request->bairro . '%');
+            $query->where('e.bairro', 'like', '%'.$request->bairro.'%');
         }
 
         if ($request->filled('regional')) {
@@ -89,7 +90,7 @@ class VistoriaController extends Controller
         }
 
         $vistorias = $query->orderBy('v.data_abordagem', 'desc')
-            ->paginate(50);
+            ->paginate(10);
 
         // Dados para filtros
         $bairros = DB::table('ender')
@@ -132,6 +133,7 @@ class VistoriaController extends Controller
             'tipo_abrigo_desmontado_id' => 'nullable|exists:tipo_abrigo_desmontado,id',
             'qtd_kg' => 'nullable|integer|min:0',
             'observacao' => 'nullable|string|max:1000',
+            'fotos.*' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:10240', // Máximo 10MB por foto
             // Campos boolean de complexidade
             'resistencia' => 'nullable|boolean',
             'num_reduzido' => 'nullable|boolean',
@@ -151,7 +153,7 @@ class VistoriaController extends Controller
         // Se não tem ponto_id, precisa criar ou buscar ponto
         $pontoId = $validated['ponto_id'] ?? null;
 
-        if (!$pontoId) {
+        if (! $pontoId) {
             // Buscar ponto próximo (dentro de 50m)
             $pontoProximo = DB::table('pontos')
                 ->whereNotNull('lat')
@@ -173,10 +175,10 @@ class VistoriaController extends Controller
             }
         }
 
-        // Criar vistoria
+        // Criar vistoria usando Eloquent para ter acesso ao Spatie Media Library
         $dataAbordagem = \Carbon\Carbon::createFromFormat('Y-m-d\TH:i', $validated['data_abordagem']);
 
-        DB::table('vistorias')->insert([
+        $vistoria = Vistoria::create([
             'ponto_id' => $pontoId,
             'data_abordagem' => $dataAbordagem,
             'tipo_abordagem_id' => $validated['tipo_abordagem_id'],
@@ -200,9 +202,18 @@ class VistoriaController extends Controller
             'agrupamento_quimico' => $request->boolean('agrupamento_quimico') ? 1 : 0,
             'saude_mental' => $request->boolean('saude_mental') ? 1 : 0,
             'animais' => $request->boolean('animais') ? 1 : 0,
-            'created_at' => now(),
-            'updated_at' => now(),
         ]);
+
+        // Processar upload de fotos usando Spatie Media Library
+        if ($request->hasFile('fotos')) {
+            foreach ($request->file('fotos') as $foto) {
+                if ($foto->isValid()) {
+                    $vistoria->addMedia($foto)
+                        ->usingName($foto->getClientOriginalName())
+                        ->toMediaCollection('fotos');
+                }
+            }
+        }
 
         return redirect()->route('mapa.index')->with('success', 'Vistoria registrada com sucesso!');
     }

@@ -28,6 +28,7 @@ Route::middleware('auth')->group(function () {
     // Mapa e Vistorias
     Route::get('/mapa', [MapaController::class, 'index'])->name('mapa.index');
     Route::get('/pontos', [\App\Http\Controllers\PontoController::class, 'index'])->name('pontos.index');
+    Route::get('/pontos/nao-georreferenciados', [\App\Http\Controllers\PontoController::class, 'naoGeorreferenciados'])->name('pontos.nao-georreferenciados');
     Route::get('/pontos/{id}', [\App\Http\Controllers\PontoController::class, 'show'])->name('pontos.show');
     Route::get('/vistorias', [VistoriaController::class, 'index'])->name('vistorias.index');
     Route::get('/vistorias/create', [VistoriaController::class, 'create'])->name('vistorias.create');

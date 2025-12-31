@@ -4,9 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class Vistoria extends Model
+class Vistoria extends Model implements HasMedia
 {
+    use InteractsWithMedia;
+
     protected $table = 'vistorias';
 
     protected $fillable = [
@@ -73,5 +79,36 @@ class Vistoria extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function fotos(): HasMany
+    {
+        return $this->hasMany(VistoriaFoto::class, 'vistoria_id')->orderBy('ordem');
+    }
+
+    /**
+     * Registrar coleção de mídia para fotos
+     */
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('fotos')
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp']);
+    }
+
+    /**
+     * Conversões de imagem (thumbnails)
+     */
+    public function registerMediaConversions(?Media $media = null): void
+    {
+        $this->addMediaConversion('thumb')
+            ->width(300)
+            ->height(300)
+            ->sharpen(10)
+            ->performOnCollections('fotos');
+
+        $this->addMediaConversion('preview')
+            ->width(800)
+            ->height(600)
+            ->performOnCollections('fotos');
     }
 }

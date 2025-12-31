@@ -28,9 +28,9 @@
 
                     <!-- Email Address -->
                     <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">{{ __('Email') }}</label>
+                        <label for="email" class="block text-sm font-medium text-gray-200 mb-1">{{ __('Email') }}</label>
                         <input id="email" 
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('email') border-red-500 @enderror" 
+                               class="w-full px-3 py-2 border border-gray-600 rounded-lg bg-[#1e2939] text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-[#1e2939] @error('email') border-red-500 @enderror" 
                                type="email" 
                                name="email" 
                                value="{{ old('email', $request->email) }}" 
@@ -44,9 +44,9 @@
 
                     <!-- Password -->
                     <div>
-                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">{{ __('Password') }}</label>
+                        <label for="password" class="block text-sm font-medium text-gray-200 mb-1">{{ __('Password') }}</label>
                         <input id="password" 
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('password') border-red-500 @enderror" 
+                               class="w-full px-3 py-2 border border-gray-600 rounded-lg bg-[#1e2939] text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-[#1e2939] @error('password') border-red-500 @enderror" 
                                type="password" 
                                name="password" 
                                required 
@@ -58,9 +58,9 @@
 
                     <!-- Confirm Password -->
                     <div>
-                        <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-1">{{ __('Confirm Password') }}</label>
+                        <label for="password_confirmation" class="block text-sm font-medium text-gray-200 mb-1">{{ __('Confirm Password') }}</label>
                         <input id="password_confirmation" 
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('password_confirmation') border-red-500 @enderror"
+                               class="w-full px-3 py-2 border border-gray-600 rounded-lg bg-[#1e2939] text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-[#1e2939] @error('password_confirmation') border-red-500 @enderror"
                                type="password"
                                name="password_confirmation" 
                                required 

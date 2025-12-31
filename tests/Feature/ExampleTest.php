@@ -14,6 +14,7 @@ class ExampleTest extends TestCase
     {
         $response = $this->get('/');
 
-        $response->assertStatus(200);
+        // A rota pode redirecionar para login ou dashboard
+        $response->assertStatus(302);
     }
 }

@@ -17,3 +17,5 @@ Route::prefix('geo')->group(function () {
     Route::get('/regionais', [GeoController::class, 'regionais']);
     Route::get('/limite-municipio', [GeoController::class, 'limiteMunicipio']);
 });
+
+Route::post('/geocode', [\App\Http\Controllers\Api\GeocodingController::class, 'geocode']);

@@ -15,12 +15,14 @@ class ImportGeoJson extends Command
     protected $description = 'Importa arquivos GeoJSON de bairros, regionais e limite do município';
 
     private Proj4php $proj4;
+
     private Proj $utmProj;
+
     private Proj $wgs84Proj;
 
     public function handle(): int
     {
-        $this->proj4 = new Proj4php();
+        $this->proj4 = new Proj4php;
         $this->utmProj = new Proj('EPSG:31983', $this->proj4); // UTM zona 23S - SIRGAS 2000
         $this->wgs84Proj = new Proj('EPSG:4326', $this->proj4); // WGS84
 
@@ -65,7 +67,7 @@ class ImportGeoJson extends Command
 
         $bar->finish();
         $this->newLine();
-        $this->info('Bairros importados: ' . count($data['features']));
+        $this->info('Bairros importados: '.count($data['features']));
     }
 
     private function importRegionais(): void
@@ -94,7 +96,7 @@ class ImportGeoJson extends Command
 
         $bar->finish();
         $this->newLine();
-        $this->info('Regionais importadas: ' . count($data['features']));
+        $this->info('Regionais importadas: '.count($data['features']));
     }
 
     private function importLimiteMunicipio(): void

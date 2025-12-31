@@ -13,16 +13,16 @@
 @endsection
 
 @section('content')
-    <div class="h-full overflow-y-auto bg-gray-50 p-4 space-y-4">
-        <div class="bg-white rounded-lg shadow-sm p-4">
+    <div class="h-full overflow-y-auto bg-gray-50 dark:bg-gray-900 p-4 space-y-4 transition-colors duration-200">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-gray-900/50 p-4 transition-colors duration-200">
             @include('profile.partials.update-profile-information-form')
         </div>
 
-        <div class="bg-white rounded-lg shadow-sm p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-gray-900/50 p-4 transition-colors duration-200">
             @include('profile.partials.update-password-form')
         </div>
 
-        <div class="bg-white rounded-lg shadow-sm p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-gray-900/50 p-4 transition-colors duration-200">
             @include('profile.partials.delete-user-form')
         </div>
     </div>

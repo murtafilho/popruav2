@@ -50,7 +50,7 @@ class PontoController extends Controller
         // Para detalhes, usa a view completa com estatísticas
         $ponto = DB::table('v_pontos')->where('id', $id)->first();
 
-        if (!$ponto) {
+        if (! $ponto) {
             return response()->json(['error' => 'Ponto não encontrado'], 404);
         }
 

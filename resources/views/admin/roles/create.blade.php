@@ -1,44 +1,52 @@
-<x-app-layout>
-    <x-slot name="header">
-        <div class="flex items-center gap-3">
-            <a href="{{ route('admin.roles.index') }}" class="p-1 rounded-lg hover:bg-white/10 transition">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                </svg>
-            </a>
-            <h1 class="text-lg font-semibold">Nova Role</h1>
-        </div>
-    </x-slot>
+@extends('layouts.app')
 
-    <div class="p-4">
+@section('title', 'Nova Role')
+
+@section('header')
+    <div class="flex items-center gap-3">
+        <a href="{{ route('admin.roles.index') }}" class="p-2 -ml-2 rounded-lg hover:bg-white/10 transition">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+        </a>
+        <h1 class="text-lg font-semibold flex-1 text-center">Nova Role</h1>
+        <div class="w-10"></div>
+    </div>
+@endsection
+
+@section('content')
+    <div class="h-full overflow-y-auto bg-gray-50 dark:bg-gray-900 p-4 transition-colors duration-200">
         <div class="max-w-xl mx-auto">
-            <form action="{{ route('admin.roles.store') }}" method="POST" class="bg-white rounded-lg shadow-sm p-4">
-        @csrf
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-gray-900/50 p-6 transition-colors duration-200">
+                <form action="{{ route('admin.roles.store') }}" method="POST" class="space-y-4">
+                    @csrf
 
-        <div class="mb-4">
-            <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nome da Role</label>
-            <input
-                type="text"
-                id="name"
-                name="name"
-                value="{{ old('name') }}"
-                class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent @error('name') border-red-500 @enderror"
-                required
-            >
-            @error('name')
-                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-            @enderror
-        </div>
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-200 dark:text-gray-300 mb-1">Nome da Role *</label>
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            value="{{ old('name') }}"
+                            placeholder="Ex: admin, editor, viewer"
+                            class="w-full px-4 py-3 text-base border-2 border-gray-500 dark:border-gray-600 rounded-lg bg-[#1e2939] text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 placeholder:opacity-70 transition-all duration-200 @error('name') border-red-500 focus:ring-red-500 @enderror"
+                            required
+                        >
+                        @error('name')
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-            <div class="flex justify-end gap-3">
-                <a href="{{ route('admin.roles.index') }}" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 text-sm">
-                    Cancelar
-                </a>
-                <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-sm font-medium">
-                    Criar Role
-                </button>
+                    <div class="flex justify-end gap-3 pt-4">
+                        <a href="{{ route('admin.roles.index') }}" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm font-medium transition-colors duration-200">
+                            Cancelar
+                        </a>
+                        <button type="submit" class="px-4 py-2 bg-blue-500 dark:bg-blue-600 text-white rounded-lg hover:bg-blue-600 dark:hover:bg-blue-700 text-sm font-medium transition-colors duration-200">
+                            Criar Role
+                        </button>
+                    </div>
+                </form>
             </div>
-            </form>
         </div>
     </div>
-</x-app-layout>
+@endsection
