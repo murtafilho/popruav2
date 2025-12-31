@@ -1,0 +1,7 @@
+{
+  "enabledMcpjsonServers": [
+    "laravel-boost",
+    "mysql",
+    "context7"
+  ]
+}
