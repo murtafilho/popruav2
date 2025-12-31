@@ -1,59 +1,82 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# POPRUA v2
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sistema de gestão de população em situação de rua desenvolvido com Laravel 12.
 
-## About Laravel
+## 🚀 Funcionalidades
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Sistema de Autenticação Completo**: Login, registro, recuperação de senha e verificação de email
+- **Mapa Interativo**: Visualização de pontos e vistorias em mapa interativo usando Leaflet
+- **Gestão de Vistorias**: Registro e acompanhamento de vistorias realizadas
+- **Gestão de Pontos**: Cadastro e visualização de pontos de abordagem
+- **Views Tabulares**: Listagens paginadas e filtradas de pontos e vistorias
+- **Sistema de Roles e Permissões**: Controle de acesso usando Spatie Permission
+- **Geolocalização**: Integração com API de geolocalização do navegador
+- **Layout Mobile-First**: Interface otimizada para dispositivos móveis
+- **Tradução pt-BR**: Sistema completamente traduzido para português brasileiro
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 📋 Requisitos
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP >= 8.2
+- Composer
+- Node.js e npm
+- Banco de dados (MySQL/PostgreSQL/SQLite)
 
-## Learning Laravel
+## 🔧 Instalação
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+1. Clone o repositório:
+```bash
+git clone https://github.com/seu-usuario/popruav2.git
+cd popruav2
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+2. Instale as dependências do PHP:
+```bash
+composer install
+```
 
-## Laravel Sponsors
+3. Instale as dependências do Node:
+```bash
+npm install
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+4. Configure o arquivo `.env`:
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-### Premium Partners
+5. Configure o banco de dados no `.env` e execute as migrações:
+```bash
+php artisan migrate
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+6. Compile os assets:
+```bash
+npm run build
+```
 
-## Contributing
+7. Inicie o servidor de desenvolvimento:
+```bash
+php artisan serve
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 🗄️ Estrutura do Banco de Dados
 
-## Code of Conduct
+- **users**: Usuários do sistema
+- **pontos**: Pontos de abordagem
+- **vistorias**: Vistorias realizadas
+- **roles**: Roles do sistema (Spatie Permission)
+- **permissions**: Permissões do sistema (Spatie Permission)
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## 🛠️ Tecnologias Utilizadas
 
-## Security Vulnerabilities
+- **Laravel 12**: Framework PHP
+- **Laravel Breeze**: Autenticação
+- **Tailwind CSS**: Framework CSS
+- **Leaflet.js**: Mapas interativos
+- **Alpine.js**: JavaScript reativo
+- **Spatie Permission**: Gerenciamento de roles e permissões
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## 📝 Licença
 
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Este projeto é de código aberto e está disponível sob a licença MIT.
