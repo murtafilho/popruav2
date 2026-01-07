@@ -1,4 +1,10 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(vendor/bin/pint:*)"
+    ]
+  },
   "enabledMcpjsonServers": [
     "laravel-boost",
     "mysql",

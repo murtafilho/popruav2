@@ -16,7 +16,7 @@
         <div id="app" class="min-h-screen flex flex-col">
             <!-- Page Header (opcional, definido por cada view) -->
             @isset($header)
-                <header class="bg-[#1e2939] text-white px-4 py-3 flex items-center justify-between shadow-md z-10 sticky top-0">
+                <header class="bg-blue-600 text-white px-4 py-3 flex items-center justify-between shadow-md z-10 sticky top-0">
                     {{ $header }}
                 </header>
             @endisset

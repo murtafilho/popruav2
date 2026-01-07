@@ -31,7 +31,7 @@
         <div class="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <div class="flex gap-2 text-sm">
                 <a href="{{ route('admin.roles.index') }}" class="text-blue-600 dark:text-blue-400 hover:underline">Roles</a>
-                <span class="text-gray-400 dark:text-gray-500">|</span>
+                <span class="text-gray-400 dark:text-gray-500 dark:text-gray-400">|</span>
                 <a href="{{ route('admin.users.index') }}" class="text-blue-600 dark:text-blue-400 hover:underline">Usuários</a>
             </div>
             <a href="{{ route('admin.permissions.create') }}" class="bg-blue-500 dark:bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-600 dark:hover:bg-blue-700 text-sm font-medium transition-colors duration-200">
@@ -59,7 +59,7 @@
                                             {{ $permission->roles->pluck('name')->join(', ') }}
                                         </span>
                                     @else
-                                        <span class="text-gray-400 dark:text-gray-500">-</span>
+                                        <span class="text-gray-400 dark:text-gray-500 dark:text-gray-400">-</span>
                                     @endif
                                 </td>
                                 <td class="px-4 py-3 text-right">

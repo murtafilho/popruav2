@@ -22,7 +22,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
                         <label class="block text-xs font-medium text-gray-200 dark:text-gray-300 mb-1">Bairro</label>
-                        <select name="bairro" class="w-full px-4 py-3 text-base border-2 border-gray-500 dark:border-gray-600 rounded-lg bg-[#1e2939] text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+                        <select name="bairro" class="w-full px-4 py-3 text-base border-2 border-gray-500 dark:border-gray-600 rounded-lg bg-[#93a6c2] text-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
                             <option value="">Todos</option>
                             @foreach($bairros as $bairro)
                                 <option value="{{ $bairro }}" {{ request('bairro') == $bairro ? 'selected' : '' }}>
@@ -33,7 +33,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-200 dark:text-gray-300 mb-1">Regional</label>
-                        <select name="regional" class="w-full px-4 py-3 text-base border-2 border-gray-500 dark:border-gray-600 rounded-lg bg-[#1e2939] text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+                        <select name="regional" class="w-full px-4 py-3 text-base border-2 border-gray-500 dark:border-gray-600 rounded-lg bg-[#93a6c2] text-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
                             <option value="">Todas</option>
                             @foreach($regionais as $regional)
                                 <option value="{{ $regional }}" {{ request('regional') == $regional ? 'selected' : '' }}>
@@ -44,7 +44,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-200 dark:text-gray-300 mb-1">Resultado</label>
-                        <select name="resultado" class="w-full px-4 py-3 text-base border-2 border-gray-500 dark:border-gray-600 rounded-lg bg-[#1e2939] text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+                        <select name="resultado" class="w-full px-4 py-3 text-base border-2 border-gray-500 dark:border-gray-600 rounded-lg bg-[#93a6c2] text-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
                             <option value="">Todos</option>
                             @foreach($resultados as $resultado)
                                 <option value="{{ $resultado->id }}" {{ request('resultado') == $resultado->id ? 'selected' : '' }}>

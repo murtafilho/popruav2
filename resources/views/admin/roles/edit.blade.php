@@ -30,7 +30,7 @@
                             name="name"
                             value="{{ old('name', $role->name) }}"
                             placeholder="Ex: admin, editor, viewer"
-                            class="w-full px-4 py-3 text-base border-2 border-gray-500 dark:border-gray-600 rounded-lg bg-[#1e2939] text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 placeholder:opacity-70 transition-all duration-200 @error('name') border-red-500 focus:ring-red-500 @enderror"
+                            class="w-full px-4 py-3 text-base border-2 border-gray-500 dark:border-gray-600 rounded-lg bg-[#93a6c2] text-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 placeholder:opacity-70 transition-all duration-200 @error('name') border-red-500 focus:ring-red-500 @enderror"
                             required
                         >
                         @error('name')

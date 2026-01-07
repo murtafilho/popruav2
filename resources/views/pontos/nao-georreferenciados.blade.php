@@ -16,6 +16,18 @@
 
 @section('content')
     <div class="h-full overflow-y-auto bg-gray-50 dark:bg-gray-900 p-4 transition-colors duration-200">
+        <!-- Mensagem de sucesso -->
+        @if(request('success'))
+        <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-4">
+            <div class="flex items-center gap-3">
+                <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                <p class="text-sm text-green-800 dark:text-green-200">Coordenadas salvas com sucesso! O ponto agora aparece no mapa.</p>
+            </div>
+        </div>
+        @endif
+
         <!-- Alerta informativo -->
         <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-4">
             <div class="flex items-start gap-3">
@@ -37,7 +49,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
                         <label class="block text-xs font-medium text-gray-200 dark:text-gray-300 mb-1">Bairro</label>
-                        <select name="bairro" class="w-full px-4 py-3 text-base border-2 border-gray-500 dark:border-gray-600 rounded-lg bg-[#1e2939] text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+                        <select name="bairro" class="w-full px-4 py-3 text-base border-2 border-gray-500 dark:border-gray-600 rounded-lg bg-[#93a6c2] text-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
                             <option value="">Todos</option>
                             @foreach($bairros as $bairro)
                                 <option value="{{ $bairro }}" {{ request('bairro') == $bairro ? 'selected' : '' }}>
@@ -48,7 +60,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-200 dark:text-gray-300 mb-1">Regional</label>
-                        <select name="regional" class="w-full px-4 py-3 text-base border-2 border-gray-500 dark:border-gray-600 rounded-lg bg-[#1e2939] text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+                        <select name="regional" class="w-full px-4 py-3 text-base border-2 border-gray-500 dark:border-gray-600 rounded-lg bg-[#93a6c2] text-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
                             <option value="">Todas</option>
                             @foreach($regionais as $regional)
                                 <option value="{{ $regional }}" {{ request('regional') == $regional ? 'selected' : '' }}>
@@ -59,7 +71,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-200 dark:text-gray-300 mb-1">Resultado</label>
-                        <select name="resultado" class="w-full px-4 py-3 text-base border-2 border-gray-500 dark:border-gray-600 rounded-lg bg-[#1e2939] text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+                        <select name="resultado" class="w-full px-4 py-3 text-base border-2 border-gray-500 dark:border-gray-600 rounded-lg bg-[#93a6c2] text-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
                             <option value="">Todos</option>
                             @foreach($resultados as $resultado)
                                 <option value="{{ $resultado->id }}" {{ request('resultado') == $resultado->id ? 'selected' : '' }}>

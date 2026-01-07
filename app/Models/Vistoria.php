@@ -20,21 +20,32 @@ class Vistoria extends Model implements HasMedia
         'nomes_pessoas',
         'quantidade_pessoas',
         'tipo_abordagem_id',
-        'conformidade',
         'casal',
+        'qtd_casais',
         'classificacao',
         'num_reduzido',
         'catador_reciclados',
         'resistencia',
         'fixacao_antiga',
-        'estrutura_abrigo_provisorio',
         'excesso_objetos',
         'trafico_ilicitos',
-        'menores_idosos',
+        'crianca_adolescente',
+        'idosos',
+        'gestante',
+        'lgbtqiapn',
+        'cena_uso_caracterizada',
+        'qtd_abrigos_provisorios',
+        'abrigos_tipos',
         'deficiente',
         'agrupamento_quimico',
         'saude_mental',
         'animais',
+        'qtd_animais',
+        'conducao_forcas_seguranca',
+        'conducao_forcas_observacao',
+        'apreensao_fiscal',
+        'auto_fiscalizacao_aplicado',
+        'auto_fiscalizacao_numero',
         'e1_id',
         'e2_id',
         'e3_id',
@@ -54,20 +65,26 @@ class Vistoria extends Model implements HasMedia
     {
         return [
             'data_abordagem' => 'date',
-            'conformidade' => 'boolean',
             'casal' => 'boolean',
             'num_reduzido' => 'boolean',
             'catador_reciclados' => 'boolean',
             'resistencia' => 'boolean',
             'fixacao_antiga' => 'boolean',
-            'estrutura_abrigo_provisorio' => 'boolean',
             'excesso_objetos' => 'boolean',
             'trafico_ilicitos' => 'boolean',
-            'menores_idosos' => 'boolean',
+            'crianca_adolescente' => 'boolean',
+            'idosos' => 'boolean',
+            'gestante' => 'boolean',
+            'lgbtqiapn' => 'boolean',
+            'cena_uso_caracterizada' => 'boolean',
+            'abrigos_tipos' => 'array',
             'deficiente' => 'boolean',
             'agrupamento_quimico' => 'boolean',
             'saude_mental' => 'boolean',
             'animais' => 'boolean',
+            'conducao_forcas_seguranca' => 'boolean',
+            'apreensao_fiscal' => 'boolean',
+            'auto_fiscalizacao_aplicado' => 'boolean',
         ];
     }
 
@@ -84,6 +101,22 @@ class Vistoria extends Model implements HasMedia
     public function fotos(): HasMany
     {
         return $this->hasMany(VistoriaFoto::class, 'vistoria_id')->orderBy('ordem');
+    }
+
+    /**
+     * Moradores que entraram no ponto nesta vistoria
+     */
+    public function moradoresEntrada(): HasMany
+    {
+        return $this->hasMany(MoradorHistorico::class, 'vistoria_entrada_id');
+    }
+
+    /**
+     * Moradores que saíram do ponto nesta vistoria
+     */
+    public function moradoresSaida(): HasMany
+    {
+        return $this->hasMany(MoradorHistorico::class, 'vistoria_saida_id');
     }
 
     /**

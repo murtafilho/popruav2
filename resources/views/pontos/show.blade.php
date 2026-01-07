@@ -114,14 +114,14 @@
                                                 <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ \Illuminate\Support\Str::limit($vistoria->nomes_pessoas, 30) }}</div>
                                             @endif
                                         @else
-                                            <span class="text-gray-400 dark:text-gray-500">-</span>
+                                            <span class="text-gray-400 dark:text-gray-500 dark:text-gray-400">-</span>
                                         @endif
                                     </td>
                                     <td class="px-4 py-3 text-gray-200 dark:text-gray-300 hidden md:table-cell">
                                         @if($vistoria->qtd_kg)
                                             {{ $vistoria->qtd_kg }} kg
                                         @else
-                                            <span class="text-gray-400 dark:text-gray-500">-</span>
+                                            <span class="text-gray-400 dark:text-gray-500 dark:text-gray-400">-</span>
                                         @endif
                                     </td>
                                     <td class="px-4 py-3">
@@ -129,7 +129,7 @@
                                             <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
                                                 {{ str_contains($vistoria->resultado_acao, 'persiste') ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' : '' }}
                                                 {{ str_contains($vistoria->resultado_acao, 'parcialmente') ? 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300' : '' }}
-                                                {{ str_contains($vistoria->resultado_acao, 'Extinto') ? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300' : '' }}
+                                                {{ str_contains($vistoria->resultado_acao, 'Deixou de Ocorrer') ? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300' : '' }}
                                                 {{ str_contains($vistoria->resultado_acao, 'ausente') ? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300' : '' }}
                                                 {{ str_contains($vistoria->resultado_acao, 'constatado') ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300' : '' }}
                                                 {{ str_contains($vistoria->resultado_acao, 'Conformidade') ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' : '' }}
@@ -137,7 +137,7 @@
                                                 {{ $vistoria->resultado_acao }}
                                             </span>
                                         @else
-                                            <span class="text-gray-400 dark:text-gray-500">-</span>
+                                            <span class="text-gray-400 dark:text-gray-500 dark:text-gray-400">-</span>
                                         @endif
                                     </td>
                                     <td class="px-4 py-3 text-gray-200 dark:text-gray-300 hidden lg:table-cell">

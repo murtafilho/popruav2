@@ -2,13 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Ponto;
 use App\Models\Vistoria;
+use App\Services\EnderecoBaseService;
+use App\Services\MoradorService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class VistoriaController extends Controller
 {
+    public function __construct(
+        private EnderecoBaseService $enderecoBaseService,
+        private MoradorService $moradorService
+    ) {}
+
     public function create(Request $request): View
     {
         $lat = $request->query('lat');
@@ -17,13 +25,13 @@ class VistoriaController extends Controller
         // Buscar ponto próximo ou criar novo
         $pontoProximo = null;
         if ($lat && $lng) {
-            $pontoProximo = DB::table('pontos as p')
-                ->join('ender as e', 'e.id', '=', 'p.endereco_id')
-                ->select('p.id', 'p.numero', 'p.lat', 'p.lng', 'e.logradouro', 'e.bairro')
-                ->whereNotNull('p.lat')
-                ->whereNotNull('p.lng')
-                ->whereRaw('ST_Distance_Sphere(POINT(p.lng, p.lat), POINT(?, ?)) < 50', [$lng, $lat])
-                ->orderByRaw('ST_Distance_Sphere(POINT(p.lng, p.lat), POINT(?, ?))', [$lng, $lat])
+            $pontoProximo = Ponto::with(['endereco', 'moradores' => function ($query) {
+                $query->whereNotNull('ponto_atual_id');
+            }])
+                ->whereNotNull('lat')
+                ->whereNotNull('lng')
+                ->whereRaw('ST_Distance_Sphere(POINT(lng, lat), POINT(?, ?)) < 50', [$lng, $lat])
+                ->orderByRaw('ST_Distance_Sphere(POINT(lng, lat), POINT(?, ?))', [$lng, $lat])
                 ->first();
         }
 
@@ -128,26 +136,51 @@ class VistoriaController extends Controller
             'data_abordagem' => 'required|date_format:Y-m-d\TH:i',
             'tipo_abordagem_id' => 'required|exists:tipo_abordagem,id',
             'quantidade_pessoas' => 'nullable|integer|min:0',
-            'nomes_pessoas' => 'nullable|string|max:500',
+            'nomes_pessoas' => 'nullable|string',
             'resultado_acao_id' => 'required|exists:resultados_acoes,id',
             'tipo_abrigo_desmontado_id' => 'nullable|exists:tipo_abrigo_desmontado,id',
             'qtd_kg' => 'nullable|integer|min:0',
-            'observacao' => 'nullable|string|max:1000',
-            'fotos.*' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:10240', // Máximo 10MB por foto
+            'observacao' => 'nullable|string',
+            'fotos.*' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:10240',
             // Campos boolean de complexidade
             'resistencia' => 'nullable|boolean',
             'num_reduzido' => 'nullable|boolean',
             'casal' => 'nullable|boolean',
+            'qtd_casais' => 'nullable|integer|min:0',
             'catador_reciclados' => 'nullable|boolean',
             'fixacao_antiga' => 'nullable|boolean',
-            'estrutura_abrigo_provisorio' => 'nullable|boolean',
             'excesso_objetos' => 'nullable|boolean',
             'trafico_ilicitos' => 'nullable|boolean',
-            'menores_idosos' => 'nullable|boolean',
+            'crianca_adolescente' => 'nullable|boolean',
+            'idosos' => 'nullable|boolean',
+            'gestante' => 'nullable|boolean',
+            'lgbtqiapn' => 'nullable|boolean',
+            'cena_uso_caracterizada' => 'nullable|boolean',
             'deficiente' => 'nullable|boolean',
             'agrupamento_quimico' => 'nullable|boolean',
             'saude_mental' => 'nullable|boolean',
             'animais' => 'nullable|boolean',
+            'qtd_animais' => 'nullable|integer|min:0',
+            // Novos campos de abrigos
+            'qtd_abrigos_provisorios' => 'nullable|integer|min:0',
+            'abrigos_tipos' => 'nullable|array',
+            'abrigos_tipos.*' => 'nullable|exists:tipo_abrigo_desmontado,id',
+            // Campos de fiscalização
+            'conducao_forcas_seguranca' => 'nullable|in:0,1',
+            'conducao_forcas_observacao' => 'nullable|string',
+            'apreensao_fiscal' => 'nullable|boolean',
+            'auto_fiscalizacao_aplicado' => 'nullable|in:0,1',
+            'auto_fiscalizacao_numero' => 'nullable|string|max:100',
+            // Moradores
+            'moradores_presentes' => 'nullable|array',
+            'moradores_presentes.*' => 'exists:moradores,id',
+            'novos_moradores' => 'nullable|array',
+            'novos_moradores.*.nome_social' => 'required|string|max:255',
+            'novos_moradores.*.apelido' => 'nullable|string|max:255',
+            'novos_moradores.*.genero' => 'nullable|string|max:100',
+            'novos_moradores.*.documento' => 'nullable|string|max:50',
+            'novos_moradores.*.contato' => 'nullable|string|max:50',
+            'novos_moradores.*.observacoes' => 'nullable|string',
         ]);
 
         // Se não tem ponto_id, precisa criar ou buscar ponto
@@ -164,7 +197,7 @@ class VistoriaController extends Controller
             if ($pontoProximo) {
                 $pontoId = $pontoProximo->id;
             } else {
-                // Criar novo ponto (simplificado - sem endereço)
+                // Criar novo ponto
                 $pontoId = DB::table('pontos')->insertGetId([
                     'lat' => $validated['lat'],
                     'lng' => $validated['lng'],
@@ -172,11 +205,27 @@ class VistoriaController extends Controller
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
+
+                // Buscar e vincular endereço mais próximo da base de endereços
+                $this->enderecoBaseService->vincularEnderecoAoPonto(
+                    $pontoId,
+                    (float) $validated['lat'],
+                    (float) $validated['lng']
+                );
             }
         }
 
         // Criar vistoria usando Eloquent para ter acesso ao Spatie Media Library
         $dataAbordagem = \Carbon\Carbon::createFromFormat('Y-m-d\TH:i', $validated['data_abordagem']);
+
+        // Processar tipos de abrigo (filtrar valores vazios)
+        $abrigosTipos = null;
+        if (! empty($validated['abrigos_tipos'])) {
+            $abrigosTipos = array_values(array_filter($validated['abrigos_tipos'], fn ($v) => ! empty($v)));
+            if (empty($abrigosTipos)) {
+                $abrigosTipos = null;
+            }
+        }
 
         $vistoria = Vistoria::create([
             'ponto_id' => $pontoId,
@@ -189,19 +238,38 @@ class VistoriaController extends Controller
             'qtd_kg' => $validated['qtd_kg'] ?? 0,
             'observacao' => $validated['observacao'] ?? '',
             'user_id' => auth()->id(),
+            // Campos boolean de complexidade
             'resistencia' => $request->boolean('resistencia') ? 1 : 0,
             'num_reduzido' => $request->boolean('num_reduzido') ? 1 : 0,
             'casal' => $request->boolean('casal') ? 1 : 0,
+            'qtd_casais' => $request->boolean('casal') ? ($validated['qtd_casais'] ?? 1) : 0,
             'catador_reciclados' => $request->boolean('catador_reciclados') ? 1 : 0,
             'fixacao_antiga' => $request->boolean('fixacao_antiga') ? 1 : 0,
-            'estrutura_abrigo_provisorio' => $request->boolean('estrutura_abrigo_provisorio') ? 1 : 0,
             'excesso_objetos' => $request->boolean('excesso_objetos') ? 1 : 0,
             'trafico_ilicitos' => $request->boolean('trafico_ilicitos') ? 1 : 0,
-            'menores_idosos' => $request->boolean('menores_idosos') ? 1 : 0,
+            'crianca_adolescente' => $request->boolean('crianca_adolescente') ? 1 : 0,
+            'idosos' => $request->boolean('idosos') ? 1 : 0,
+            'gestante' => $request->boolean('gestante') ? 1 : 0,
+            'lgbtqiapn' => $request->boolean('lgbtqiapn') ? 1 : 0,
+            'cena_uso_caracterizada' => $request->boolean('cena_uso_caracterizada') ? 1 : 0,
             'deficiente' => $request->boolean('deficiente') ? 1 : 0,
             'agrupamento_quimico' => $request->boolean('agrupamento_quimico') ? 1 : 0,
             'saude_mental' => $request->boolean('saude_mental') ? 1 : 0,
             'animais' => $request->boolean('animais') ? 1 : 0,
+            'qtd_animais' => $request->boolean('animais') ? ($validated['qtd_animais'] ?? 1) : 0,
+            // Novos campos de abrigos
+            'qtd_abrigos_provisorios' => $validated['qtd_abrigos_provisorios'] ?? 0,
+            'abrigos_tipos' => $abrigosTipos,
+            // Campos de fiscalização
+            'conducao_forcas_seguranca' => ($validated['conducao_forcas_seguranca'] ?? '0') === '1',
+            'conducao_forcas_observacao' => ($validated['conducao_forcas_seguranca'] ?? '0') === '1'
+                ? ($validated['conducao_forcas_observacao'] ?? '')
+                : null,
+            'apreensao_fiscal' => $request->boolean('apreensao_fiscal') ? 1 : 0,
+            'auto_fiscalizacao_aplicado' => ($validated['auto_fiscalizacao_aplicado'] ?? '0') === '1',
+            'auto_fiscalizacao_numero' => ($validated['auto_fiscalizacao_aplicado'] ?? '0') === '1'
+                ? ($validated['auto_fiscalizacao_numero'] ?? '')
+                : null,
         ]);
 
         // Processar upload de fotos usando Spatie Media Library
@@ -213,6 +281,25 @@ class VistoriaController extends Controller
                         ->toMediaCollection('fotos');
                 }
             }
+        }
+
+        // Processar moradores
+        $ponto = Ponto::find($pontoId);
+
+        // Criar novos moradores e vincular ao ponto
+        if (! empty($validated['novos_moradores'])) {
+            foreach ($validated['novos_moradores'] as $dadosMorador) {
+                $this->moradorService->criarComEntrada($dadosMorador, $ponto, $vistoria);
+            }
+        }
+
+        // Atualizar presença dos moradores existentes
+        if (! empty($validated['moradores_presentes'])) {
+            $this->moradorService->atualizarPresencaVistoria(
+                $ponto,
+                $validated['moradores_presentes'],
+                $vistoria
+            );
         }
 
         return redirect()->route('mapa.index')->with('success', 'Vistoria registrada com sucesso!');

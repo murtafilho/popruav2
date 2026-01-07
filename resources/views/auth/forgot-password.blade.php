@@ -20,7 +20,7 @@
             <div class="bg-white rounded-lg shadow-lg p-6">
                 <h2 class="text-xl font-semibold text-gray-900 mb-4">{{ __('Esqueci minha senha') }}</h2>
                 
-                <p class="mb-4 text-sm text-gray-600">
+                <p class="mb-4 text-sm text-gray-600 dark:text-gray-300">
                     {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
                 </p>
 
@@ -37,7 +37,7 @@
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-200 mb-1">{{ __('Email') }}</label>
                         <input id="email" 
-                               class="w-full px-3 py-2 border border-gray-600 rounded-lg bg-[#1e2939] text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-[#1e2939] @error('email') border-red-500 @enderror" 
+                               class="w-full px-3 py-2 border border-gray-600 rounded-lg bg-[#93a6c2] text-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-[#93a6c2] @error('email') border-red-500 @enderror" 
                                type="email" 
                                name="email" 
                                value="{{ old('email') }}" 

@@ -56,4 +56,37 @@ class PontoController extends Controller
 
         return response()->json($ponto);
     }
+
+    /**
+     * Atualiza as coordenadas de um ponto (geocodificação manual).
+     */
+    public function updateCoordenadas(Request $request, int $id): JsonResponse
+    {
+        $validated = $request->validate([
+            'lat' => 'required|numeric|between:-90,90',
+            'lng' => 'required|numeric|between:-180,180',
+        ]);
+
+        $ponto = DB::table('pontos')->where('id', $id)->first();
+
+        if (! $ponto) {
+            return response()->json(['error' => 'Ponto não encontrado'], 404);
+        }
+
+        DB::table('pontos')
+            ->where('id', $id)
+            ->update([
+                'lat' => $validated['lat'],
+                'lng' => $validated['lng'],
+                'updated_at' => now(),
+            ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Coordenadas atualizadas com sucesso',
+            'ponto_id' => $id,
+            'lat' => $validated['lat'],
+            'lng' => $validated['lng'],
+        ]);
+    }
 }

@@ -2,6 +2,23 @@
 
 @section('title', 'Mapa')
 
+@push('styles')
+<style>
+    .bairro-label,
+    .regional-label {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+    .bairro-label span,
+    .regional-label span {
+        display: inline-block;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+    }
+</style>
+@endpush
+
 @section('header')
     <div class="flex items-center gap-3">
         <a href="{{ route('dashboard') }}" class="flex items-center gap-3 hover:opacity-80 transition">
@@ -55,74 +72,74 @@
 
     <!-- Layers Panel (abre pelo menu) -->
     <div id="layers-panel" class="absolute top-14 right-2 z-[1000] bg-white dark:bg-gray-800 rounded-lg shadow-lg dark:shadow-gray-900/50 p-3 hidden max-h-[80vh] overflow-y-auto transition-colors duration-200">
-        <h4 class="text-sm font-semibold mb-2 text-white">Mapa Base</h4>
+        <h4 class="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Mapa Base</h4>
         <div class="space-y-1 mb-3">
             <label class="flex items-center gap-2 text-sm cursor-pointer">
-                <input type="radio" name="base-layer" id="base-street" class="text-primary">
-                <span class="text-white">Ruas</span>
+                <input type="radio" name="base-layer" id="base-street" class="text-blue-500">
+                <span class="text-gray-700 dark:text-gray-200">Ruas</span>
             </label>
             <label class="flex items-center gap-2 text-sm cursor-pointer">
-                <input type="radio" name="base-layer" id="base-satellite" class="text-primary" checked>
-                <span class="text-white">Satélite</span>
+                <input type="radio" name="base-layer" id="base-satellite" class="text-blue-500" checked>
+                <span class="text-gray-700 dark:text-gray-200">Satélite</span>
             </label>
         </div>
 
-        <h4 class="text-sm font-semibold mb-2 text-white border-t dark:border-gray-700 pt-2">Camadas</h4>
+        <h4 class="text-sm font-semibold mb-2 text-gray-900 dark:text-white border-t border-gray-200 dark:border-gray-700 pt-2">Camadas</h4>
         <div class="space-y-2 mb-3">
             <label class="flex items-center gap-2 text-sm cursor-pointer">
-                <input type="checkbox" id="layer-regionais" class="rounded text-primary">
-                <span class="text-white">Regionais</span>
+                <input type="checkbox" id="layer-regionais" class="rounded text-blue-500">
+                <span class="text-gray-700 dark:text-gray-200">Regionais</span>
             </label>
             <label class="flex items-center gap-2 text-sm cursor-pointer">
-                <input type="checkbox" id="layer-bairros" class="rounded text-primary">
-                <span class="text-white">Bairros</span>
+                <input type="checkbox" id="layer-bairros" class="rounded text-blue-500">
+                <span class="text-gray-700 dark:text-gray-200">Bairros</span>
             </label>
             <label class="flex items-center gap-2 text-sm cursor-pointer">
-                <input type="checkbox" id="layer-limite" class="rounded text-primary" checked>
-                <span class="text-white">Limite Municipal</span>
+                <input type="checkbox" id="layer-limite" class="rounded text-blue-500" checked>
+                <span class="text-gray-700 dark:text-gray-200">Limite Municipal</span>
             </label>
             <label class="flex items-center gap-2 text-sm cursor-pointer">
-                <input type="checkbox" id="layer-pontos" class="rounded text-primary" checked>
-                <span class="text-white">Pontos</span>
+                <input type="checkbox" id="layer-pontos" class="rounded text-blue-500" checked>
+                <span class="text-gray-700 dark:text-gray-200">Pontos</span>
             </label>
         </div>
 
-        <h4 class="text-sm font-semibold mb-2 text-white border-t dark:border-gray-700 pt-2">Filtrar por Resultado</h4>
+        <h4 class="text-sm font-semibold mb-2 text-gray-900 dark:text-white border-t border-gray-200 dark:border-gray-700 pt-2">Filtrar por Resultado</h4>
         <div class="space-y-1 text-xs">
             <label class="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" data-resultado="1" class="filter-resultado rounded" checked>
                 <span class="w-3 h-3 rounded-full bg-[#dc2626]"></span>
-                <span class="text-white">Fenômeno persiste</span>
+                <span class="text-gray-700 dark:text-gray-200">Fenômeno persiste</span>
             </label>
             <label class="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" data-resultado="2" class="filter-resultado rounded" checked>
                 <span class="w-3 h-3 rounded-full bg-[#f97316]"></span>
-                <span class="text-white">Impactado parcialmente</span>
+                <span class="text-gray-700 dark:text-gray-200">Impactado parcialmente</span>
             </label>
             <label class="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" data-resultado="3" class="filter-resultado rounded">
                 <span class="w-3 h-3 rounded-full bg-[#1f2937]"></span>
-                <span class="text-white">Fenômeno Extinto</span>
+                <span class="text-gray-700 dark:text-gray-200">Deixou de Ocorrer</span>
             </label>
             <label class="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" data-resultado="4" class="filter-resultado rounded" checked>
                 <span class="w-3 h-3 rounded-full bg-[#6b7280]"></span>
-                <span class="text-white">PSR ausente</span>
+                <span class="text-gray-700 dark:text-gray-200">PSR ausente</span>
             </label>
             <label class="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" data-resultado="5" class="filter-resultado rounded">
                 <span class="w-3 h-3 rounded-full bg-[#3b82f6]"></span>
-                <span class="text-white">Não constatado</span>
+                <span class="text-gray-700 dark:text-gray-200">Não constatado</span>
             </label>
             <label class="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" data-resultado="6" class="filter-resultado rounded" checked>
                 <span class="w-3 h-3 rounded-full bg-[#10b981]"></span>
-                <span class="text-white">Em Conformidade</span>
+                <span class="text-gray-700 dark:text-gray-200">Em Conformidade</span>
             </label>
             <label class="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" data-resultado="null" class="filter-resultado rounded" checked>
                 <span class="w-3 h-3 rounded-full bg-[#a855f7]"></span>
-                <span class="text-white">Sem vistoria</span>
+                <span class="text-gray-700 dark:text-gray-200">Sem vistoria</span>
             </label>
         </div>
     </div>
@@ -136,11 +153,12 @@
             </div>
         </div>
     </div>
+
 @endsection
 
 @section('footer')
     <div class="flex justify-around">
-        <button class="flex flex-col items-center text-primary text-xs py-1">
+        <button class="flex flex-col items-center text-blue-500 text-xs py-1">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
             </svg>
@@ -208,39 +226,115 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Variável para armazenar marcador do ponto selecionado
     let selectedPointMarker = null;
+    let geocodeMarker = null; // Marcador para modo geocodificação
+    let geocodeMode = geocoded && pontoId; // Modo de geocodificação ativo
+    let currentGeocodeCoords = null; // Coordenadas atuais para geocodificação
+
+    // Função para atualizar coordenadas exibidas
+    function updateGeocodeCoords(lat, lng) {
+        currentGeocodeCoords = { lat, lng };
+        const coordsEl = document.getElementById('geocode-coords');
+        if (coordsEl) {
+            coordsEl.textContent = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
+        }
+    }
+
+    // Função para criar/mover marcador de geocodificação
+    function setGeocodeMarker(lat, lng, isInitial = false) {
+        // Remove marcador anterior se existir
+        if (geocodeMarker) {
+            map.removeLayer(geocodeMarker);
+        }
+
+        // Cor amarela para marcador inicial, verde para reposicionado
+        const markerColor = isInitial ? '#eab308' : '#10b981';
+
+        geocodeMarker = L.circleMarker([lat, lng], {
+            radius: 14,
+            fillColor: markerColor,
+            color: '#fff',
+            weight: 3,
+            opacity: 1,
+            fillOpacity: 1
+        }).addTo(map);
+
+        updateGeocodeCoords(lat, lng);
+    }
 
     // Se há coordenadas na URL, usar elas; senão usar o padrão
     if (lat && lng) {
         const pointLat = parseFloat(lat);
         const pointLng = parseFloat(lng);
         map.setView([pointLat, pointLng], zoom);
-        
+
         // Adicionar marcador no ponto após o mapa carregar
         map.whenReady(() => {
-            const markerColor = geocoded ? '#10b981' : '#3b82f6';
-            const markerTitle = geocoded ? 'Localização encontrada via geocodificação (OSM)' : 'Ponto selecionado';
-            
-            selectedPointMarker = L.circleMarker([pointLat, pointLng], {
-                radius: 12,
-                fillColor: markerColor,
-                color: '#fff',
-                weight: 3,
-                opacity: 1,
-                fillOpacity: 1
-            }).addTo(map);
-            
-            let popupContent = markerTitle;
-            if (geocoded) {
-                popupContent += '<br><small class="text-gray-600">Coordenadas obtidas do OpenStreetMap</small>';
-                if (pontoId) {
-                    popupContent += `<br><a href="/pontos/${pontoId}" class="text-blue-600 hover:underline text-sm">Ver detalhes do ponto</a>`;
-                }
+            if (geocodeMode) {
+                // Modo geocodificação: mostrar marcador amarelo
+                setGeocodeMarker(pointLat, pointLng, true);
+            } else {
+                // Modo normal: marcador azul
+                selectedPointMarker = L.circleMarker([pointLat, pointLng], {
+                    radius: 12,
+                    fillColor: '#3b82f6',
+                    color: '#fff',
+                    weight: 3,
+                    opacity: 1,
+                    fillOpacity: 1
+                }).addTo(map);
+
+                selectedPointMarker.bindPopup('Ponto selecionado').openPopup();
             }
-            
-            selectedPointMarker.bindPopup(popupContent).openPopup();
         });
     } else {
         map.setView(BH_CENTER, DEFAULT_ZOOM);
+    }
+
+    // Handler para clique no mapa em modo geocodificação
+    if (geocodeMode) {
+        map.on('click', function(e) {
+            setGeocodeMarker(e.latlng.lat, e.latlng.lng, false);
+        });
+
+        // Handler para botão de confirmação
+        document.getElementById('btn-confirmar-geocode').addEventListener('click', async function() {
+            if (!currentGeocodeCoords) return;
+
+            const btn = this;
+            btn.disabled = true;
+            btn.innerHTML = '<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Salvando...';
+
+            try {
+                const response = await fetch(`/api/pontos/${pontoId}/coordenadas`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        lat: currentGeocodeCoords.lat,
+                        lng: currentGeocodeCoords.lng
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Sucesso - redireciona para lista com mensagem
+                    window.location.href = '/pontos/nao-georreferenciados?success=1';
+                } else {
+                    alert('Erro ao salvar coordenadas: ' + (data.message || 'Erro desconhecido'));
+                    btn.disabled = false;
+                    btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Confirmar';
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao salvar coordenadas. Tente novamente.');
+                btn.disabled = false;
+                btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Confirmar';
+            }
+        });
     }
 
     // Layers - usando MarkerClusterGroup para melhor performance
@@ -253,7 +347,9 @@ document.addEventListener('DOMContentLoaded', function() {
         disableClusteringAtZoom: 18
     }).addTo(map);
     let regionaisLayer = null;
+    let regionaisLabelsLayer = null;
     let bairrosLayer = null;
+    let bairrosLabelsLayer = null;
     let limiteLayer = null;
     let allPointsLoaded = false;
     let allMarkers = []; // Armazena todos os markers para filtrar
@@ -284,7 +380,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const coresResultado = {
         1: '#dc2626', // Fenômeno persiste - Vermelho
         2: '#f97316', // Impactado parcialmente - Laranja
-        3: '#1f2937', // Fenômeno Extinto - Preto
+        3: '#1f2937', // Deixou de Ocorrer - Preto
         4: '#6b7280', // PSR ausente - Cinza
         5: '#3b82f6', // Fenômeno não constatado - Azul
         6: '#10b981', // Em Conformidade - Verde escuro
@@ -294,7 +390,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const legendaResultado = {
         1: 'Fenômeno persiste',
         2: 'Impactado parcialmente',
-        3: 'Fenômeno Extinto',
+        3: 'Deixou de Ocorrer',
         4: 'PSR ausente',
         5: 'Não constatado',
         6: 'Em Conformidade',
@@ -316,6 +412,42 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
         });
+
+        // Criar layer de labels das regionais
+        regionaisLabelsLayer = L.layerGroup();
+        data.features.forEach(feature => {
+            if (feature.properties && feature.properties.nome) {
+                // Calcular centroide do polígono
+                const bounds = L.geoJSON(feature).getBounds();
+                const center = bounds.getCenter();
+
+                const label = L.marker(center, {
+                    icon: L.divIcon({
+                        className: 'regional-label',
+                        html: `<span class="px-2 py-1 bg-blue-500/90 text-white text-xs font-bold rounded shadow-sm whitespace-nowrap">${feature.properties.nome}</span>`,
+                        iconSize: null,
+                        iconAnchor: [0, 0]
+                    })
+                });
+                regionaisLabelsLayer.addLayer(label);
+            }
+        });
+    }
+
+    // Controlar visibilidade das labels de regionais baseado no zoom
+    function updateRegionaisLabels() {
+        if (!regionaisLabelsLayer || !document.getElementById('layer-regionais').checked) return;
+
+        const zoom = map.getZoom();
+        if (zoom >= 12 && zoom < 15) {
+            if (!map.hasLayer(regionaisLabelsLayer)) {
+                regionaisLabelsLayer.addTo(map);
+            }
+        } else {
+            if (map.hasLayer(regionaisLabelsLayer)) {
+                map.removeLayer(regionaisLabelsLayer);
+            }
+        }
     }
 
     async function loadBairros() {
@@ -332,7 +464,49 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
         });
+
+        // Criar layer de labels dos bairros
+        bairrosLabelsLayer = L.layerGroup();
+        data.features.forEach(feature => {
+            if (feature.properties && feature.properties.nome) {
+                // Calcular centroide do polígono
+                const bounds = L.geoJSON(feature).getBounds();
+                const center = bounds.getCenter();
+
+                const label = L.marker(center, {
+                    icon: L.divIcon({
+                        className: 'bairro-label',
+                        html: `<span class="px-2 py-1 bg-white/90 dark:bg-gray-800/90 text-gray-800 dark:text-gray-200 text-xs font-medium rounded shadow-sm whitespace-nowrap">${feature.properties.nome}</span>`,
+                        iconSize: null,
+                        iconAnchor: [0, 0]
+                    })
+                });
+                bairrosLabelsLayer.addLayer(label);
+            }
+        });
     }
+
+    // Controlar visibilidade das labels de bairros baseado no zoom
+    function updateBairrosLabels() {
+        if (!bairrosLabelsLayer || !document.getElementById('layer-bairros').checked) return;
+
+        const zoom = map.getZoom();
+        if (zoom >= 15) {
+            if (!map.hasLayer(bairrosLabelsLayer)) {
+                bairrosLabelsLayer.addTo(map);
+            }
+        } else {
+            if (map.hasLayer(bairrosLabelsLayer)) {
+                map.removeLayer(bairrosLabelsLayer);
+            }
+        }
+    }
+
+    // Listener de zoom para labels
+    map.on('zoomend', function() {
+        updateRegionaisLabels();
+        updateBairrosLabels();
+    });
 
     async function loadLimite() {
         if (limiteLayer) return;
@@ -454,8 +628,14 @@ document.addEventListener('DOMContentLoaded', function() {
         if (this.checked) {
             await loadRegionais();
             regionaisLayer.addTo(map);
-        } else if (regionaisLayer) {
-            map.removeLayer(regionaisLayer);
+            updateRegionaisLabels(); // Mostrar labels se zoom >= 12 e < 15
+        } else {
+            if (regionaisLayer) {
+                map.removeLayer(regionaisLayer);
+            }
+            if (regionaisLabelsLayer) {
+                map.removeLayer(regionaisLabelsLayer);
+            }
         }
     });
 
@@ -463,8 +643,14 @@ document.addEventListener('DOMContentLoaded', function() {
         if (this.checked) {
             await loadBairros();
             bairrosLayer.addTo(map);
-        } else if (bairrosLayer) {
-            map.removeLayer(bairrosLayer);
+            updateBairrosLabels(); // Mostrar labels se zoom >= 15
+        } else {
+            if (bairrosLayer) {
+                map.removeLayer(bairrosLayer);
+            }
+            if (bairrosLabelsLayer) {
+                map.removeLayer(bairrosLabelsLayer);
+            }
         }
     });
 
@@ -505,7 +691,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Mostra loading
         showBottomSheet(`
             <div class="flex items-center justify-center py-4">
-                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
             </div>
         `);
 
@@ -515,25 +701,25 @@ document.addEventListener('DOMContentLoaded', function() {
             const details = await response.json();
 
             showBottomSheet(`
-                <h3 class="text-lg font-semibold mb-2">${details.logradouro}, ${details.numero}</h3>
-                <p class="text-sm text-gray-600 mb-3">${details.bairro} - ${details.regional}</p>
+                <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">${details.logradouro}, ${details.numero}</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">${details.bairro} - ${details.regional}</p>
                 <div class="grid grid-cols-3 gap-2 mb-4">
-                    <div class="bg-gray-100 rounded-lg p-2 text-center">
-                        <div class="text-lg font-bold text-primary">${details.contador || 0}</div>
-                        <div class="text-xs text-gray-500">Vistorias</div>
+                    <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-2 text-center">
+                        <div class="text-lg font-bold text-blue-500">${details.contador || 0}</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">Vistorias</div>
                     </div>
-                    <div class="bg-gray-100 rounded-lg p-2 text-center">
-                        <div class="text-lg font-bold text-primary">${details.soma_kg || 0}</div>
-                        <div class="text-xs text-gray-500">Kg</div>
+                    <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-2 text-center">
+                        <div class="text-lg font-bold text-blue-500">${details.soma_kg || 0}</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">Kg</div>
                     </div>
-                    <div class="bg-gray-100 rounded-lg p-2 text-center">
-                        <div class="text-lg font-bold text-primary">${details.complexidade || 0}</div>
-                        <div class="text-xs text-gray-500">Complex.</div>
+                    <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-2 text-center">
+                        <div class="text-lg font-bold text-blue-500">${details.complexidade || 0}</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">Complex.</div>
                     </div>
                 </div>
                 <button
                     onclick="window.location.href='/pontos/${details.id}/vistorias/create'"
-                    class="w-full bg-primary text-white py-3 rounded-lg font-medium hover:bg-primary-dark transition"
+                    class="w-full bg-blue-500 text-white py-3 rounded-lg font-medium hover:bg-blue-600 transition"
                 >
                     Nova Vistoria
                 </button>
@@ -556,7 +742,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function enableVistoriaButton() {
         btnVistoria.disabled = false;
         btnVistoria.classList.remove('text-gray-300', 'cursor-not-allowed');
-        btnVistoria.classList.add('text-primary');
+        btnVistoria.classList.add('text-blue-500');
     }
 
     function setUserLocation(lat, lng, accuracy = null) {
@@ -640,7 +826,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // Restaura botão com cor primária
                     restoreButton();
-                    btn.classList.add('text-primary');
+                    btn.classList.add('text-blue-500');
                 },
                 error => {
                     // Restaura botão ao estado normal
@@ -656,11 +842,19 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Clique no mapa move o marcador de localização
+    // Clique no mapa cria ponto provisório, ajusta zoom e habilita vistoria
     map.on('click', function(e) {
-        if (locationMode && userLocationMarker) {
-            setUserLocation(e.latlng.lat, e.latlng.lng);
+        // Cria/move o marcador provisório
+        setUserLocation(e.latlng.lat, e.latlng.lng);
+
+        // Ajusta zoom para 17 se estiver menor
+        if (map.getZoom() < 17) {
+            map.setView(e.latlng, 17);
         }
+
+        // Ativa o modo de seleção
+        locationMode = true;
+
         hideBottomSheet();
     });
 
@@ -669,18 +863,18 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!currentLocation) return;
 
         showBottomSheet(`
-            <h3 class="text-lg font-semibold mb-2">Nova Vistoria</h3>
-            <p class="text-sm text-gray-600 mb-4">
+            <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">Nova Vistoria</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
                 <strong>Localização:</strong><br>
                 Lat: ${currentLocation.lat.toFixed(6)}<br>
                 Lng: ${currentLocation.lng.toFixed(6)}
             </p>
             <div class="space-y-3">
                 <a href="/vistorias/create?lat=${currentLocation.lat}&lng=${currentLocation.lng}"
-                   class="block w-full bg-primary text-white py-3 rounded-lg font-medium text-center hover:bg-primary-dark transition">
+                   class="block w-full bg-blue-500 text-white py-3 rounded-lg font-medium text-center hover:bg-blue-600 transition">
                     Registrar Vistoria
                 </a>
-                <button onclick="hideBottomSheet()" class="w-full bg-gray-200 text-gray-200 py-3 rounded-lg font-medium hover:bg-gray-300 transition">
+                <button onclick="hideBottomSheet()" class="w-full bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 py-3 rounded-lg font-medium hover:bg-gray-100 dark:hover:bg-gray-600 transition border border-gray-300 dark:border-gray-600">
                     Cancelar
                 </button>
             </div>

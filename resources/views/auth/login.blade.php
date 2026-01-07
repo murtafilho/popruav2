@@ -33,7 +33,7 @@
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-200 dark:text-gray-300 mb-1">{{ __('Email') }}</label>
                         <input id="email" 
-                               class="w-full px-4 py-3 text-base border-2 border-gray-500 dark:border-gray-600 rounded-lg bg-[#1e2939] text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 placeholder:opacity-70 transition-all duration-200 @error('email') border-red-500 focus:ring-red-500 @enderror" 
+                               class="w-full px-4 py-3 text-base border-2 border-gray-500 dark:border-gray-600 rounded-lg bg-[#93a6c2] text-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 placeholder:opacity-70 transition-all duration-200 @error('email') border-red-500 focus:ring-red-500 @enderror" 
                                type="email" 
                                name="email" 
                                value="{{ old('email') }}" 
@@ -49,7 +49,7 @@
                     <div>
                         <label for="password" class="block text-sm font-medium text-gray-200 dark:text-gray-300 mb-1">{{ __('Password') }}</label>
                         <input id="password" 
-                               class="w-full px-4 py-3 text-base border-2 border-gray-500 dark:border-gray-600 rounded-lg bg-[#1e2939] text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 placeholder:opacity-70 transition-all duration-200 @error('password') border-red-500 focus:ring-red-500 @enderror"
+                               class="w-full px-4 py-3 text-base border-2 border-gray-500 dark:border-gray-600 rounded-lg bg-[#93a6c2] text-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 placeholder:opacity-70 transition-all duration-200 @error('password') border-red-500 focus:ring-red-500 @enderror"
                                type="password"
                                name="password"
                                required 

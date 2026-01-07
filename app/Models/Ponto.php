@@ -29,6 +29,22 @@ class Ponto extends Model
         return $this->hasMany(Vistoria::class, 'ponto_id');
     }
 
+    /**
+     * Moradores atualmente neste ponto
+     */
+    public function moradores(): HasMany
+    {
+        return $this->hasMany(Morador::class, 'ponto_atual_id');
+    }
+
+    /**
+     * Histórico de todos moradores que já passaram por este ponto
+     */
+    public function historicoMoradores(): HasMany
+    {
+        return $this->hasMany(MoradorHistorico::class, 'ponto_id')->orderByDesc('data_entrada');
+    }
+
     public function scopeInBounds($query, float $north, float $south, float $east, float $west)
     {
         return $query->whereNotNull('lat')

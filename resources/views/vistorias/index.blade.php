@@ -22,7 +22,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                     <div>
                         <label class="block text-xs font-medium text-gray-200 dark:text-gray-300 mb-1">Bairro</label>
-                        <select name="bairro" class="w-full px-4 py-3 text-base border-2 border-gray-500 dark:border-gray-600 rounded-lg bg-[#1e2939] text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+                        <select name="bairro" class="w-full px-4 py-3 text-base border-2 border-gray-500 dark:border-gray-600 rounded-lg bg-[#93a6c2] text-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
                             <option value="">Todos</option>
                             @foreach($bairros as $bairro)
                                 <option value="{{ $bairro }}" {{ request('bairro') == $bairro ? 'selected' : '' }}>
@@ -33,7 +33,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-200 dark:text-gray-300 mb-1">Regional</label>
-                        <select name="regional" class="w-full px-4 py-3 text-base border-2 border-gray-500 dark:border-gray-600 rounded-lg bg-[#1e2939] text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+                        <select name="regional" class="w-full px-4 py-3 text-base border-2 border-gray-500 dark:border-gray-600 rounded-lg bg-[#93a6c2] text-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
                             <option value="">Todas</option>
                             @foreach($regionais as $regional)
                                 <option value="{{ $regional }}" {{ request('regional') == $regional ? 'selected' : '' }}>
@@ -44,7 +44,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-200 dark:text-gray-300 mb-1">Resultado</label>
-                        <select name="resultado" class="w-full px-4 py-3 text-base border-2 border-gray-500 dark:border-gray-600 rounded-lg bg-[#1e2939] text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+                        <select name="resultado" class="w-full px-4 py-3 text-base border-2 border-gray-500 dark:border-gray-600 rounded-lg bg-[#93a6c2] text-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
                             <option value="">Todos</option>
                             @foreach($resultados as $resultado)
                                 <option value="{{ $resultado->id }}" {{ request('resultado') == $resultado->id ? 'selected' : '' }}>
@@ -57,12 +57,12 @@
                         <div>
                             <label class="block text-xs font-medium text-gray-200 dark:text-gray-300 mb-1">Data Início</label>
                             <input type="date" name="data_inicio" value="{{ request('data_inicio') }}" 
-                                   class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-[#1e2939] text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-[#93a6c2] text-black focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-gray-200 dark:text-gray-300 mb-1">Data Fim</label>
                             <input type="date" name="data_fim" value="{{ request('data_fim') }}" 
-                                   class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-[#1e2939] text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-[#93a6c2] text-black focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         </div>
                     </div>
                 </div>
@@ -137,14 +137,14 @@
                                     @if($vistoria->quantidade_pessoas)
                                         {{ $vistoria->quantidade_pessoas }}
                                     @else
-                                        <span class="text-gray-400 dark:text-gray-500">-</span>
+                                        <span class="text-gray-400 dark:text-gray-500 dark:text-gray-400">-</span>
                                     @endif
                                 </td>
                                 <td class="px-4 py-3 text-gray-200 dark:text-gray-300 hidden lg:table-cell">
                                     @if($vistoria->qtd_kg)
                                         {{ $vistoria->qtd_kg }} kg
                                     @else
-                                        <span class="text-gray-400 dark:text-gray-500">-</span>
+                                        <span class="text-gray-400 dark:text-gray-500 dark:text-gray-400">-</span>
                                     @endif
                                 </td>
                                 <td class="px-4 py-3">
@@ -152,7 +152,7 @@
                                         <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
                                             {{ str_contains($vistoria->resultado_acao, 'persiste') ? 'bg-red-100 text-red-800' : '' }}
                                             {{ str_contains($vistoria->resultado_acao, 'parcialmente') ? 'bg-orange-100 text-orange-800' : '' }}
-                                            {{ str_contains($vistoria->resultado_acao, 'Extinto') ? 'bg-gray-100 text-gray-800' : '' }}
+                                            {{ str_contains($vistoria->resultado_acao, 'Deixou de Ocorrer') ? 'bg-gray-100 text-gray-800' : '' }}
                                             {{ str_contains($vistoria->resultado_acao, 'ausente') ? 'bg-gray-100 text-gray-800' : '' }}
                                             {{ str_contains($vistoria->resultado_acao, 'constatado') ? 'bg-blue-100 text-blue-800' : '' }}
                                             {{ str_contains($vistoria->resultado_acao, 'Conformidade') ? 'bg-green-100 text-green-800' : '' }}

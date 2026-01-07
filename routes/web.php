@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserRoleController;
 use App\Http\Controllers\MapaController;
+use App\Http\Controllers\MoradorController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\VistoriaController;
 use Illuminate\Support\Facades\Route;
@@ -25,6 +26,11 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // Power BI
+    Route::get('/powerbi', function () {
+        return view('powerbi.index');
+    })->name('powerbi.index')->can('ver relatorios');
+
     // Mapa e Vistorias
     Route::get('/mapa', [MapaController::class, 'index'])->name('mapa.index');
     Route::get('/pontos', [\App\Http\Controllers\PontoController::class, 'index'])->name('pontos.index');
@@ -33,6 +39,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/vistorias', [VistoriaController::class, 'index'])->name('vistorias.index');
     Route::get('/vistorias/create', [VistoriaController::class, 'create'])->name('vistorias.create');
     Route::post('/vistorias', [VistoriaController::class, 'store'])->name('vistorias.store');
+
+    // Moradores
+    Route::resource('moradores', MoradorController::class)->parameters(['moradores' => 'morador']);
 
     // Admin routes
     Route::prefix('admin')->name('admin.')->group(function () {
