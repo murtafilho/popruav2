@@ -958,7 +958,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="sheet-stat-label">Complex.</div>
                     </div>
                 </div>
-                <button onclick="window.location.href=`${APP_BASE}/pontos/${details.id}/vistorias/create`" class="btn btn-primary btn-block">
+                <button onclick="window.location.href='${APP_BASE}/pontos/${details.id}/vistorias/create'" class="btn btn-primary btn-block">
                     Nova Vistoria
                 </button>
             `);
