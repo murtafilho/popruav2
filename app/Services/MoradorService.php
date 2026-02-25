@@ -160,7 +160,7 @@ class MoradorService
                     ->orWhere('apelido', 'like', "%{$termo}%")
                     ->orWhere('nome_registro', 'like', "%{$termo}%");
             })
-            ->with(['pontoAtual.endereco']);
+            ->with(['pontoAtual.enderecoAtualizado']);
 
         if ($excluirPontoId) {
             $query->where(function ($q) use ($excluirPontoId) {
@@ -178,7 +178,7 @@ class MoradorService
     public function getHistorico(Morador $morador): Collection
     {
         return $morador->historico()
-            ->with(['ponto.endereco', 'vistoriaEntrada', 'vistoriaSaida'])
+            ->with(['ponto.enderecoAtualizado', 'vistoriaEntrada', 'vistoriaSaida'])
             ->get();
     }
 
