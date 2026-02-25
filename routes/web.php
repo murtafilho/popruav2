@@ -26,10 +26,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Power BI
-    Route::get('/powerbi', function () {
-        return view('powerbi.index');
-    })->name('powerbi.index')->can('ver relatorios');
+
 
     // Mapa e Vistorias
     Route::get('/mapa', [MapaController::class, 'index'])->name('mapa.index');
@@ -57,4 +54,9 @@ Route::middleware('auth')->group(function () {
     });
 });
 
-require __DIR__.'/auth.php';
+// Power BI - rota publica (sem autenticacao)
+Route::get("/powerbi", function () {
+    return view("powerbi.index");
+})->name("powerbi.index");
+
+require __DIR__."/auth.php";

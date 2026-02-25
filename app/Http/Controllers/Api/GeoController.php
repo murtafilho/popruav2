@@ -4,86 +4,83 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class GeoController extends Controller
 {
+    // Dados geográficos são estáticos — cache de 24h
+    private const TTL = 86400;
+
     public function bairros(): JsonResponse
     {
-        $bairros = DB::table('geo_bairros')
-            ->select('id', 'codigo', 'nome', 'area_km2', 'perimetro_m', 'geometry')
-            ->get();
-
-        $features = $bairros->map(function ($bairro) {
-            return [
-                'type' => 'Feature',
-                'properties' => [
-                    'id' => $bairro->id,
-                    'codigo' => $bairro->codigo,
-                    'nome' => $bairro->nome,
-                    'area_km2' => $bairro->area_km2,
-                    'perimetro_m' => $bairro->perimetro_m,
-                ],
-                'geometry' => json_decode($bairro->geometry),
-            ];
+        $data = Cache::remember('geo:bairros', self::TTL, function () {
+            return DB::table('geo_bairros')
+                ->select('id', 'codigo', 'nome', 'area_km2', 'perimetro_m', 'geometry')
+                ->get()
+                ->map(fn ($b) => [
+                    'type' => 'Feature',
+                    'properties' => [
+                        'id'         => $b->id,
+                        'codigo'     => $b->codigo,
+                        'nome'       => $b->nome,
+                        'area_km2'   => $b->area_km2,
+                        'perimetro_m'=> $b->perimetro_m,
+                    ],
+                    'geometry' => json_decode($b->geometry),
+                ]);
         });
 
-        return response()->json([
-            'type' => 'FeatureCollection',
-            'features' => $features,
-        ]);
+        return response()->json(['type' => 'FeatureCollection', 'features' => $data]);
     }
 
     public function regionais(): JsonResponse
     {
-        $regionais = DB::table('geo_regionais')
-            ->select('id', 'codigo', 'sigla', 'nome', 'area_km2', 'perimetro_m', 'geometry')
-            ->get();
-
-        $features = $regionais->map(function ($regional) {
-            return [
-                'type' => 'Feature',
-                'properties' => [
-                    'id' => $regional->id,
-                    'codigo' => $regional->codigo,
-                    'sigla' => $regional->sigla,
-                    'nome' => $regional->nome,
-                    'area_km2' => $regional->area_km2,
-                    'perimetro_m' => $regional->perimetro_m,
-                ],
-                'geometry' => json_decode($regional->geometry),
-            ];
+        $data = Cache::remember('geo:regionais', self::TTL, function () {
+            return DB::table('geo_regionais')
+                ->select('id', 'codigo', 'sigla', 'nome', 'area_km2', 'perimetro_m', 'geometry')
+                ->get()
+                ->map(fn ($r) => [
+                    'type' => 'Feature',
+                    'properties' => [
+                        'id'         => $r->id,
+                        'codigo'     => $r->codigo,
+                        'sigla'      => $r->sigla,
+                        'nome'       => $r->nome,
+                        'area_km2'   => $r->area_km2,
+                        'perimetro_m'=> $r->perimetro_m,
+                    ],
+                    'geometry' => json_decode($r->geometry),
+                ]);
         });
 
-        return response()->json([
-            'type' => 'FeatureCollection',
-            'features' => $features,
-        ]);
+        return response()->json(['type' => 'FeatureCollection', 'features' => $data]);
     }
 
     public function limiteMunicipio(): JsonResponse
     {
-        $limite = DB::table('geo_limite_municipio')
-            ->select('id', 'area_km2', 'perimetro_m', 'geometry')
-            ->first();
+        $data = Cache::remember('geo:limite-municipio', self::TTL, function () {
+            $limite = DB::table('geo_limite_municipio')
+                ->select('id', 'area_km2', 'perimetro_m', 'geometry')
+                ->first();
 
-        if (! $limite) {
+            if (! $limite) return null;
+
+            return [[
+                'type' => 'Feature',
+                'properties' => [
+                    'id'         => $limite->id,
+                    'area_km2'   => $limite->area_km2,
+                    'perimetro_m'=> $limite->perimetro_m,
+                ],
+                'geometry' => json_decode($limite->geometry),
+            ]];
+        });
+
+        if (! $data) {
             return response()->json(['error' => 'Limite não encontrado'], 404);
         }
 
-        return response()->json([
-            'type' => 'FeatureCollection',
-            'features' => [
-                [
-                    'type' => 'Feature',
-                    'properties' => [
-                        'id' => $limite->id,
-                        'area_km2' => $limite->area_km2,
-                        'perimetro_m' => $limite->perimetro_m,
-                    ],
-                    'geometry' => json_decode($limite->geometry),
-                ],
-            ],
-        ]);
+        return response()->json(['type' => 'FeatureCollection', 'features' => $data]);
     }
 }
