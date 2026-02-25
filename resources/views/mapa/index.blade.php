@@ -286,6 +286,7 @@
 
 @push('scripts')
 <script>
+        const APP_BASE = "{{ rtrim(url('/'), '/') }}";
 document.addEventListener('DOMContentLoaded', function() {
     // Belo Horizonte center coordinates (média dos pontos no banco)
     const BH_CENTER = [-19.9135, -43.9514];
@@ -352,7 +353,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const coords = window.pendingVistoriaCoords;
                     sheetZoomActions.innerHTML = `
                         <button onclick="hideBottomSheet()" class="btn btn-secondary" style="flex: 1;">Fechar</button>
-                        <a href="/vistorias/create?lat=${coords.lat}&lng=${coords.lng}" class="btn btn-success" style="flex: 1;">
+                        <a href="${APP_BASE}/vistorias/create?lat=${coords.lat}&lng=${coords.lng}" class="btn btn-success" style="flex: 1;">
                             <svg style="width: 16px; height: 16px; margin-right: 4px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                             </svg>
@@ -957,7 +958,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="sheet-stat-label">Complex.</div>
                     </div>
                 </div>
-                <button onclick="window.location.href='/pontos/${details.id}/vistorias/create'" class="btn btn-primary btn-block">
+                <button onclick="window.location.href=`${APP_BASE}/pontos/${details.id}/vistorias/create`" class="btn btn-primary btn-block">
                     Nova Vistoria
                 </button>
             `);
@@ -1172,7 +1173,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                     <div class="sheet-actions">
                         <button onclick="hideBottomSheet()" class="btn btn-secondary" style="flex: 1;">Cancelar</button>
-                        <a href="/vistorias/create?${vistoriaParams.toString()}" class="btn btn-primary" style="flex: 1;"><svg style="width: 16px; height: 16px; margin-right: 4px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>Nova Vistoria Aqui</a>
+                        <a href="${APP_BASE}/vistorias/create?${vistoriaParams.toString()}" class="btn btn-primary" style="flex: 1;"><svg style="width: 16px; height: 16px; margin-right: 4px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>Nova Vistoria Aqui</a>
                     </div>
                 `);
             } else {
@@ -1191,7 +1192,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                     <div class="sheet-actions">
                         <button onclick="hideBottomSheet()" class="btn btn-secondary" style="flex: 1;">Cancelar</button>
-                        <a href="/vistorias/create?${vistoriaParams.toString()}" class="btn btn-primary" style="flex: 1;"><svg style="width: 16px; height: 16px; margin-right: 4px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>Nova Vistoria Aqui</a>
+                        <a href="${APP_BASE}/vistorias/create?${vistoriaParams.toString()}" class="btn btn-primary" style="flex: 1;"><svg style="width: 16px; height: 16px; margin-right: 4px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>Nova Vistoria Aqui</a>
                     </div>
                 `);
             }
@@ -1212,7 +1213,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 <div class="sheet-actions">
                     <button onclick="hideBottomSheet()" class="btn btn-secondary" style="flex: 1;">Cancelar</button>
-                    <a href="/vistorias/create?${vistoriaParams.toString()}" class="btn btn-primary" style="flex: 1;"><svg style="width: 16px; height: 16px; margin-right: 4px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>Nova Vistoria Aqui</a>
+                    <a href="${APP_BASE}/vistorias/create?${vistoriaParams.toString()}" class="btn btn-primary" style="flex: 1;"><svg style="width: 16px; height: 16px; margin-right: 4px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>Nova Vistoria Aqui</a>
                 </div>
             `);
         }
@@ -1293,7 +1294,7 @@ document.addEventListener('DOMContentLoaded', function() {
             ${enderecoHtml}
             <p class="sheet-coords">${currentLocation.lat.toFixed(6)}, ${currentLocation.lng.toFixed(6)}</p>
             <div class="sheet-actions-vertical">
-                <a href="/vistorias/create?${vistoriaParams.toString()}" class="btn btn-primary btn-block">Registrar Vistoria</a>
+                <a href="${APP_BASE}/vistorias/create?${vistoriaParams.toString()}" class="btn btn-primary btn-block">Registrar Vistoria</a>
                 <button onclick="hideBottomSheet()" class="btn btn-secondary btn-block">Cancelar</button>
             </div>
         `);
@@ -1532,7 +1533,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <p class="sheet-subtitle" style="margin-bottom: var(--space-4);">${bairro} - ${regional}</p>
             <div class="sheet-actions">
                 <button onclick="hideBottomSheet()" class="btn btn-secondary" style="flex: 1;">Cancelar</button>
-                <a href="/vistorias/create?lat=${lat}&lng=${lng}" class="btn btn-primary" style="flex: 1;"><svg style="width: 16px; height: 16px; margin-right: 4px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>Nova Vistoria Aqui</a>
+                <a href="${APP_BASE}/vistorias/create?lat=${lat}&lng=${lng}" class="btn btn-primary" style="flex: 1;"><svg style="width: 16px; height: 16px; margin-right: 4px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>Nova Vistoria Aqui</a>
             </div>
         `);
 
