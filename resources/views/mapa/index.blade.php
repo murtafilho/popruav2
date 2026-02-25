@@ -1305,7 +1305,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Função para aproximar zoom e fechar o bottom sheet
     window.zoomAndCloseSheet = function(lat, lng) {
-        map.setView([lat, lng], map.getZoom() + 1);
+        map.setView([lat, lng], MIN_ZOOM_VISTORIA);
         hideBottomSheet();
     };
 
