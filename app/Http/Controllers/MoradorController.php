@@ -20,7 +20,7 @@ class MoradorController extends Controller
 
     public function index(Request $request): View
     {
-        $query = Morador::query()->with(['pontoAtual.endereco']);
+        $query = Morador::query()->with(['pontoAtual.enderecoAtualizado']);
 
         // Filtrar por termo de busca
         if ($request->filled('search')) {
@@ -63,7 +63,7 @@ class MoradorController extends Controller
 
     public function show(Morador $morador): View
     {
-        $morador->load(['pontoAtual.endereco']);
+        $morador->load(['pontoAtual.enderecoAtualizado']);
         $historico = $this->moradorService->getHistorico($morador);
 
         return view('moradores.show', [
@@ -76,7 +76,7 @@ class MoradorController extends Controller
     {
         $ponto = null;
         if ($request->filled('ponto_id')) {
-            $ponto = Ponto::with('endereco')->find($request->ponto_id);
+            $ponto = Ponto::with(['enderecoAtualizado'])->find($request->ponto_id);
         }
 
         return view('moradores.create', [

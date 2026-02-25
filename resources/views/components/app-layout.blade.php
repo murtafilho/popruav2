@@ -12,17 +12,17 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         @stack('styles')
     </head>
-    <body class="bg-gray-100 antialiased">
-        <div id="app" class="min-h-screen flex flex-col">
+    <body>
+        <div id="app" class="app-container">
             <!-- Page Header (opcional, definido por cada view) -->
             @isset($header)
-                <header class="bg-blue-600 text-white px-4 py-3 flex items-center justify-between shadow-md z-10 sticky top-0">
+                <header class="app-header">
                     {{ $header }}
                 </header>
             @endisset
 
             <!-- Page Content -->
-            <main class="flex-1 relative overflow-hidden">
+            <main class="app-main">
                 {{ $slot }}
             </main>
         </div>

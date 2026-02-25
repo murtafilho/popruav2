@@ -44,7 +44,7 @@ class Morador extends Model
      */
     public function pontos(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
-        return $this->belongsToMany(Ponto::class, 'morador_historico')
+        return $this->belongsToMany(Ponto::class, 'morador_historicos')
             ->withPivot(['vistoria_entrada_id', 'vistoria_saida_id', 'data_entrada', 'data_saida'])
             ->withTimestamps();
     }

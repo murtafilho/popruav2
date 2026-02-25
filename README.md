@@ -1,82 +1,222 @@
 # POPRUA v2
 
-Sistema de gestão de população em situação de rua desenvolvido com Laravel 12.
+Sistema de Gestão de População em Situação de Rua - Belo Horizonte
 
-## 🚀 Funcionalidades
+## Sobre o Projeto
 
-- **Sistema de Autenticação Completo**: Login, registro, recuperação de senha e verificação de email
-- **Mapa Interativo**: Visualização de pontos e vistorias em mapa interativo usando Leaflet
-- **Gestão de Vistorias**: Registro e acompanhamento de vistorias realizadas
-- **Gestão de Pontos**: Cadastro e visualização de pontos de abordagem
-- **Views Tabulares**: Listagens paginadas e filtradas de pontos e vistorias
-- **Sistema de Roles e Permissões**: Controle de acesso usando Spatie Permission
-- **Geolocalização**: Integração com API de geolocalização do navegador
+O POPRUA v2 é um sistema web para gestão e monitoramento de vistorias relacionadas à população em situação de rua em Belo Horizonte. O sistema permite:
+
+- Cadastro e gestão de pontos de ocupação georreferenciados
+- Registro de vistorias com informações detalhadas
+- Georreferenciamento completo com suporte a consultas espaciais (PostGIS)
+- Gestão de moradores e histórico de movimentação
+- Mapa interativo com visualização por bairro/regional
+- Relatórios e análises espaciais
+
+## Stack Tecnológica
+
+| Componente | Versão | Descrição |
+|------------|--------|-----------|
+| PHP | 8.4 | Runtime |
+| Laravel | 12 | Framework |
+| PostgreSQL | 16 | Banco de dados |
+| PostGIS | 3.4 | Extensão geoespacial |
+| Redis | - | Cache e filas |
+| Tailwind CSS | 3 | Estilização |
+| Leaflet.js | - | Mapas interativos |
+| Alpine.js | - | JavaScript reativo |
+
+## Funcionalidades
+
+- **Sistema de Autenticação Completo**: Login, registro, recuperação de senha
+- **Mapa Interativo**: Visualização de pontos e vistorias com Leaflet
+- **Consultas Espaciais**: Pontos por bairro, proximidade, área de cobertura
+- **Gestão de Vistorias**: Registro e acompanhamento de vistorias
+- **Gestão de Pontos**: Cadastro com georreferenciamento automático
+- **Sistema de Roles e Permissões**: Controle de acesso com Spatie Permission
 - **Layout Mobile-First**: Interface otimizada para dispositivos móveis
-- **Tradução pt-BR**: Sistema completamente traduzido para português brasileiro
+- **Tradução pt-BR**: Sistema completamente em português
 
-## 📋 Requisitos
+## Requisitos
 
-- PHP >= 8.2
+- PHP 8.4+
+- PostgreSQL 16+ com PostGIS 3.4+
+- Redis
 - Composer
-- Node.js e npm
-- Banco de dados (MySQL/PostgreSQL/SQLite)
+- Node.js 18+
+- npm
 
-## 🔧 Instalação
+## Instalação
 
-1. Clone o repositório:
+### 1. Clone o repositório
+
 ```bash
-git clone https://github.com/seu-usuario/popruav2.git
+git clone <url-do-repositorio>
 cd popruav2
 ```
 
-2. Instale as dependências do PHP:
+### 2. Instale as dependências
+
 ```bash
 composer install
-```
-
-3. Instale as dependências do Node:
-```bash
 npm install
 ```
 
-4. Configure o arquivo `.env`:
+### 3. Configure o ambiente
+
 ```bash
 cp .env.example .env
 php artisan key:generate
 ```
 
-5. Configure o banco de dados no `.env` e execute as migrações:
+### 4. Configure o banco de dados
+
+Edite o arquivo `.env`:
+
+```env
+DB_CONNECTION=pgsql
+DB_HOST=localhost
+DB_PORT=5432
+DB_DATABASE=popruav2
+DB_USERNAME=postgres
+DB_PASSWORD=sua_senha
+```
+
+### 5. Crie o banco de dados com PostGIS
+
+```bash
+sudo -u postgres psql -c "CREATE DATABASE popruav2;"
+sudo -u postgres psql -d popruav2 -c "CREATE EXTENSION postgis;"
+```
+
+### 6. Execute as migrações
+
 ```bash
 php artisan migrate
 ```
 
-6. Compile os assets:
+### 7. Compile os assets
+
 ```bash
 npm run build
+# ou para desenvolvimento
+npm run dev
 ```
 
-7. Inicie o servidor de desenvolvimento:
+### 8. Inicie o servidor
+
 ```bash
 php artisan serve
 ```
 
-## 🗄️ Estrutura do Banco de Dados
+## Estrutura do Banco de Dados
 
-- **users**: Usuários do sistema
-- **pontos**: Pontos de abordagem
-- **vistorias**: Vistorias realizadas
-- **roles**: Roles do sistema (Spatie Permission)
-- **permissions**: Permissões do sistema (Spatie Permission)
+### Tabelas Principais
 
-## 🛠️ Tecnologias Utilizadas
+| Tabela | Descrição |
+|--------|-----------|
+| `pontos` | Locais de ocupação georreferenciados |
+| `vistorias` | Registros de vistorias realizadas |
+| `moradores` | Cadastro de pessoas em situação de rua |
+| `morador_historicos` | Histórico de movimentação |
+| `endereco_atualizados` | Base de endereços de BH (755k registros) |
 
-- **Laravel 12**: Framework PHP
-- **Laravel Breeze**: Autenticação
-- **Tailwind CSS**: Framework CSS
-- **Leaflet.js**: Mapas interativos
-- **Alpine.js**: JavaScript reativo
-- **Spatie Permission**: Gerenciamento de roles e permissões
+### Tabelas Geográficas (PostGIS)
 
-## 📝 Licença
+| Tabela | Tipo Geometria | Registros | Índice GIST |
+|--------|---------------|-----------|-------------|
+| `pontos` | POINT | 2.642 | idx_pontos_geom |
+| `endereco_atualizados` | POINT | 755.903 | idx_endereco_atualizados_geom |
+| `geo_bairros` | MULTIPOLYGON | 493 | idx_geo_bairros_geom |
+| `geo_regionais` | MULTIPOLYGON | 10 | idx_geo_regionais_geom |
+| `geo_limite_municipio` | GEOMETRY | 1 | idx_geo_limite_municipio_geom |
 
-Este projeto é de código aberto e está disponível sob a licença MIT.
+## Consultas Espaciais
+
+O sistema utiliza PostGIS para consultas geoespaciais otimizadas:
+
+### Pontos por bairro
+
+```sql
+SELECT gb.nome as bairro, COUNT(p.id) as total
+FROM geo_bairros gb
+JOIN pontos p ON ST_Contains(gb.geom, p.geom)
+GROUP BY gb.nome
+ORDER BY total DESC;
+```
+
+### Pontos em raio de 500m
+
+```sql
+SELECT id, ST_Distance(geom::geography, ponto::geography) as metros
+FROM pontos
+WHERE ST_DWithin(geom::geography, ponto::geography, 500);
+```
+
+### Identificar bairro de um ponto
+
+```sql
+SELECT gb.nome
+FROM geo_bairros gb
+WHERE ST_Contains(gb.geom, ST_SetSRID(ST_MakePoint(-43.9378, -19.9191), 4326));
+```
+
+## Comandos Artisan
+
+```bash
+# Migrar dados do MySQL para PostgreSQL
+php artisan migrate:mysql-to-postgres
+
+# Executar testes
+php artisan test
+
+# Formatar código
+vendor/bin/pint --dirty
+
+# Limpar cache
+php artisan cache:clear
+php artisan config:clear
+```
+
+## Estrutura de Diretórios
+
+```
+app/
+├── Console/Commands/     # Comandos Artisan customizados
+├── Http/
+│   ├── Controllers/      # Controllers da aplicação
+│   └── Requests/         # Form Requests para validação
+├── Models/               # Models Eloquent
+└── Services/             # Serviços da aplicação
+
+database/
+├── factories/            # Factories para testes
+├── migrations/           # Migrações do banco
+└── seeders/              # Seeders
+
+resources/
+├── css/                  # Estilos CSS/Tailwind
+├── js/                   # JavaScript
+└── views/                # Blade templates
+
+tests/
+├── Feature/              # Testes de integração
+└── Unit/                 # Testes unitários
+```
+
+## Testes
+
+```bash
+# Executar todos os testes
+php artisan test
+
+# Executar teste específico
+php artisan test --filter=NomeDoTeste
+
+# Executar com coverage
+php artisan test --coverage
+```
+
+## Licença
+
+Projeto proprietário - Prefeitura de Belo Horizonte

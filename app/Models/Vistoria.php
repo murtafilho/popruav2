@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -11,6 +12,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class Vistoria extends Model implements HasMedia
 {
+    use HasFactory;
     use InteractsWithMedia;
 
     protected $table = 'vistorias';
@@ -50,6 +52,8 @@ class Vistoria extends Model implements HasMedia
         'e2_id',
         'e3_id',
         'e4_id',
+        'e5_id',
+        'e6_id',
         'material_apreendido',
         'material_descartado',
         'tipo_abrigo_desmontado_id',
@@ -96,6 +100,51 @@ class Vistoria extends Model implements HasMedia
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function tipoAbordagem(): BelongsTo
+    {
+        return $this->belongsTo(TipoAbordagem::class, 'tipo_abordagem_id');
+    }
+
+    public function tipoAbrigoDesmontado(): BelongsTo
+    {
+        return $this->belongsTo(TipoAbrigoDesmontado::class, 'tipo_abrigo_desmontado_id');
+    }
+
+    public function resultadoAcao(): BelongsTo
+    {
+        return $this->belongsTo(ResultadoAcao::class, 'resultado_acao_id');
+    }
+
+    public function encaminhamento1(): BelongsTo
+    {
+        return $this->belongsTo(Encaminhamento::class, 'e1_id');
+    }
+
+    public function encaminhamento2(): BelongsTo
+    {
+        return $this->belongsTo(Encaminhamento::class, 'e2_id');
+    }
+
+    public function encaminhamento3(): BelongsTo
+    {
+        return $this->belongsTo(Encaminhamento::class, 'e3_id');
+    }
+
+    public function encaminhamento4(): BelongsTo
+    {
+        return $this->belongsTo(Encaminhamento::class, 'e4_id');
+    }
+
+    public function encaminhamento5(): BelongsTo
+    {
+        return $this->belongsTo(Encaminhamento::class, 'e5_id');
+    }
+
+    public function encaminhamento6(): BelongsTo
+    {
+        return $this->belongsTo(Encaminhamento::class, 'e6_id');
     }
 
     public function fotos(): HasMany

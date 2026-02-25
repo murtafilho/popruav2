@@ -3,76 +3,101 @@
 @section('title', 'Gerenciar Roles')
 
 @section('header')
-    <div class="flex items-center gap-3">
-        <a href="{{ route('dashboard') }}" class="p-2 -ml-2 rounded-lg hover:bg-white/10 transition">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div class="mobile-header-content">
+        <a href="{{ route('dashboard') }}" class="btn btn-ghost btn-icon" style="margin-left: -8px;">
+            <svg style="width: 22px; height: 22px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
             </svg>
         </a>
-        <h1 class="text-lg font-semibold flex-1 text-center">Gerenciar Roles</h1>
-        <div class="w-10"></div>
+        <span class="mobile-header-title">Gerenciar Roles</span>
+        <div style="width: 44px;"></div>
     </div>
 @endsection
 
 @section('content')
-    <div class="h-full overflow-y-auto bg-gray-50 dark:bg-gray-900 p-4 transition-colors duration-200">
+    <div class="page-content">
         @if(session('success'))
-            <div class="mb-4 p-3 bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 text-green-800 dark:text-green-200 rounded-lg text-sm transition-colors duration-200">
+            <div class="alert alert-success mb-4">
                 {{ session('success') }}
             </div>
         @endif
 
         @if(session('error'))
-            <div class="mb-4 p-3 bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 text-red-800 dark:text-red-200 rounded-lg text-sm transition-colors duration-200">
+            <div class="alert alert-error mb-4">
                 {{ session('error') }}
             </div>
         @endif
 
-        <div class="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-            <div class="flex gap-2 text-sm">
-                <a href="{{ route('admin.permissions.index') }}" class="text-blue-600 dark:text-blue-400 hover:underline">Permissions</a>
-                <span class="text-gray-400 dark:text-gray-500 dark:text-gray-400">|</span>
-                <a href="{{ route('admin.users.index') }}" class="text-blue-600 dark:text-blue-400 hover:underline">Usuários</a>
+        <div class="card mb-4">
+            <div class="card-body" style="padding: var(--space-3);">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-3);">
+                    <div class="admin-nav-links">
+                        <a href="{{ route('admin.permissions.index') }}" class="link">Permissions</a>
+                        <span class="text-muted">|</span>
+                        <a href="{{ route('admin.users.index') }}" class="link">Usuarios</a>
+                    </div>
+                    <a href="{{ route('admin.roles.create') }}" class="btn btn-primary btn-sm">
+                        <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        Nova Role
+                    </a>
+                </div>
             </div>
-            <a href="{{ route('admin.roles.create') }}" class="bg-blue-500 dark:bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-600 dark:hover:bg-blue-700 text-sm font-medium transition-colors duration-200">
-                Nova Role
-            </a>
         </div>
 
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-gray-900/50 overflow-hidden transition-colors duration-200">
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead class="bg-gray-50 dark:bg-gray-700">
+        <div class="table-container">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th class="text-center">Usuarios</th>
+                        <th class="text-center hide-mobile">Permissions</th>
+                        <th class="text-right">Acoes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($roles as $role)
                         <tr>
-                            <th class="px-4 py-3 text-left text-sm font-medium text-gray-900 dark:text-gray-200">Nome</th>
-                            <th class="px-4 py-3 text-left text-sm font-medium text-gray-900 dark:text-gray-200">Usuários</th>
-                            <th class="px-4 py-3 text-left text-sm font-medium text-gray-900 dark:text-gray-200">Permissions</th>
-                            <th class="px-4 py-3 text-right text-sm font-medium text-gray-900 dark:text-gray-200">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                        @forelse($roles as $role)
-                            <tr class="odd:bg-gray-50 dark:odd:bg-gray-700/30 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors duration-200">
-                                <td class="px-4 py-3 font-medium text-gray-900 dark:text-gray-200">{{ $role->name }}</td>
-                                <td class="px-4 py-3 text-gray-600 dark:text-gray-300">{{ $role->users_count }}</td>
-                                <td class="px-4 py-3 text-gray-600 dark:text-gray-300">{{ $role->permissions->count() }}</td>
-                                <td class="px-4 py-3 text-right">
-                                    <a href="{{ route('admin.roles.edit', $role) }}" class="text-blue-600 dark:text-blue-400 hover:underline text-sm mr-3">Editar</a>
-                                    <form action="{{ route('admin.roles.destroy', $role) }}" method="POST" class="inline" onsubmit="return confirm('Tem certeza que deseja excluir esta role?')">
+                            <td>
+                                <span class="font-medium">{{ $role->name }}</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge badge-secondary">{{ $role->users_count }}</span>
+                            </td>
+                            <td class="text-center hide-mobile">
+                                <span class="badge badge-info">{{ $role->permissions->count() }}</span>
+                            </td>
+                            <td class="text-right">
+                                <div class="table-actions">
+                                    <a href="{{ route('admin.roles.edit', $role) }}" class="btn btn-ghost btn-sm">
+                                        <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                        </svg>
+                                        <span class="hide-mobile">Editar</span>
+                                    </a>
+                                    <form action="{{ route('admin.roles.destroy', $role) }}" method="POST" style="display: inline;" onsubmit="return confirm('Tem certeza que deseja excluir esta role?')">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="text-red-600 dark:text-red-400 hover:underline text-sm">Excluir</button>
+                                        <button type="submit" class="btn btn-ghost btn-sm text-danger">
+                                            <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                            </svg>
+                                            <span class="hide-mobile">Excluir</span>
+                                        </button>
                                     </form>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="4" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">Nenhuma role cadastrada.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4" class="text-center text-muted" style="padding: var(--space-8);">
+                                Nenhuma role cadastrada.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
 @endsection

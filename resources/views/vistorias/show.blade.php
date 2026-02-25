@@ -1,0 +1,381 @@
+@extends('layouts.app')
+
+@section('title', 'Detalhes da Vistoria')
+
+@section('header')
+    <a href="{{ route('vistorias.index') }}" class="btn btn-ghost btn-icon" style="margin-left: -8px;">
+        <svg style="width: 22px; height: 22px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+    </a>
+    <span class="mobile-header-title" style="flex: 1; text-align: center;">Detalhes da Vistoria</span>
+    <div style="display: flex; gap: var(--space-1);">
+        @if($vistoria->ponto && $vistoria->ponto->lat && $vistoria->ponto->lng)
+            <a href="{{ route('mapa.index', ['lat' => $vistoria->ponto->lat, 'lng' => $vistoria->ponto->lng, 'zoom' => 19]) }}" class="btn btn-ghost btn-icon" title="Ver no mapa">
+                <svg style="width: 22px; height: 22px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+                </svg>
+            </a>
+        @endif
+        <a href="{{ route('vistorias.report', $vistoria) }}" class="btn btn-ghost btn-icon" title="Relatorio">
+            <svg style="width: 22px; height: 22px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+            </svg>
+        </a>
+        <a href="{{ route('vistorias.edit', $vistoria) }}" class="btn btn-ghost btn-icon" title="Editar">
+            <svg style="width: 22px; height: 22px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+            </svg>
+        </a>
+    </div>
+@endsection
+
+@section('content')
+    <div class="page-content">
+        {{-- Cabecalho --}}
+        <div class="card mb-4">
+            <div class="card-body">
+                <div style="display: flex; align-items: flex-start; gap: var(--space-4);">
+                    <div style="flex: 1;">
+                        <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-2);">
+                            <svg style="width: 24px; height: 24px; color: var(--accent-primary);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                            </svg>
+                            <h2 style="font-size: var(--text-lg); font-weight: var(--font-semibold);">
+                                {{ \Carbon\Carbon::parse($vistoria->data_abordagem)->format('d/m/Y') }}
+                                <span class="text-muted" style="font-weight: var(--font-normal);">
+                                    {{ \Carbon\Carbon::parse($vistoria->data_abordagem)->format('H:i') }}
+                                </span>
+                            </h2>
+                        </div>
+
+                        @if($vistoria->ponto && $vistoria->ponto->enderecoAtualizado)
+                            <p style="font-size: var(--text-sm); color: var(--text-secondary);">
+                                @if($vistoria->ponto->enderecoAtualizado->SIGLA_TIPO_LOGRADOURO)
+                                    {{ $vistoria->ponto->enderecoAtualizado->SIGLA_TIPO_LOGRADOURO }}
+                                @endif
+                                {{ $vistoria->ponto->enderecoAtualizado->NOME_LOGRADOURO }},
+                                {{ $vistoria->ponto->enderecoAtualizado->NUMERO_IMOVEL ?? $vistoria->ponto->numero }}
+                            </p>
+                            <p class="text-muted" style="font-size: var(--text-xs);">
+                                {{ $vistoria->ponto->enderecoAtualizado->NOME_BAIRRO_OFICIAL }} - {{ $vistoria->ponto->enderecoAtualizado->NOME_REGIONAL }}
+                            </p>
+                        @endif
+                    </div>
+
+                    @if($vistoria->resultadoAcao)
+                        @php
+                            $badgeClass = match(true) {
+                                str_contains($vistoria->resultadoAcao->resultado, 'persiste') => 'badge-danger',
+                                str_contains($vistoria->resultadoAcao->resultado, 'parcialmente') => 'badge-warning',
+                                str_contains($vistoria->resultadoAcao->resultado, 'ausente') => 'badge-default',
+                                str_contains($vistoria->resultadoAcao->resultado, 'constatado') => 'badge-info',
+                                str_contains($vistoria->resultadoAcao->resultado, 'Conformidade') => 'badge-success',
+                                default => 'badge-secondary',
+                            };
+                        @endphp
+                        <span class="badge {{ $badgeClass }}">{{ $vistoria->resultadoAcao->resultado }}</span>
+                    @endif
+                </div>
+            </div>
+        </div>
+
+        {{-- Informacoes Basicas --}}
+        <div class="card mb-4">
+            <div class="card-body">
+                <h3 style="font-size: var(--text-sm); font-weight: var(--font-semibold); margin-bottom: var(--space-3); display: flex; align-items: center; gap: var(--space-2);">
+                    <svg style="width: 18px; height: 18px; color: var(--status-info);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Informacoes Basicas
+                </h3>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Tipo de Abordagem</span>
+                        <span class="info-value">{{ $vistoria->tipoAbordagem->tipo ?? '-' }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Quantidade de Pessoas</span>
+                        <span class="info-value">{{ $vistoria->quantidade_pessoas ?? 0 }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Material Recolhido (Kg)</span>
+                        <span class="info-value">{{ $vistoria->qtd_kg ?? 0 }} kg</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Registrado por</span>
+                        <span class="info-value">{{ $vistoria->user->name ?? '-' }}</span>
+                    </div>
+                </div>
+
+                @if($vistoria->nomes_pessoas)
+                    <div style="margin-top: var(--space-4); padding-top: var(--space-4); border-top: 1px solid var(--border-primary);">
+                        <span class="info-label" style="display: block; margin-bottom: var(--space-2);">Nomes das Pessoas</span>
+                        <p class="text-secondary" style="font-size: var(--text-sm); white-space: pre-wrap;">{{ $vistoria->nomes_pessoas }}</p>
+                    </div>
+                @endif
+            </div>
+        </div>
+
+        {{-- Caracteristicas de Complexidade --}}
+        @php
+            $caracteristicas = [
+                ['campo' => 'casal', 'label' => 'Casal', 'extra' => $vistoria->qtd_casais ? "({$vistoria->qtd_casais} casais)" : null],
+                ['campo' => 'num_reduzido', 'label' => 'Numero Reduzido'],
+                ['campo' => 'catador_reciclados', 'label' => 'Catador de Reciclados'],
+                ['campo' => 'resistencia', 'label' => 'Resistencia'],
+                ['campo' => 'fixacao_antiga', 'label' => 'Fixacao Antiga'],
+                ['campo' => 'excesso_objetos', 'label' => 'Excesso de Objetos'],
+                ['campo' => 'trafico_ilicitos', 'label' => 'Trafico/Ilicitos'],
+                ['campo' => 'crianca_adolescente', 'label' => 'Crianca/Adolescente'],
+                ['campo' => 'idosos', 'label' => 'Idosos'],
+                ['campo' => 'gestante', 'label' => 'Gestante'],
+                ['campo' => 'lgbtqiapn', 'label' => 'LGBTQIAPN+'],
+                ['campo' => 'cena_uso_caracterizada', 'label' => 'Cena de Uso Caracterizada'],
+                ['campo' => 'deficiente', 'label' => 'Deficiente'],
+                ['campo' => 'agrupamento_quimico', 'label' => 'Agrupamento Quimico'],
+                ['campo' => 'saude_mental', 'label' => 'Saude Mental'],
+                ['campo' => 'animais', 'label' => 'Animais', 'extra' => $vistoria->qtd_animais ? "({$vistoria->qtd_animais} animais)" : null],
+            ];
+            $caracteristicasAtivas = collect($caracteristicas)->filter(fn($c) => $vistoria->{$c['campo']});
+        @endphp
+
+        @if($caracteristicasAtivas->count() > 0)
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 style="font-size: var(--text-sm); font-weight: var(--font-semibold); margin-bottom: var(--space-3); display: flex; align-items: center; gap: var(--space-2);">
+                        <svg style="width: 18px; height: 18px; color: var(--status-warning);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                        Caracteristicas de Complexidade
+                    </h3>
+
+                    <div style="display: flex; flex-wrap: wrap; gap: var(--space-2);">
+                        @foreach($caracteristicasAtivas as $c)
+                            <span class="badge badge-warning">
+                                {{ $c['label'] }}
+                                @if(isset($c['extra']) && $c['extra'])
+                                    <span class="text-muted">{{ $c['extra'] }}</span>
+                                @endif
+                            </span>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        {{-- Abrigos --}}
+        @if($vistoria->qtd_abrigos_provisorios > 0 || count($tiposAbrigoSelecionados) > 0 || $vistoria->tipoAbrigoDesmontado)
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 style="font-size: var(--text-sm); font-weight: var(--font-semibold); margin-bottom: var(--space-3); display: flex; align-items: center; gap: var(--space-2);">
+                        <svg style="width: 18px; height: 18px; color: var(--accent-secondary);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                        </svg>
+                        Abrigos
+                    </h3>
+
+                    <div class="info-grid">
+                        @if($vistoria->qtd_abrigos_provisorios > 0)
+                            <div class="info-item">
+                                <span class="info-label">Abrigos Provisorios</span>
+                                <span class="info-value">{{ $vistoria->qtd_abrigos_provisorios }}</span>
+                            </div>
+                        @endif
+
+                        @if($vistoria->tipoAbrigoDesmontado)
+                            <div class="info-item">
+                                <span class="info-label">Tipo Abrigo Desmontado</span>
+                                <span class="info-value">{{ $vistoria->tipoAbrigoDesmontado->tipo_abrigo }}</span>
+                            </div>
+                        @endif
+                    </div>
+
+                    @if(count($tiposAbrigoSelecionados) > 0)
+                        <div style="margin-top: var(--space-3);">
+                            <span class="info-label" style="display: block; margin-bottom: var(--space-2);">Tipos de Abrigo</span>
+                            <div style="display: flex; flex-wrap: wrap; gap: var(--space-2);">
+                                @foreach($tiposAbrigoSelecionados as $tipo)
+                                    <span class="badge badge-secondary">{{ $tipo }}</span>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        @endif
+
+        {{-- Fiscalizacao --}}
+        @if($vistoria->conducao_forcas_seguranca || $vistoria->apreensao_fiscal || $vistoria->auto_fiscalizacao_aplicado)
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 style="font-size: var(--text-sm); font-weight: var(--font-semibold); margin-bottom: var(--space-3); display: flex; align-items: center; gap: var(--space-2);">
+                        <svg style="width: 18px; height: 18px; color: var(--status-danger);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                        Fiscalizacao
+                    </h3>
+
+                    <div class="info-grid">
+                        @if($vistoria->conducao_forcas_seguranca)
+                            <div class="info-item">
+                                <span class="info-label">Conducao Forcas Seguranca</span>
+                                <span class="info-value">
+                                    <span class="badge badge-danger">Sim</span>
+                                    @if($vistoria->conducao_forcas_observacao)
+                                        <span class="text-muted" style="display: block; font-size: var(--text-xs); margin-top: var(--space-1);">
+                                            {{ $vistoria->conducao_forcas_observacao }}
+                                        </span>
+                                    @endif
+                                </span>
+                            </div>
+                        @endif
+
+                        @if($vistoria->apreensao_fiscal)
+                            <div class="info-item">
+                                <span class="info-label">Apreensao Fiscal</span>
+                                <span class="badge badge-danger">Sim</span>
+                            </div>
+                        @endif
+
+                        @if($vistoria->auto_fiscalizacao_aplicado)
+                            <div class="info-item">
+                                <span class="info-label">Auto de Fiscalizacao</span>
+                                <span class="info-value">
+                                    <span class="badge badge-warning">Aplicado</span>
+                                    @if($vistoria->auto_fiscalizacao_numero)
+                                        <span class="text-mono" style="display: block; font-size: var(--text-xs); margin-top: var(--space-1);">
+                                            N {{ $vistoria->auto_fiscalizacao_numero }}
+                                        </span>
+                                    @endif
+                                </span>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        {{-- Encaminhamentos --}}
+        @php
+            $encaminhamentos = collect([
+                $vistoria->encaminhamento1,
+                $vistoria->encaminhamento2,
+                $vistoria->encaminhamento3,
+                $vistoria->encaminhamento4,
+                $vistoria->encaminhamento5,
+                $vistoria->encaminhamento6,
+            ])->filter();
+        @endphp
+
+        @if($encaminhamentos->count() > 0)
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 style="font-size: var(--text-sm); font-weight: var(--font-semibold); margin-bottom: var(--space-3); display: flex; align-items: center; gap: var(--space-2);">
+                        <svg style="width: 18px; height: 18px; color: var(--status-success);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                        </svg>
+                        Encaminhamentos
+                    </h3>
+
+                    <div style="display: flex; flex-direction: column; gap: var(--space-2);">
+                        @foreach($encaminhamentos as $enc)
+                            <div style="display: flex; align-items: center; gap: var(--space-2); padding: var(--space-2); background: var(--bg-tertiary); border-radius: var(--radius-md);">
+                                <svg style="width: 16px; height: 16px; color: var(--status-success);" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                </svg>
+                                <span style="font-size: var(--text-sm);">{{ $enc->encaminhamento }}</span>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        {{-- Observacao --}}
+        @if($vistoria->observacao)
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 style="font-size: var(--text-sm); font-weight: var(--font-semibold); margin-bottom: var(--space-3); display: flex; align-items: center; gap: var(--space-2);">
+                        <svg style="width: 18px; height: 18px; color: var(--text-muted);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+                        </svg>
+                        Observacao
+                    </h3>
+
+                    <p class="text-secondary" style="font-size: var(--text-sm); white-space: pre-wrap;">{{ $vistoria->observacao }}</p>
+                </div>
+            </div>
+        @endif
+
+        {{-- Fotos --}}
+        @php
+            $fotos = $vistoria->getMedia('fotos');
+        @endphp
+
+        @if($fotos->count() > 0)
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 style="font-size: var(--text-sm); font-weight: var(--font-semibold); margin-bottom: var(--space-3); display: flex; align-items: center; gap: var(--space-2);">
+                        <svg style="width: 18px; height: 18px; color: var(--accent-primary);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        Fotos ({{ $fotos->count() }})
+                    </h3>
+
+                    <div class="photo-grid">
+                        @foreach($fotos as $foto)
+                            <a href="{{ $foto->getUrl() }}" target="_blank" class="photo-item">
+                                <img src="{{ $foto->getUrl('thumb') }}" alt="Foto da vistoria" loading="lazy">
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        {{-- Moradores Registrados --}}
+        @if($vistoria->moradoresEntrada->count() > 0)
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 style="font-size: var(--text-sm); font-weight: var(--font-semibold); margin-bottom: var(--space-3); display: flex; align-items: center; gap: var(--space-2);">
+                        <svg style="width: 18px; height: 18px; color: var(--status-info);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                        Moradores Registrados
+                    </h3>
+
+                    <div style="display: flex; flex-direction: column; gap: var(--space-2);">
+                        @foreach($vistoria->moradoresEntrada as $historico)
+                            @if($historico->morador)
+                                <a href="{{ route('moradores.show', $historico->morador) }}" class="location-card">
+                                    <div class="location-card-content">
+                                        <p class="location-card-address">{{ $historico->morador->nome_social }}</p>
+                                        @if($historico->morador->apelido)
+                                            <p class="location-card-detail">"{{ $historico->morador->apelido }}"</p>
+                                        @endif
+                                    </div>
+                                    <svg style="width: 20px; height: 20px; color: var(--text-muted);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                                </a>
+                            @endif
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        {{-- Link para o Ponto --}}
+        @if($vistoria->ponto)
+            <a href="{{ route('pontos.show', $vistoria->ponto->id) }}" class="btn btn-secondary w-full">
+                <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                Ver Ponto e Outras Vistorias
+            </a>
+        @endif
+    </div>
+@endsection

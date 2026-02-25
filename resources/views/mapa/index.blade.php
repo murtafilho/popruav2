@@ -16,140 +16,236 @@
         transform: translate(-50%, -50%);
         pointer-events: none;
     }
+    /* Indicador de Zoom no Footer */
+    .footer-zoom-indicator {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+        font-size: var(--text-xs);
+        cursor: default;
+    }
+    .footer-zoom-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    .footer-zoom-icon-danger {
+        background-color: var(--color-danger);
+        color: white;
+    }
+    .footer-zoom-icon-success {
+        background-color: var(--color-success);
+        color: white;
+    }
+    .footer-zoom-indicator span:last-child {
+        color: var(--text-secondary);
+    }
+    .footer-zoom-indicator span:last-child strong {
+        color: var(--text-primary);
+    }
+    /* Badge de Zoom no Bottom Sheet */
+    .sheet-zoom-badge {
+        display: inline-block;
+        padding: var(--space-1) var(--space-3);
+        border-radius: var(--radius-full);
+        font-weight: var(--font-semibold);
+        font-size: var(--text-sm);
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    .sheet-zoom-danger {
+        background-color: var(--color-danger);
+        color: white;
+    }
+    .sheet-zoom-success {
+        background-color: var(--color-success);
+        color: white;
+    }
 </style>
 @endpush
 
 @section('header')
-    <div class="flex items-center gap-3">
-        <a href="{{ route('dashboard') }}" class="flex items-center gap-3 hover:opacity-80 transition">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-            </svg>
-            <h1 class="text-lg font-semibold">POPRUA</h1>
-        </a>
+    <div style="display: flex; align-items: center; gap: var(--space-2); flex: 1;">
+        <!-- Campos de Busca -->
+        <div class="map-search-bar">
+            <!-- Logradouro -->
+            <div class="map-search-field">
+                <input
+                    type="text"
+                    id="search-logradouro"
+                    placeholder="Logradouro"
+                    autocomplete="off"
+                    class="form-input form-input-sm"
+                >
+                <div id="logradouro-results" class="map-search-results hidden"></div>
+            </div>
+            <!-- Numero -->
+            <div class="map-search-numero">
+                <input
+                    type="number"
+                    id="search-numero"
+                    placeholder="No"
+                    autocomplete="off"
+                    class="form-input form-input-sm"
+                >
+            </div>
+            <!-- Botao Buscar -->
+            <button
+                type="button"
+                id="btn-buscar-endereco"
+                class="btn btn-ghost btn-icon btn-sm"
+                title="Buscar endereco"
+            >
+                <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+            </button>
+        </div>
     </div>
-    <div class="flex items-center gap-2">
-        <button onclick="toggleDarkMode()" class="p-2 rounded-lg hover:bg-white/10 transition" title="Alternar tema">
-            <svg data-light-icon class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+    <div style="display: flex; align-items: center; gap: var(--space-2);">
+        <!-- Badge de Zoom -->
+        <span id="zoom-badge" class="badge badge-danger" title="Zoom atual">
+            <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"/>
             </svg>
-            <svg data-dark-icon class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+            <span id="zoom-level">12</span>
+            <span id="zoom-warning" style="font-weight: bold; margin-left: 4px;">Zoom insuficiente</span>
+        </span>
+        <button id="btn-menu" class="btn btn-ghost btn-icon">
+            <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
             </svg>
         </button>
-        <button id="btn-menu" class="p-2 rounded-lg hover:bg-white/10 transition">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-        </svg>
-    </button>
+    </div>
 @endsection
 
 @section('content')
     <!-- Map Container -->
     <div id="map"></div>
 
-    <!-- Indicador de Zoom -->
-    <div id="zoom-indicator" class="absolute bottom-20 left-4 z-[1000] bg-white/90 dark:bg-gray-800/90 text-gray-200 dark:text-gray-200 px-2 py-1 rounded shadow text-xs font-mono transition-colors duration-200">
-        Zoom: <span id="zoom-level">12</span>
-    </div>
-
-    <!-- FAB - Minha Localização -->
+    <!-- FAB - Minha Localizacao -->
     <button
         id="btn-my-location"
-        class="absolute bottom-20 right-4 z-[1000] w-12 h-12 bg-white dark:bg-gray-800 text-gray-200 dark:text-gray-200 rounded-full shadow-lg flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 transition active:scale-95"
-        title="Minha localização"
+        class="map-fab"
+        title="Minha localizacao"
     >
-        <svg id="location-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+        <svg id="location-icon" style="width: 24px; height: 24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <!-- Google Maps style crosshair -->
+            <circle cx="12" cy="12" r="3" stroke-width="2"/>
+            <circle cx="12" cy="12" r="7" stroke-width="2"/>
+            <path stroke-linecap="round" stroke-width="2" d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
         </svg>
-        <svg id="location-loader" class="w-6 h-6 hidden animate-spin" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        <svg id="location-loader" style="width: 24px; height: 24px;" class="hidden spinner" fill="none" viewBox="0 0 24 24">
+            <circle style="opacity: 0.25;" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path style="opacity: 0.75;" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
         </svg>
     </button>
 
     <!-- Layers Panel (abre pelo menu) -->
-    <div id="layers-panel" class="absolute top-14 right-2 z-[1000] bg-white dark:bg-gray-800 rounded-lg shadow-lg dark:shadow-gray-900/50 p-3 hidden max-h-[80vh] overflow-y-auto transition-colors duration-200">
-        <h4 class="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Mapa Base</h4>
-        <div class="space-y-1 mb-3">
-            <label class="flex items-center gap-2 text-sm cursor-pointer">
-                <input type="radio" name="base-layer" id="base-street" class="text-blue-500">
-                <span class="text-gray-700 dark:text-gray-200">Ruas</span>
+    <div id="layers-panel" class="map-layers-panel hidden">
+        <h4 class="layers-panel-title">Mapa Base</h4>
+        <div class="layers-panel-group">
+            <label class="layers-panel-option">
+                <input type="radio" name="base-layer" id="base-street" class="form-checkbox">
+                <span>Ruas</span>
             </label>
-            <label class="flex items-center gap-2 text-sm cursor-pointer">
-                <input type="radio" name="base-layer" id="base-satellite" class="text-blue-500" checked>
-                <span class="text-gray-700 dark:text-gray-200">Satélite</span>
-            </label>
-        </div>
-
-        <h4 class="text-sm font-semibold mb-2 text-gray-900 dark:text-white border-t border-gray-200 dark:border-gray-700 pt-2">Camadas</h4>
-        <div class="space-y-2 mb-3">
-            <label class="flex items-center gap-2 text-sm cursor-pointer">
-                <input type="checkbox" id="layer-regionais" class="rounded text-blue-500">
-                <span class="text-gray-700 dark:text-gray-200">Regionais</span>
-            </label>
-            <label class="flex items-center gap-2 text-sm cursor-pointer">
-                <input type="checkbox" id="layer-bairros" class="rounded text-blue-500">
-                <span class="text-gray-700 dark:text-gray-200">Bairros</span>
-            </label>
-            <label class="flex items-center gap-2 text-sm cursor-pointer">
-                <input type="checkbox" id="layer-limite" class="rounded text-blue-500" checked>
-                <span class="text-gray-700 dark:text-gray-200">Limite Municipal</span>
-            </label>
-            <label class="flex items-center gap-2 text-sm cursor-pointer">
-                <input type="checkbox" id="layer-pontos" class="rounded text-blue-500" checked>
-                <span class="text-gray-700 dark:text-gray-200">Pontos</span>
+            <label class="layers-panel-option">
+                <input type="radio" name="base-layer" id="base-satellite" class="form-checkbox" checked>
+                <span>Satelite</span>
             </label>
         </div>
 
-        <h4 class="text-sm font-semibold mb-2 text-gray-900 dark:text-white border-t border-gray-200 dark:border-gray-700 pt-2">Filtrar por Resultado</h4>
-        <div class="space-y-1 text-xs">
-            <label class="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" data-resultado="1" class="filter-resultado rounded" checked>
-                <span class="w-3 h-3 rounded-full bg-[#dc2626]"></span>
-                <span class="text-gray-700 dark:text-gray-200">Fenômeno persiste</span>
+        <h4 class="layers-panel-title layers-panel-divider">Camadas</h4>
+        <div class="layers-panel-group">
+            <label class="layers-panel-option">
+                <input type="checkbox" id="layer-regionais" class="form-checkbox">
+                <span>Regionais</span>
             </label>
-            <label class="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" data-resultado="2" class="filter-resultado rounded" checked>
-                <span class="w-3 h-3 rounded-full bg-[#f97316]"></span>
-                <span class="text-gray-700 dark:text-gray-200">Impactado parcialmente</span>
+            <label class="layers-panel-option">
+                <input type="checkbox" id="layer-bairros" class="form-checkbox">
+                <span>Bairros</span>
             </label>
-            <label class="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" data-resultado="3" class="filter-resultado rounded">
-                <span class="w-3 h-3 rounded-full bg-[#1f2937]"></span>
-                <span class="text-gray-700 dark:text-gray-200">Deixou de Ocorrer</span>
+            <label class="layers-panel-option">
+                <input type="checkbox" id="layer-limite" class="form-checkbox" checked>
+                <span>Limite Municipal</span>
             </label>
-            <label class="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" data-resultado="4" class="filter-resultado rounded" checked>
-                <span class="w-3 h-3 rounded-full bg-[#6b7280]"></span>
-                <span class="text-gray-700 dark:text-gray-200">PSR ausente</span>
+            <label class="layers-panel-option">
+                <input type="checkbox" id="layer-pontos" class="form-checkbox" checked>
+                <span>Pontos</span>
             </label>
-            <label class="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" data-resultado="5" class="filter-resultado rounded">
-                <span class="w-3 h-3 rounded-full bg-[#3b82f6]"></span>
-                <span class="text-gray-700 dark:text-gray-200">Não constatado</span>
+        </div>
+
+        <h4 class="layers-panel-title layers-panel-divider">Filtrar por Resultado</h4>
+        <div class="layers-panel-filters">
+            <label class="layers-panel-filter">
+                <input type="checkbox" data-resultado="1" class="filter-resultado form-checkbox" checked>
+                <span class="filter-color" style="background-color: #dc2626;"></span>
+                <span>Fenomeno persiste</span>
             </label>
-            <label class="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" data-resultado="6" class="filter-resultado rounded" checked>
-                <span class="w-3 h-3 rounded-full bg-[#10b981]"></span>
-                <span class="text-gray-700 dark:text-gray-200">Em Conformidade</span>
+            <label class="layers-panel-filter">
+                <input type="checkbox" data-resultado="2" class="filter-resultado form-checkbox" checked>
+                <span class="filter-color" style="background-color: #f97316;"></span>
+                <span>Impactado parcialmente</span>
             </label>
-            <label class="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" data-resultado="null" class="filter-resultado rounded" checked>
-                <span class="w-3 h-3 rounded-full bg-[#a855f7]"></span>
-                <span class="text-gray-700 dark:text-gray-200">Sem vistoria</span>
+            <label class="layers-panel-filter">
+                <input type="checkbox" data-resultado="3" class="filter-resultado form-checkbox">
+                <span class="filter-color" style="background-color: #1f2937;"></span>
+                <span>Deixou de Ocorrer</span>
+            </label>
+            <label class="layers-panel-filter">
+                <input type="checkbox" data-resultado="4" class="filter-resultado form-checkbox" checked>
+                <span class="filter-color" style="background-color: #6b7280;"></span>
+                <span>PSR ausente</span>
+            </label>
+            <label class="layers-panel-filter">
+                <input type="checkbox" data-resultado="5" class="filter-resultado form-checkbox">
+                <span class="filter-color" style="background-color: #3b82f6;"></span>
+                <span>Nao constatado</span>
+            </label>
+            <label class="layers-panel-filter">
+                <input type="checkbox" data-resultado="6" class="filter-resultado form-checkbox" checked>
+                <span class="filter-color" style="background-color: #10b981;"></span>
+                <span>Em Conformidade</span>
+            </label>
+            <label class="layers-panel-filter">
+                <input type="checkbox" data-resultado="null" class="filter-resultado form-checkbox" checked>
+                <span class="filter-color" style="background-color: #a855f7;"></span>
+                <span>Sem vistoria</span>
             </label>
         </div>
     </div>
 
     <!-- Bottom Sheet - Point Info -->
-    <div id="bottom-sheet" class="absolute bottom-0 left-0 right-0 z-[1000] bg-white dark:bg-gray-800 rounded-t-2xl shadow-2xl transform translate-y-full transition-all duration-300">
-        <div class="p-4">
-            <div class="w-12 h-1 bg-gray-300 dark:bg-gray-600 rounded-full mx-auto mb-4"></div>
+    <div id="bottom-sheet" class="bottom-sheet">
+        <div class="bottom-sheet-content">
+            <div class="bottom-sheet-handle"></div>
             <div id="sheet-content">
                 <!-- Content will be dynamically inserted -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Relatorio -->
+    <div id="relatorio-modal" class="relatorio-modal hidden">
+        <div class="relatorio-modal-overlay" onclick="fecharRelatorio()"></div>
+        <div class="relatorio-modal-content">
+            <div class="relatorio-modal-header">
+                <span class="relatorio-modal-title">Relatorio da Vistoria</span>
+                <button type="button" class="relatorio-modal-close" onclick="fecharRelatorio()">
+                    <svg style="width: 24px; height: 24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="relatorio-modal-body">
+                <div id="relatorio-loader" class="relatorio-loader">
+                    <div class="loading-spinner"></div>
+                </div>
+                <iframe id="relatorio-iframe" src="" frameborder="0"></iframe>
             </div>
         </div>
     </div>
@@ -157,24 +253,33 @@
 @endsection
 
 @section('footer')
-    <div class="flex justify-around">
-        <button class="flex flex-col items-center text-blue-500 text-xs py-1">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div class="footer-nav">
+        <button class="footer-nav-item active">
+            <svg style="width: 24px; height: 24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
             </svg>
             <span>Mapa</span>
         </button>
-        <button id="btn-vistoria" class="flex flex-col items-center text-gray-300 text-xs py-1 cursor-not-allowed" disabled>
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <button id="btn-vistoria" class="footer-nav-item">
+            <svg style="width: 24px; height: 24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
             </svg>
-            <span>Vistoria</span>
+            <span>Nova Vistoria</span>
         </button>
-        <a href="{{ route('profile.edit') }}" class="flex flex-col items-center text-gray-500 text-xs py-1 hover:text-gray-200 transition">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+        <!-- Indicador de Zoom no Footer -->
+        <div id="footer-zoom-indicator" class="footer-nav-item footer-zoom-indicator" title="Zoom minimo para vistoria: 19">
+            <span id="footer-zoom-icon" class="footer-zoom-icon footer-zoom-icon-danger">
+                <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"/>
+                </svg>
+            </span>
+            <span>Zoom: <strong id="footer-zoom-level">12</strong></span>
+        </div>
+        <a href="{{ route('dashboard') }}" class="footer-nav-item">
+            <svg style="width: 24px; height: 24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
             </svg>
-            <span>Perfil</span>
+            <span>Home</span>
         </a>
     </div>
 @endsection
@@ -185,6 +290,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Belo Horizonte center coordinates (média dos pontos no banco)
     const BH_CENTER = [-19.9135, -43.9514];
     const DEFAULT_ZOOM = 12;
+    const MIN_ZOOM_VISTORIA = 19;
 
     // Verificar se há parâmetros de localização na URL
     const urlParams = new URLSearchParams(window.location.search);
@@ -193,6 +299,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const zoom = urlParams.get('zoom') ? parseInt(urlParams.get('zoom')) : DEFAULT_ZOOM;
     const pontoId = urlParams.get('ponto_id');
     const geocoded = urlParams.get('geocoded') === '1';
+    const enderecoParam = urlParams.get('endereco');
+    const referenciaParam = urlParams.get('referencia');
 
     // Initialize map
     const map = L.map('map', {
@@ -202,12 +310,102 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add zoom control to bottom-left (better for mobile)
     L.control.zoom({ position: 'bottomleft' }).addTo(map);
 
-    // Atualizar indicador de zoom
+    // Atualizar indicador de zoom com badge colorido (header e footer)
     const zoomLevel = document.getElementById('zoom-level');
-    zoomLevel.textContent = map.getZoom();
-    map.on('zoomend', () => {
-        zoomLevel.textContent = map.getZoom();
-    });
+    const zoomBadge = document.getElementById('zoom-badge');
+    const zoomWarning = document.getElementById('zoom-warning');
+    const footerZoomLevel = document.getElementById('footer-zoom-level');
+    const footerZoomIcon = document.getElementById('footer-zoom-icon');
+
+    function updateZoomBadge() {
+        const currentZoom = map.getZoom();
+
+        // Atualiza header
+        zoomLevel.textContent = currentZoom;
+
+        // Atualiza footer
+        if (footerZoomLevel) {
+            footerZoomLevel.textContent = currentZoom;
+        }
+
+        // Atualiza bottom sheet (se estiver aberto com aviso de zoom)
+        const sheetZoomLevel = document.getElementById('sheet-zoom-level');
+        const sheetZoomStatus = document.getElementById('sheet-zoom-status');
+        const sheetZoomTitle = document.getElementById('sheet-zoom-title');
+        const sheetZoomActions = document.getElementById('sheet-zoom-actions');
+
+        if (sheetZoomLevel) {
+            sheetZoomLevel.textContent = currentZoom;
+
+            // Atualiza o badge e mensagem quando zoom atinge o mínimo
+            if (currentZoom >= MIN_ZOOM_VISTORIA && sheetZoomStatus) {
+                sheetZoomStatus.classList.remove('sheet-zoom-danger');
+                sheetZoomStatus.classList.add('sheet-zoom-success');
+                sheetZoomStatus.textContent = 'Zoom OK';
+
+                if (sheetZoomTitle) {
+                    sheetZoomTitle.textContent = 'Pronto para vistoria!';
+                }
+
+                // Atualiza botões para mostrar opção de criar vistoria
+                if (sheetZoomActions && window.pendingVistoriaCoords) {
+                    const coords = window.pendingVistoriaCoords;
+                    sheetZoomActions.innerHTML = `
+                        <button onclick="hideBottomSheet()" class="btn btn-secondary" style="flex: 1;">Fechar</button>
+                        <a href="/vistorias/create?lat=${coords.lat}&lng=${coords.lng}" class="btn btn-success" style="flex: 1;">
+                            <svg style="width: 16px; height: 16px; margin-right: 4px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            Nova Vistoria
+                        </a>
+                    `;
+                }
+            } else if (currentZoom < MIN_ZOOM_VISTORIA && sheetZoomStatus) {
+                sheetZoomStatus.classList.remove('sheet-zoom-success');
+                sheetZoomStatus.classList.add('sheet-zoom-danger');
+                sheetZoomStatus.textContent = 'Zoom insuficiente';
+
+                if (sheetZoomTitle) {
+                    sheetZoomTitle.textContent = 'Aproxime mais o mapa';
+                }
+
+                // Restaura botões originais
+                if (sheetZoomActions && window.pendingVistoriaCoords) {
+                    const coords = window.pendingVistoriaCoords;
+                    sheetZoomActions.innerHTML = `
+                        <button onclick="hideBottomSheet()" class="btn btn-secondary" style="flex: 1;">Fechar</button>
+                        <button onclick="window.zoomAndCloseSheet(${coords.lat}, ${coords.lng})" class="btn btn-primary" style="flex: 1;">Aproximar</button>
+                    `;
+                }
+            }
+        }
+
+        // Muda cor: vermelho com aviso até 18, verde de 19 em diante
+        if (currentZoom >= MIN_ZOOM_VISTORIA) {
+            zoomBadge.classList.remove('badge-danger');
+            zoomBadge.classList.add('badge-success');
+            zoomWarning.style.display = 'none';
+
+            // Footer: verde quando zoom suficiente
+            if (footerZoomIcon) {
+                footerZoomIcon.classList.remove('footer-zoom-icon-danger');
+                footerZoomIcon.classList.add('footer-zoom-icon-success');
+            }
+        } else {
+            zoomBadge.classList.remove('badge-success');
+            zoomBadge.classList.add('badge-danger');
+            zoomWarning.style.display = 'inline';
+
+            // Footer: vermelho quando zoom insuficiente
+            if (footerZoomIcon) {
+                footerZoomIcon.classList.remove('footer-zoom-icon-success');
+                footerZoomIcon.classList.add('footer-zoom-icon-danger');
+            }
+        }
+    }
+
+    updateZoomBadge();
+    map.on('zoomend', updateZoomBadge);
 
     // Camadas base
     const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -283,7 +481,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     fillOpacity: 1
                 }).addTo(map);
 
-                selectedPointMarker.bindPopup('Ponto selecionado').openPopup();
+                // Montar popup com informações do endereço
+                let popupContent = '<div style="font-size: var(--text-sm);">';
+                if (enderecoParam) {
+                    popupContent += `<p style="font-weight: var(--font-semibold); color: var(--text-primary);">${decodeURIComponent(enderecoParam)}</p>`;
+                }
+                if (referenciaParam) {
+                    popupContent += `<p style="font-size: var(--text-xs); color: var(--text-secondary); margin-top: var(--space-1);"><strong>Ref:</strong> ${decodeURIComponent(referenciaParam)}</p>`;
+                }
+                popupContent += `<p class="text-mono" style="font-size: var(--text-xs); color: var(--text-muted); margin-top: var(--space-1);">${pointLat.toFixed(6)}, ${pointLng.toFixed(6)}</p>`;
+                popupContent += '</div>';
+
+                selectedPointMarker.bindPopup(popupContent).openPopup();
             }
         });
     } else {
@@ -302,7 +511,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const btn = this;
             btn.disabled = true;
-            btn.innerHTML = '<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Salvando...';
+            btn.innerHTML = '<svg class="spinner" style="width: 16px; height: 16px;" fill="none" viewBox="0 0 24 24"><circle style="opacity: 0.25;" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path style="opacity: 0.75;" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Salvando...';
 
             try {
                 const response = await fetch(`/api/pontos/${pontoId}/coordenadas`, {
@@ -321,21 +530,32 @@ document.addEventListener('DOMContentLoaded', function() {
                 const data = await response.json();
 
                 if (data.success) {
-                    // Sucesso - redireciona para lista com mensagem
-                    window.location.href = '/pontos/nao-georreferenciados?success=1';
+                    // Sucesso - redireciona para lista com mensagem e detalhes
+                    const params = new URLSearchParams({
+                        success: '1',
+                        ponto: data.endereco_ponto || '',
+                        bairro: data.bairro || '',
+                        referencia: data.endereco_referencia || '',
+                        lat: data.lat,
+                        lng: data.lng
+                    });
+                    window.location.href = '/pontos/nao-georreferenciados?' + params.toString();
                 } else {
                     alert('Erro ao salvar coordenadas: ' + (data.message || 'Erro desconhecido'));
                     btn.disabled = false;
-                    btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Confirmar';
+                    btn.innerHTML = '<svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Confirmar';
                 }
             } catch (error) {
                 console.error('Erro:', error);
                 alert('Erro ao salvar coordenadas. Tente novamente.');
                 btn.disabled = false;
-                btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Confirmar';
+                btn.innerHTML = '<svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Confirmar';
             }
         });
     }
+
+    // Flag para evitar conflito entre clique em marcador e clique no mapa
+    let markerClickedRecently = false;
 
     // Layers - usando MarkerClusterGroup para melhor performance
     const markersLayer = L.markerClusterGroup({
@@ -346,6 +566,7 @@ document.addEventListener('DOMContentLoaded', function() {
         zoomToBoundsOnClick: true,
         disableClusteringAtZoom: 18
     }).addTo(map);
+
     let regionaisLayer = null;
     let regionaisLabelsLayer = null;
     let bairrosLayer = null;
@@ -408,7 +629,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 layer.bindTooltip(feature.properties.nome, {
                     permanent: false,
                     direction: 'center',
-                    className: 'bg-white px-2 py-1 rounded shadow text-sm'
+                    className: 'map-tooltip'
                 });
             }
         });
@@ -424,7 +645,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const label = L.marker(center, {
                     icon: L.divIcon({
                         className: 'regional-label',
-                        html: `<span class="px-2 py-1 bg-blue-500/90 text-white text-xs font-bold rounded shadow-sm whitespace-nowrap">${feature.properties.nome}</span>`,
+                        html: `<span class="map-label map-label-regional">${feature.properties.nome}</span>`,
                         iconSize: null,
                         iconAnchor: [0, 0]
                     })
@@ -460,7 +681,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 layer.bindTooltip(feature.properties.nome, {
                     permanent: false,
                     direction: 'center',
-                    className: 'bg-white px-2 py-1 rounded shadow text-xs'
+                    className: 'map-tooltip map-tooltip-sm'
                 });
             }
         });
@@ -476,7 +697,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const label = L.marker(center, {
                     icon: L.divIcon({
                         className: 'bairro-label',
-                        html: `<span class="px-2 py-1 bg-white/90 dark:bg-gray-800/90 text-gray-800 dark:text-gray-200 text-xs font-medium rounded shadow-sm whitespace-nowrap">${feature.properties.nome}</span>`,
+                        html: `<span class="map-label map-label-bairro">${feature.properties.nome}</span>`,
                         iconSize: null,
                         iconAnchor: [0, 0]
                     })
@@ -545,21 +766,37 @@ document.addEventListener('DOMContentLoaded', function() {
                         const cor = coresResultado[resultadoId] || coresResultado[null];
                         const status = legendaResultado[resultadoId] || legendaResultado[null];
 
+                        const totalVistorias = ponto.total_vistorias || 0;
+                        const complexidade = ponto.complexidade || 0;
+                        const ultimaVistoriaId = ponto.ultima_vistoria_id;
+                        const relatorioLink = ultimaVistoriaId
+                            ? `<br><a href="#" onclick="event.stopPropagation(); abrirRelatorio(${ultimaVistoriaId}); return false;" style="font-size: 11px; color: #3b82f6; text-decoration: underline;">Ver relatorio</a>`
+                            : '';
+                        const complexidadeCor = complexidade >= 8 ? '#dc2626' : complexidade >= 4 ? '#f59e0b' : '#6b7280';
                         const marker = L.circleMarker([lat, lng], {
                             radius: 8,
                             fillColor: cor,
                             color: '#fff',
                             weight: 2,
                             opacity: 1,
-                            fillOpacity: 0.9
+                            fillOpacity: 0.9,
+                            bubblingMouseEvents: false
                         }).bindPopup(`
                                 <strong>${ponto.logradouro}, ${ponto.numero}</strong><br>
                                 <small>${ponto.bairro} - ${ponto.regional}</small><br>
-                                <span style="color:${cor}; font-weight:bold;">● ${status}</span>
+                                <span style="color:${cor}; font-weight:bold;">● ${status}</span><br>
+                                <span style="font-size: 11px; color: #6b7280;">Vistorias: <strong>${totalVistorias}</strong> | Complexidade: <strong style="color:${complexidadeCor}">${complexidade}</strong></span>${relatorioLink}
                             `);
                         marker.pontoData = ponto;
+
+                        // Handler de clique individual (garante funcionamento com bubblingMouseEvents: false)
+                        marker.on('click', function(e) {
+                            L.DomEvent.stopPropagation(e);
+                            markerClickedRecently = true;
+                            setTimeout(() => { markerClickedRecently = false; }, 300);
+                            showPointDetails(ponto);
+                        });
                         marker.resultadoId = resultadoId; // Armazena para filtro
-                        marker.on('click', () => showPointDetails(ponto));
                         allMarkers.push(marker);
                     }
                 });
@@ -688,10 +925,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     async function showPointDetails(ponto) {
+        // Limpa marcador azul de seleção se existir
+        clearUserLocation();
+
         // Mostra loading
         showBottomSheet(`
-            <div class="flex items-center justify-center py-4">
-                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+            <div class="sheet-loading">
+                <div class="loading-spinner"></div>
             </div>
         `);
 
@@ -701,35 +941,42 @@ document.addEventListener('DOMContentLoaded', function() {
             const details = await response.json();
 
             showBottomSheet(`
-                <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">${details.logradouro}, ${details.numero}</h3>
-                <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">${details.bairro} - ${details.regional}</p>
-                <div class="grid grid-cols-3 gap-2 mb-4">
-                    <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-2 text-center">
-                        <div class="text-lg font-bold text-blue-500">${details.contador || 0}</div>
-                        <div class="text-xs text-gray-500 dark:text-gray-400">Vistorias</div>
+                <h3 class="sheet-title">${details.logradouro}, ${details.numero}</h3>
+                <p class="sheet-subtitle">${details.bairro} - ${details.regional}</p>
+                <div class="sheet-stats">
+                    <div class="sheet-stat">
+                        <div class="sheet-stat-value">${details.contador || 0}</div>
+                        <div class="sheet-stat-label">Vistorias</div>
                     </div>
-                    <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-2 text-center">
-                        <div class="text-lg font-bold text-blue-500">${details.soma_kg || 0}</div>
-                        <div class="text-xs text-gray-500 dark:text-gray-400">Kg</div>
+                    <div class="sheet-stat">
+                        <div class="sheet-stat-value">${details.soma_kg || 0}</div>
+                        <div class="sheet-stat-label">Kg</div>
                     </div>
-                    <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-2 text-center">
-                        <div class="text-lg font-bold text-blue-500">${details.complexidade || 0}</div>
-                        <div class="text-xs text-gray-500 dark:text-gray-400">Complex.</div>
+                    <div class="sheet-stat">
+                        <div class="sheet-stat-value">${details.complexidade || 0}</div>
+                        <div class="sheet-stat-label">Complex.</div>
                     </div>
                 </div>
-                <button
-                    onclick="window.location.href='/pontos/${details.id}/vistorias/create'"
-                    class="w-full bg-blue-500 text-white py-3 rounded-lg font-medium hover:bg-blue-600 transition"
-                >
+                <button onclick="window.location.href='/pontos/${details.id}/vistorias/create'" class="btn btn-primary btn-block">
                     Nova Vistoria
                 </button>
             `);
         } catch (err) {
             showBottomSheet(`
-                <p class="text-red-500 text-center">Erro ao carregar detalhes</p>
+                <p class="sheet-error">Erro ao carregar detalhes</p>
             `);
         }
     }
+
+    // Evento de clique no layer de marcadores (mais confiável que eventos individuais)
+    markersLayer.on('click', function(e) {
+        const marker = e.layer;
+        if (marker && marker.pontoData) {
+            markerClickedRecently = true;
+            setTimeout(() => { markerClickedRecently = false; }, 300);
+            showPointDetails(marker.pontoData);
+        }
+    });
 
     // Geolocation - botão FAB
     let userLocationMarker = null;
@@ -741,8 +988,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function enableVistoriaButton() {
         btnVistoria.disabled = false;
-        btnVistoria.classList.remove('text-gray-300', 'cursor-not-allowed');
-        btnVistoria.classList.add('text-blue-500');
+        btnVistoria.classList.add('active');
+    }
+
+    // Limpa o marcador azul de seleção de localização
+    function clearUserLocation() {
+        if (userLocationMarker) {
+            map.removeLayer(userLocationMarker);
+            userLocationMarker = null;
+        }
+        if (accuracyCircle) {
+            map.removeLayer(accuracyCircle);
+            accuracyCircle = null;
+        }
+        currentLocation = null;
+        locationMode = false;
     }
 
     function setUserLocation(lat, lng, accuracy = null) {
@@ -803,14 +1063,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const restoreButton = () => {
             if (loader) loader.classList.add('hidden');
             if (icon) icon.classList.remove('hidden');
-            btn.classList.remove('text-blue-500');
+            btn.classList.remove('active');
             btn.style.pointerEvents = 'auto';
         };
         
         // Mostra loader e esconde ícone
         if (icon) icon.classList.add('hidden');
         if (loader) loader.classList.remove('hidden');
-        btn.classList.add('text-blue-500');
+        btn.classList.add('active');
         btn.style.pointerEvents = 'none'; // Desabilita cliques temporariamente
 
         if (navigator.geolocation) {
@@ -820,13 +1080,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     const lng = position.coords.longitude;
 
                     setUserLocation(lat, lng, position.coords.accuracy);
-                    map.setView([lat, lng], 17);
+                    map.setView([lat, lng], MIN_ZOOM_VISTORIA);
 
                     locationMode = true; // Ativa modo de seleção
                     
                     // Restaura botão com cor primária
                     restoreButton();
-                    btn.classList.add('text-blue-500');
+                    btn.classList.add('active');
                 },
                 error => {
                     // Restaura botão ao estado normal
@@ -842,41 +1102,199 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Clique no mapa cria ponto provisório, ajusta zoom e habilita vistoria
-    map.on('click', function(e) {
-        // Cria/move o marcador provisório
-        setUserLocation(e.latlng.lat, e.latlng.lng);
+    // Armazena dados do endereço atual para uso no botão Vistoria
+    let currentEndereco = null;
 
-        // Ajusta zoom para 17 se estiver menor
-        if (map.getZoom() < 17) {
-            map.setView(e.latlng, 17);
+    // Clique no mapa cria ponto provisório, busca endereço e habilita vistoria
+    map.on('click', async function(e) {
+        // Ignora se clicou em um marcador recentemente
+        if (markerClickedRecently) {
+            return;
         }
+
+        const lat = e.latlng.lat;
+        const lng = e.latlng.lng;
+
+        // Verifica zoom mínimo para criar vistoria
+        if (map.getZoom() < MIN_ZOOM_VISTORIA) {
+            showBottomSheet(`
+                <div class="sheet-address-info">
+                    <p id="sheet-zoom-status" class="sheet-label sheet-zoom-badge sheet-zoom-danger">Zoom insuficiente</p>
+                    <h3 id="sheet-zoom-title" class="sheet-title">Aproxime mais o mapa</h3>
+                    <p class="sheet-subtitle">Zoom atual: <strong id="sheet-zoom-level">${map.getZoom()}</strong> | Minimo necessario: ${MIN_ZOOM_VISTORIA}</p>
+                </div>
+                <div id="sheet-zoom-actions" class="sheet-actions">
+                    <button onclick="hideBottomSheet()" class="btn btn-secondary" style="flex: 1;">Fechar</button>
+                    <button onclick="window.zoomAndCloseSheet(${lat}, ${lng})" class="btn btn-primary" style="flex: 1;">Aproximar</button>
+                </div>
+            `);
+            // Armazenar coordenadas para uso quando zoom atingir o mínimo
+            window.pendingVistoriaCoords = { lat, lng };
+            return;
+        }
+
+        // Cria/move o marcador provisório
+        setUserLocation(lat, lng);
 
         // Ativa o modo de seleção
         locationMode = true;
 
-        hideBottomSheet();
+        // Busca o endereço de porta mais próximo
+        try {
+            const response = await fetch(`/api/enderecos/por-coordenadas?lat=${lat}&lng=${lng}`);
+            const data = await response.json();
+
+            if (data.encontrado) {
+                const end = data.endereco;
+                const enderecoLabel = `${end.tipo} ${end.logradouro}, ${Math.round(end.numero)}`;
+                const distancia = data.distancia_metros;
+
+                // Armazenar endereço para uso no botão Vistoria
+                currentEndereco = end;
+
+                // Montar URL com dados do endereço
+                const vistoriaParams = new URLSearchParams({
+                    lat: lat,
+                    lng: lng,
+                    endereco_tipo: end.tipo || '',
+                    endereco_logradouro: end.logradouro || '',
+                    endereco_numero: Math.round(end.numero) || '',
+                    endereco_bairro: end.bairro || '',
+                    endereco_regional: end.regional || '',
+                    endereco_distancia: distancia
+                });
+
+                showBottomSheet(`
+                    <div class="sheet-address-info">
+                        <p class="sheet-label">Endereco de porta mais proximo (${distancia}m)</p>
+                        <h3 class="sheet-title">${enderecoLabel}</h3>
+                        <p class="sheet-subtitle">${end.bairro} - ${end.regional}</p>
+                    </div>
+                    <div class="sheet-actions">
+                        <button onclick="hideBottomSheet()" class="btn btn-secondary" style="flex: 1;">Cancelar</button>
+                        <a href="/vistorias/create?${vistoriaParams.toString()}" class="btn btn-primary" style="flex: 1;"><svg style="width: 16px; height: 16px; margin-right: 4px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>Nova Vistoria Aqui</a>
+                    </div>
+                `);
+            } else {
+                // Mesmo sem endereço próximo, permitir criar vistoria
+                currentEndereco = null;
+                const vistoriaParams = new URLSearchParams({
+                    lat: lat,
+                    lng: lng
+                });
+
+                showBottomSheet(`
+                    <div class="sheet-address-info">
+                        <p class="sheet-label">Nenhum endereco de porta proximo</p>
+                        <h3 class="sheet-title">Local sem referencia</h3>
+                        <p class="sheet-subtitle">Coordenadas: ${lat.toFixed(6)}, ${lng.toFixed(6)}</p>
+                    </div>
+                    <div class="sheet-actions">
+                        <button onclick="hideBottomSheet()" class="btn btn-secondary" style="flex: 1;">Cancelar</button>
+                        <a href="/vistorias/create?${vistoriaParams.toString()}" class="btn btn-primary" style="flex: 1;"><svg style="width: 16px; height: 16px; margin-right: 4px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>Nova Vistoria Aqui</a>
+                    </div>
+                `);
+            }
+        } catch (err) {
+            console.error('Erro ao buscar endereço:', err);
+            // Mesmo com erro, permitir criar vistoria apenas com coordenadas
+            currentEndereco = null;
+            const vistoriaParams = new URLSearchParams({
+                lat: lat,
+                lng: lng
+            });
+
+            showBottomSheet(`
+                <div class="sheet-address-info">
+                    <p class="sheet-label">Erro ao buscar endereco</p>
+                    <h3 class="sheet-title">Local sem referencia</h3>
+                    <p class="sheet-subtitle">Coordenadas: ${lat.toFixed(6)}, ${lng.toFixed(6)}</p>
+                </div>
+                <div class="sheet-actions">
+                    <button onclick="hideBottomSheet()" class="btn btn-secondary" style="flex: 1;">Cancelar</button>
+                    <a href="/vistorias/create?${vistoriaParams.toString()}" class="btn btn-primary" style="flex: 1;"><svg style="width: 16px; height: 16px; margin-right: 4px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>Nova Vistoria Aqui</a>
+                </div>
+            `);
+        }
     });
 
     // Botão de vistoria
-    btnVistoria.addEventListener('click', function() {
-        if (!currentLocation) return;
+    btnVistoria.addEventListener('click', async function() {
+        // Se nao tem ponto selecionado, mostrar popup informativo
+        if (!currentLocation) {
+            showBottomSheet(`
+                <div class="sheet-warning">
+                    <div class="sheet-warning-icon">
+                        <svg style="width: 24px; height: 24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                    </div>
+                    <h3 class="sheet-title">Selecione um Ponto</h3>
+                    <p class="sheet-text">Para registrar uma nova vistoria, voce precisa:</p>
+                    <div class="sheet-instructions">
+                        <div class="sheet-instruction">
+                            <span class="sheet-instruction-number">1.</span>
+                            <span>Clicar no mapa para criar um <strong>novo ponto</strong></span>
+                        </div>
+                        <div class="sheet-instruction">
+                            <span class="sheet-instruction-number">2.</span>
+                            <span>Ou selecionar um <strong>ponto existente</strong> no mapa</span>
+                        </div>
+                    </div>
+                    <button onclick="hideBottomSheet()" class="btn btn-primary btn-block">Entendi</button>
+                </div>
+            `);
+            return;
+        }
+
+        // Mostrar loading
+        showBottomSheet(`
+            <div class="sheet-loading">
+                <div class="loading-spinner"></div>
+            </div>
+        `);
+
+        // Buscar endereço se não tiver
+        if (!currentEndereco) {
+            try {
+                const response = await fetch(`/api/enderecos/por-coordenadas?lat=${currentLocation.lat}&lng=${currentLocation.lng}`);
+                const data = await response.json();
+                if (data.encontrado) {
+                    currentEndereco = data.endereco;
+                }
+            } catch (err) {
+                console.error('Erro ao buscar endereço:', err);
+            }
+        }
+
+        // Montar URL com dados do endereço
+        const vistoriaParams = new URLSearchParams({
+            lat: currentLocation.lat,
+            lng: currentLocation.lng
+        });
+
+        let enderecoHtml = '';
+        if (currentEndereco) {
+            const end = currentEndereco;
+            vistoriaParams.set('endereco_tipo', end.tipo || '');
+            vistoriaParams.set('endereco_logradouro', end.logradouro || '');
+            vistoriaParams.set('endereco_numero', Math.round(end.numero) || '');
+            vistoriaParams.set('endereco_bairro', end.bairro || '');
+            vistoriaParams.set('endereco_regional', end.regional || '');
+
+            enderecoHtml = `
+                <p class="sheet-address">${end.tipo} ${end.logradouro}, ${Math.round(end.numero)}</p>
+                <p class="sheet-subtitle">${end.bairro} - ${end.regional}</p>
+            `;
+        }
 
         showBottomSheet(`
-            <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">Nova Vistoria</h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                <strong>Localização:</strong><br>
-                Lat: ${currentLocation.lat.toFixed(6)}<br>
-                Lng: ${currentLocation.lng.toFixed(6)}
-            </p>
-            <div class="space-y-3">
-                <a href="/vistorias/create?lat=${currentLocation.lat}&lng=${currentLocation.lng}"
-                   class="block w-full bg-blue-500 text-white py-3 rounded-lg font-medium text-center hover:bg-blue-600 transition">
-                    Registrar Vistoria
-                </a>
-                <button onclick="hideBottomSheet()" class="w-full bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 py-3 rounded-lg font-medium hover:bg-gray-100 dark:hover:bg-gray-600 transition border border-gray-300 dark:border-gray-600">
-                    Cancelar
-                </button>
+            <h3 class="sheet-title">Nova Vistoria</h3>
+            ${enderecoHtml}
+            <p class="sheet-coords">${currentLocation.lat.toFixed(6)}, ${currentLocation.lng.toFixed(6)}</p>
+            <div class="sheet-actions-vertical">
+                <a href="/vistorias/create?${vistoriaParams.toString()}" class="btn btn-primary btn-block">Registrar Vistoria</a>
+                <button onclick="hideBottomSheet()" class="btn btn-secondary btn-block">Cancelar</button>
             </div>
         `);
     });
@@ -884,19 +1302,247 @@ document.addEventListener('DOMContentLoaded', function() {
     // Expor hideBottomSheet globalmente para o onclick inline
     window.hideBottomSheet = hideBottomSheet;
 
-    // Solicitar localização automaticamente se vier de "Nova Vistoria"
-    if (urlParams.get('nova_vistoria') === '1') {
-        // Aguarda o mapa estar totalmente carregado
-        map.whenReady(() => {
-            // Pequeno delay para garantir que tudo está pronto
-            setTimeout(() => {
-                // Simula o clique no botão de localização
-                const btn = document.getElementById('btn-my-location');
-                if (btn) {
-                    btn.click();
-                }
-            }, 500);
+    // Função para aproximar zoom e fechar o bottom sheet
+    window.zoomAndCloseSheet = function(lat, lng) {
+        map.setView([lat, lng], map.getZoom() + 1);
+        hideBottomSheet();
+    };
+
+    // Modal do Relatorio
+    function abrirRelatorio(vistoriaId) {
+        const modal = document.getElementById('relatorio-modal');
+        const iframe = document.getElementById('relatorio-iframe');
+        const loader = document.getElementById('relatorio-loader');
+
+        modal.classList.remove('hidden');
+        loader.classList.remove('hidden');
+        iframe.classList.add('hidden');
+
+        iframe.src = `/vistorias/${vistoriaId}/relatorio`;
+
+        iframe.onload = function() {
+            loader.classList.add('hidden');
+            iframe.classList.remove('hidden');
+        };
+
+        document.body.style.overflow = 'hidden';
+    }
+
+    function fecharRelatorio() {
+        const modal = document.getElementById('relatorio-modal');
+        const iframe = document.getElementById('relatorio-iframe');
+
+        modal.classList.add('hidden');
+        iframe.src = '';
+        document.body.style.overflow = '';
+    }
+
+    // Fechar modal com ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            fecharRelatorio();
+        }
+    });
+
+    // Expor funcoes globalmente
+    window.abrirRelatorio = abrirRelatorio;
+    window.fecharRelatorio = fecharRelatorio;
+
+    // ========== BUSCA DE ENDEREÇO ==========
+    const searchLogradouro = document.getElementById('search-logradouro');
+    const searchNumero = document.getElementById('search-numero');
+    const logradouroResults = document.getElementById('logradouro-results');
+    const btnBuscar = document.getElementById('btn-buscar-endereco');
+    let searchMarker = null;
+    let searchTimeout = null;
+    let selectedLogradouro = null; // Armazena o logradouro selecionado (sem tipo)
+
+    // Prevenir que eventos do mapa afetem os inputs
+    if (searchLogradouro) {
+        searchLogradouro.addEventListener('click', e => e.stopPropagation());
+    }
+    if (searchNumero) {
+        searchNumero.addEventListener('click', e => e.stopPropagation());
+    }
+
+    // Autocomplete de logradouros
+    if (searchLogradouro && logradouroResults) {
+        searchLogradouro.addEventListener('input', function(e) {
+            e.stopPropagation();
+            const termo = this.value.trim();
+            selectedLogradouro = null; // Limpa seleção ao digitar
+
+            if (searchTimeout) {
+                clearTimeout(searchTimeout);
+            }
+
+            if (termo.length < 2) {
+                logradouroResults.classList.add('hidden');
+                return;
+            }
+
+            searchTimeout = setTimeout(() => {
+                buscarLogradouros(termo);
+            }, 300);
         });
+
+        // Fechar ao clicar fora
+        document.addEventListener('click', function(e) {
+            if (!searchLogradouro.contains(e.target) && !logradouroResults.contains(e.target)) {
+                logradouroResults.classList.add('hidden');
+            }
+        });
+    }
+
+    // Função para buscar logradouros
+    async function buscarLogradouros(termo) {
+        try {
+            logradouroResults.innerHTML = '<div style="padding: var(--space-2); text-align: center;">Carregando...</div>';
+            logradouroResults.classList.remove('hidden');
+
+            const response = await fetch(`/api/enderecos/logradouros?q=${encodeURIComponent(termo)}`);
+            const logradouros = await response.json();
+
+            if (logradouros.length === 0) {
+                logradouroResults.innerHTML = '<div style="padding: var(--space-2); text-align: center; color: var(--text-muted);">Nenhum logradouro encontrado</div>';
+            } else {
+                logradouroResults.innerHTML = logradouros.map(log => `
+                    <button type="button" class="autocomplete-item" data-tipo="${log.tipo || ''}" data-logradouro="${log.logradouro || ''}" data-regional="${log.regional || ''}">
+                        <div style="font-weight: var(--font-medium);">${log.tipo || ''} ${log.logradouro || ''}</div>
+                        <div style="font-size: var(--text-xs); color: var(--text-muted);">${log.regional || ''}</div>
+                    </button>
+                `).join('');
+
+                // Adicionar event listeners
+                logradouroResults.querySelectorAll('.autocomplete-item').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const tipo = this.dataset.tipo;
+                        const logradouro = this.dataset.logradouro;
+                        selectedLogradouro = logradouro; // Armazena o logradouro puro para busca
+                        searchLogradouro.value = `${tipo} ${logradouro}`;
+                        logradouroResults.classList.add('hidden');
+                        searchNumero.focus();
+                    });
+                });
+            }
+        } catch (err) {
+            console.error('Erro na busca:', err);
+            logradouroResults.innerHTML = '<div style="padding: var(--space-2); text-align: center; color: var(--color-danger);">Erro ao buscar logradouros</div>';
+        }
+    }
+
+    // Buscar endereco completo (logradouro + numero opcional)
+    async function buscarEnderecoCompleto() {
+        // Usa o logradouro selecionado do autocomplete, ou extrai do campo digitado
+        let logradouro = selectedLogradouro;
+        if (!logradouro) {
+            // Se digitou manualmente, tenta extrair removendo o tipo do início
+            const valorCampo = searchLogradouro.value.trim();
+            if (!valorCampo) {
+                alert('Digite um logradouro');
+                searchLogradouro.focus();
+                return;
+            }
+            // Remove prefixos comuns de tipo (AVE, RUA, PCA, etc.)
+            logradouro = valorCampo.replace(/^(AVE|RUA|PCA|ALA|TRV|BEC|PRC|VIA|ROD|EST|LAD)\s+/i, '');
+        }
+
+        const numeroInput = searchNumero.value.trim();
+        const numero = numeroInput ? parseInt(numeroInput) : null;
+
+        try {
+            const params = new URLSearchParams({ logradouro: logradouro });
+            if (numero && numero > 0) {
+                params.append('numero', numero);
+            }
+
+            const response = await fetch(`/api/enderecos/buscar?${params}`);
+            const result = await response.json();
+
+            if (result.encontrado) {
+                const end = result.endereco;
+                const lat = parseFloat(end.lat);
+                const lng = parseFloat(end.lng);
+
+                // Determina o tipo de resultado
+                const numeroInformado = result.numero_informado;
+                const isAproximado = !result.exato || !numeroInformado;
+                const enderecoLabel = `${end.tipo} ${end.logradouro}, ${Math.round(end.numero)}`;
+
+                // Mensagem personalizada
+                let mensagemAproximado = null;
+                if (!numeroInformado) {
+                    mensagemAproximado = 'centro';
+                } else if (!result.exato) {
+                    mensagemAproximado = numero;
+                }
+
+                irParaEndereco(lat, lng, enderecoLabel, end.bairro, end.regional, isAproximado, mensagemAproximado);
+            } else {
+                alert('Endereço não encontrado');
+            }
+        } catch (err) {
+            console.error('Erro na busca:', err);
+            alert('Erro ao buscar endereço');
+        }
+    }
+
+    // Botão de buscar
+    btnBuscar.addEventListener('click', buscarEnderecoCompleto);
+
+    // Enter no campo de número dispara busca
+    searchNumero.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            buscarEnderecoCompleto();
+        }
+    });
+
+    // Navegar para o endereço no mapa
+    function irParaEndereco(lat, lng, endereco, bairro, regional, isAproximado = false, mensagemAproximado = null) {
+        // Remove marcador anterior se existir
+        if (searchMarker) {
+            map.removeLayer(searchMarker);
+        }
+
+        // Adiciona marcador destacado (amarelo)
+        searchMarker = L.circleMarker([lat, lng], {
+            radius: 14,
+            fillColor: '#f59e0b',
+            color: '#fff',
+            weight: 3,
+            opacity: 1,
+            fillOpacity: 1
+        }).addTo(map);
+
+        // Centraliza e ajusta zoom
+        map.setView([lat, lng], 18);
+
+        // Mostra informacoes no bottom sheet
+        let avisoAproximado = '';
+        if (isAproximado && mensagemAproximado === 'centro') {
+            avisoAproximado = '<div class="alert alert-info" style="margin-bottom: var(--space-3);">Mostrando o centro do logradouro.</div>';
+        } else if (isAproximado && mensagemAproximado) {
+            avisoAproximado = `<div class="alert alert-warning" style="margin-bottom: var(--space-3);">Numero ${mensagemAproximado} nao encontrado. Mostrando o mais proximo.</div>`;
+        }
+
+        showBottomSheet(`
+            ${avisoAproximado}
+            <h3 class="sheet-title">${endereco}</h3>
+            <p class="sheet-subtitle" style="margin-bottom: var(--space-4);">${bairro} - ${regional}</p>
+            <div class="sheet-actions">
+                <button onclick="hideBottomSheet()" class="btn btn-secondary" style="flex: 1;">Cancelar</button>
+                <a href="/vistorias/create?lat=${lat}&lng=${lng}" class="btn btn-primary" style="flex: 1;"><svg style="width: 16px; height: 16px; margin-right: 4px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>Nova Vistoria Aqui</a>
+            </div>
+        `);
+
+        // Armazena localização para uso no botão Vistoria
+        currentLocation = { lat, lng };
+        enableVistoriaButton();
+
+        // Limpa campos
+        searchLogradouro.value = '';
+        searchNumero.value = '';
     }
 });
 </script>

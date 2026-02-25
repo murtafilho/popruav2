@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Services\EnderecoBaseService;
+use App\Services\EnderecoService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -12,12 +12,12 @@ use Illuminate\Support\Facades\Log;
 class GeocodingController extends Controller
 {
     public function __construct(
-        private EnderecoBaseService $enderecoBaseService
+        private EnderecoService $enderecoService
     ) {}
 
     /**
      * Geocodifica um endereço.
-     * Primeiro busca na tabela endereco_base, depois usa Nominatim (OpenStreetMap) como fallback.
+     * Primeiro busca na tabela endereco_atualizados, depois usa Nominatim (OpenStreetMap) como fallback.
      */
     public function geocode(Request $request): JsonResponse
     {
@@ -32,27 +32,27 @@ class GeocodingController extends Controller
         $numero = $request->input('numero');
         $bairro = $request->input('bairro', '');
 
-        // 1. Tenta buscar na tabela endereco_base primeiro
-        $enderecoBase = $this->enderecoBaseService->geocodificarEndereco($logradouro, $numero, $bairro);
+        // 1. Tenta buscar na tabela endereco_atualizado primeiro
+        $endereco = $this->enderecoService->geocodificarEndereco($logradouro, $numero, $bairro);
 
-        if ($enderecoBase && $enderecoBase->lat && $enderecoBase->lng) {
-            $enderecoEncontrado = $enderecoBase->tipo.' '.$enderecoBase->logradouro.', '.intval($enderecoBase->numero);
-            if ($enderecoBase->bairro) {
-                $enderecoEncontrado .= ' - '.$enderecoBase->bairro;
+        if ($endereco && $endereco->lat && $endereco->lng) {
+            $enderecoEncontrado = $endereco->tipo.' '.$endereco->logradouro.', '.intval($endereco->numero);
+            if ($endereco->bairro) {
+                $enderecoEncontrado .= ' - '.$endereco->bairro;
             }
 
             return response()->json([
                 'success' => true,
-                'lat' => (float) $enderecoBase->lat,
-                'lng' => (float) $enderecoBase->lng,
-                'source' => 'endereco_base',
+                'lat' => (float) $endereco->lat,
+                'lng' => (float) $endereco->lng,
+                'source' => 'endereco_atualizado',
                 'display_name' => $enderecoEncontrado,
                 'address' => [
-                    'tipo' => $enderecoBase->tipo,
-                    'logradouro' => $enderecoBase->logradouro,
-                    'numero' => intval($enderecoBase->numero),
-                    'bairro' => $enderecoBase->bairro,
-                    'regional' => $enderecoBase->regional,
+                    'tipo' => $endereco->tipo,
+                    'logradouro' => $endereco->logradouro,
+                    'numero' => intval($endereco->numero),
+                    'bairro' => $endereco->bairro,
+                    'regional' => $endereco->regional,
                 ],
             ]);
         }

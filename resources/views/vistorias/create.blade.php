@@ -3,18 +3,20 @@
 @section('title', 'Nova Vistoria')
 
 @section('header')
-    <a href="{{ route('mapa.index') }}" class="p-2 -ml-2 rounded-lg hover:bg-white/10 transition">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-        </svg>
-    </a>
-    <h1 class="text-lg font-semibold flex-1 text-center">Nova Vistoria</h1>
-    <div class="w-10"></div>
+    <div class="flex items-center gap-3 flex-1">
+        <a href="{{ route('mapa.index') }}" class="btn btn-ghost btn-icon" style="margin-left: -8px;">
+            <svg style="width: 22px; height: 22px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+        </a>
+        <span class="mobile-header-title flex-1 text-center">Nova Vistoria</span>
+        <div style="width: 44px;"></div>
+    </div>
 @endsection
 
 @section('content')
-    <div class="h-full flex flex-col bg-gray-50 dark:bg-gray-900">
-        <form id="vistoria-form" action="{{ route('vistorias.store') }}" method="POST" enctype="multipart/form-data" class="flex flex-col h-full">
+    <div class="form-page">
+        <form id="vistoria-form" action="{{ route('vistorias.store') }}" method="POST" enctype="multipart/form-data" class="form-container">
             @csrf
             <input type="hidden" name="lat" value="{{ $lat }}">
             <input type="hidden" name="lng" value="{{ $lng }}">
@@ -22,492 +24,673 @@
                 <input type="hidden" name="ponto_id" value="{{ $pontoProximo->id }}">
             @endif
 
-            <!-- Navegação das Abas -->
-            <div class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
-                <div class="flex">
-                    <button type="button" onclick="showTab(0)" class="tab-btn flex-1 py-3 px-2 text-xs font-medium text-center border-b-2 transition-colors" data-tab="0">
-                        <svg class="w-5 h-5 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                        </svg>
-                        Dados
-                    </button>
-                    <button type="button" onclick="showTab(1)" class="tab-btn flex-1 py-3 px-2 text-xs font-medium text-center border-b-2 transition-colors" data-tab="1">
-                        <svg class="w-5 h-5 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
-                        </svg>
-                        Perfil
-                    </button>
-                    <button type="button" onclick="showTab(2)" class="tab-btn flex-1 py-3 px-2 text-xs font-medium text-center border-b-2 transition-colors" data-tab="2">
-                        <svg class="w-5 h-5 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
-                        </svg>
-                        Fiscalização
-                    </button>
-                    <button type="button" onclick="showTab(3)" class="tab-btn flex-1 py-3 px-2 text-xs font-medium text-center border-b-2 transition-colors" data-tab="3">
-                        <svg class="w-5 h-5 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                        </svg>
-                        Moradores
-                    </button>
-                    <button type="button" onclick="showTab(4)" class="tab-btn flex-1 py-3 px-2 text-xs font-medium text-center border-b-2 transition-colors" data-tab="4">
-                        <svg class="w-5 h-5 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
-                        </svg>
-                        Fotos
-                    </button>
+            <!-- Progress Stepper -->
+            <div class="progress-stepper" id="progress-stepper">
+                <div class="stepper-item active" data-step="0" onclick="goToStep(0)">
+                    <div class="stepper-circle">1</div>
+                    <span class="stepper-label">Dados</span>
+                </div>
+                <div class="stepper-item" data-step="1" onclick="goToStep(1)">
+                    <div class="stepper-circle">2</div>
+                    <span class="stepper-label">Caract.</span>
+                </div>
+                <div class="stepper-item" data-step="2" onclick="goToStep(2)">
+                    <div class="stepper-circle">3</div>
+                    <span class="stepper-label">Relatorio</span>
+                </div>
+                <div class="stepper-item" data-step="3" onclick="goToStep(3)">
+                    <div class="stepper-circle">4</div>
+                    <span class="stepper-label">Encam.</span>
+                </div>
+                <div class="stepper-item" data-step="4" onclick="goToStep(4)">
+                    <div class="stepper-circle">5</div>
+                    <span class="stepper-label">Moradores</span>
+                </div>
+                <div class="stepper-item" data-step="5" onclick="goToStep(5)">
+                    <div class="stepper-circle">6</div>
+                    <span class="stepper-label">Fotos</span>
                 </div>
             </div>
+            <div class="step-indicator">
+                <span id="step-indicator">Etapa <span class="step-indicator-text">1</span> de <span class="step-indicator-text">6</span></span>
+            </div>
 
-            <!-- Conteúdo das Abas -->
-            <div class="flex-1 overflow-y-auto">
-                <!-- Aba 1: Dados Básicos -->
-                <div class="tab-content p-4 space-y-4" data-tab="0">
-                    <!-- Localização -->
-                    <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
-                        <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-2">Localização</h3>
-                        @if($pontoProximo)
-                            <p class="text-sm text-green-600">
-                                <span class="font-medium">Ponto existente:</span>
-                                {{ $pontoProximo->endereco->logradouro ?? '' }}, {{ $pontoProximo->numero }} - {{ $pontoProximo->endereco->bairro ?? '' }}
+            <!-- Conteudo das Abas -->
+            <div class="form-content">
+                <!-- Aba 1: Dados Basicos -->
+                <div class="tab-content" data-tab="0">
+                    <!-- Localizacao -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h3 class="form-section-title">Localizacao</h3>
+                            @if($pontoProximo)
+                                <p class="text-success" style="font-size: var(--text-sm);">
+                                    <span style="font-weight: var(--font-medium);">Ponto existente:</span>
+                                    {{ $pontoProximo->enderecoAtualizado->tipo ?? '' }} {{ $pontoProximo->enderecoAtualizado->logradouro ?? '' }}, {{ $pontoProximo->enderecoAtualizado->numero ?? $pontoProximo->numero }} - {{ $pontoProximo->enderecoAtualizado->bairro ?? '' }}
+                                </p>
+                            @else
+                                <div>
+                                    <p class="text-warning" style="font-size: var(--text-sm); font-weight: var(--font-medium);">
+                                        Novo ponto sera criado
+                                    </p>
+                                    @if($enderecoReferencia)
+                                        <p class="text-secondary" style="font-size: var(--text-sm); margin-top: var(--space-1);">
+                                            <span style="font-weight: var(--font-medium);">Referencia:</span>
+                                            {{ $enderecoReferencia['tipo'] }} {{ $enderecoReferencia['logradouro'] }}, {{ $enderecoReferencia['numero'] }}
+                                        </p>
+                                        <p class="text-muted" style="font-size: var(--text-xs);">
+                                            {{ $enderecoReferencia['bairro'] }} - {{ $enderecoReferencia['regional'] }}
+                                        </p>
+                                    @endif
+                                </div>
+                            @endif
+                            <p class="text-muted" style="font-size: var(--text-xs); margin-top: var(--space-1);">
+                                Lat: {{ number_format($lat, 6) }} | Lng: {{ number_format($lng, 6) }}
                             </p>
-                        @else
-                            <p class="text-sm text-orange-600">
-                                Novo ponto será criado
-                            </p>
-                        @endif
-                        <p class="text-xs text-gray-500 mt-1">
-                            Lat: {{ number_format($lat, 6) }} | Lng: {{ number_format($lng, 6) }}
-                        </p>
+
+                            <div class="form-group mt-3">
+                                <label class="form-label">Referencia do Endereco</label>
+                                <input type="text" name="complemento_ponto"
+                                       value="{{ $pontoProximo->complemento ?? $referenciaAutomatica ?? '' }}"
+                                       placeholder="Ex: Proximo ao mercado, em frente a escola..."
+                                       class="form-input">
+                                <p class="form-hint">Descricao do local para facilitar a identificacao</p>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Dados da Vistoria -->
-                    <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm space-y-3">
-                        <h3 class="font-semibold text-gray-900 dark:text-gray-100">Dados da Vistoria</h3>
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h3 class="form-section-title">Dados da Vistoria</h3>
 
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Data/Hora da Abordagem *</label>
-                            <input type="datetime-local" name="data_abordagem" value="{{ date('Y-m-d\TH:i') }}" required
-                                   class="w-full px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tipo de Abordagem *</label>
-                            <select name="tipo_abordagem_id" required
-                                    class="w-full px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                <option value="">Selecione...</option>
-                                @foreach($tiposAbordagem as $tipo)
-                                    <option value="{{ $tipo->id }}">{{ $tipo->tipo }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Resultado da Ação *</label>
-                            <select name="resultado_acao_id" required
-                                    class="w-full px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                <option value="">Selecione...</option>
-                                @foreach($resultadosAcao as $resultado)
-                                    <option value="{{ $resultado->id }}">{{ $resultado->resultado }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Qtd. Pessoas</label>
-                                <input type="number" name="quantidade_pessoas" min="0" value="0"
-                                       class="w-full px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <div class="form-group">
+                                <label class="form-label required">Data/Hora da Abordagem</label>
+                                <input type="datetime-local" name="data_abordagem" value="{{ date('Y-m-d\TH:i') }}" required class="form-input">
                             </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Qtd. Kg</label>
-                                <input type="number" name="qtd_kg" min="0" value="0"
-                                       class="w-full px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+
+                            <div class="form-group">
+                                <label class="form-label required">Tipo de Abordagem</label>
+                                <select name="tipo_abordagem_id" required class="form-input form-select">
+                                    <option value="">Selecione...</option>
+                                    @foreach($tiposAbordagem as $tipo)
+                                        <option value="{{ $tipo->id }}">{{ $tipo->tipo }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Aba 2: Perfil da Ocorrência -->
-                <div class="tab-content p-4 space-y-4 hidden" data-tab="1">
+                <!-- Aba 2: Perfil da Ocorrencia -->
+                <div class="tab-content hidden" data-tab="1">
+                    <!-- Quantidades -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="form-group">
+                                    <label class="form-label">Qtd. Pessoas</label>
+                                    <input type="number" name="quantidade_pessoas" min="0" value="0" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Qtd. Kg</label>
+                                    <input type="number" name="qtd_kg" min="0" value="0" class="form-input">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Nomes das Pessoas -->
-                    <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nomes das Pessoas</label>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Um nome por linha</p>
-                        <div class="relative">
-                            <textarea name="nomes_pessoas" id="nomes_pessoas" rows="3" placeholder="Digite um nome por linha..."
-                                      class="w-full px-4 py-3 pr-12 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 resize-none"></textarea>
-                            <button type="button" onclick="startVoiceInput('nomes_pessoas')"
-                                    class="voice-btn absolute right-2 top-3 p-2 text-gray-500 hover:text-blue-500 transition-colors">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
-                                </svg>
-                            </button>
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <label class="form-label">Nomes das Pessoas</label>
+                            <p class="form-hint">Um nome por linha</p>
+                            <div class="input-with-voice">
+                                <textarea name="nomes_pessoas" id="nomes_pessoas" rows="3" placeholder="Digite um nome por linha..." class="form-input form-textarea"></textarea>
+                                <button type="button" onclick="startVoiceInput('nomes_pessoas')" class="voice-btn">
+                                    <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Abrigos -->
-                    <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm space-y-3">
-                        <h3 class="font-semibold text-gray-900 dark:text-gray-100">Abrigos</h3>
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h3 class="form-section-title">Abrigos</h3>
 
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Qtd. Abrigos Provisórios</label>
-                            <input type="number" name="qtd_abrigos_provisorios" id="qtd_abrigos" min="0" value="0"
-                                   onchange="atualizarCamposAbrigos()"
-                                   class="w-full px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        </div>
+                            <div class="form-group">
+                                <label class="form-label">Qtd. Abrigos Provisorios</label>
+                                <input type="number" name="qtd_abrigos_provisorios" id="qtd_abrigos" min="0" value="0" onchange="atualizarCamposAbrigos()" class="form-input">
+                            </div>
 
-                        <div id="abrigos-container" class="space-y-2 hidden">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tipos de Abrigo Desmontado</label>
-                            <div id="abrigos-list" class="space-y-2"></div>
-                        </div>
+                            <div id="abrigos-container" class="hidden">
+                                <label class="form-label">Tipos de Abrigo Desmontado</label>
+                                <div id="abrigos-list" class="flex flex-col gap-2"></div>
+                            </div>
 
-                        <div id="tipo-abrigo-unico">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tipo de Abrigo Desmontado</label>
-                            <select name="tipo_abrigo_desmontado_id"
-                                    class="w-full px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                <option value="">Nenhum</option>
-                                @foreach($tiposAbrigo as $tipo)
-                                    <option value="{{ $tipo->id }}">{{ $tipo->tipo_abrigo }}</option>
-                                @endforeach
-                            </select>
+                            <div id="tipo-abrigo-unico" class="form-group">
+                                <label class="form-label">Tipo de Abrigo Desmontado</label>
+                                <select name="tipo_abrigo_desmontado_id" class="form-input form-select">
+                                    <option value="">Nenhum</option>
+                                    @foreach($tiposAbrigo as $tipo)
+                                        <option value="{{ $tipo->id }}">{{ $tipo->tipo_abrigo }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Fatores de Complexidade -->
-                    <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
-                        <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-3">Fatores de Complexidade</h3>
-                        <div class="grid grid-cols-2 gap-2">
-                            <label class="flex items-center gap-2 text-sm p-2 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
-                                <input type="checkbox" name="resistencia" value="1" class="rounded text-blue-500 w-5 h-5">
-                                <span class="text-gray-700 dark:text-gray-300">Resistência</span>
-                            </label>
-                            <label class="flex items-center gap-2 text-sm p-2 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
-                                <input type="checkbox" name="num_reduzido" value="1" class="rounded text-blue-500 w-5 h-5">
-                                <span class="text-gray-700 dark:text-gray-300">Núm. Reduzido</span>
-                            </label>
-
-                            <label class="flex items-center gap-2 text-sm p-2 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
-                                <input type="checkbox" name="casal" id="checkbox_casal" value="1" onchange="toggleQtdCasais()" class="rounded text-blue-500 w-5 h-5">
-                                <span class="text-gray-700 dark:text-gray-300">Casal</span>
-                            </label>
-                            <div id="qtd_casais_container" class="hidden">
-                                <input type="number" name="qtd_casais" id="qtd_casais" min="1" value="1" placeholder="Qtd."
-                                       class="w-full px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            </div>
-
-                            <label class="flex items-center gap-2 text-sm p-2 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
-                                <input type="checkbox" name="catador_reciclados" value="1" class="rounded text-blue-500 w-5 h-5">
-                                <span class="text-gray-700 dark:text-gray-300">Catador</span>
-                            </label>
-                            <label class="flex items-center gap-2 text-sm p-2 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
-                                <input type="checkbox" name="fixacao_antiga" value="1" class="rounded text-blue-500 w-5 h-5">
-                                <span class="text-gray-700 dark:text-gray-300">Fixação Antiga</span>
-                            </label>
-                            <label class="flex items-center gap-2 text-sm p-2 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
-                                <input type="checkbox" name="excesso_objetos" value="1" class="rounded text-blue-500 w-5 h-5">
-                                <span class="text-gray-700 dark:text-gray-300">Excesso Objetos</span>
-                            </label>
-                            <label class="flex items-center gap-2 text-sm p-2 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
-                                <input type="checkbox" name="trafico_ilicitos" value="1" class="rounded text-blue-500 w-5 h-5">
-                                <span class="text-gray-700 dark:text-gray-300">Tráfico/Ilícitos</span>
-                            </label>
-                            <label class="flex items-center gap-2 text-sm p-2 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
-                                <input type="checkbox" name="crianca_adolescente" value="1" class="rounded text-blue-500 w-5 h-5">
-                                <span class="text-gray-700 dark:text-gray-300">Criança/Adolesc.</span>
-                            </label>
-                            <label class="flex items-center gap-2 text-sm p-2 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
-                                <input type="checkbox" name="idosos" value="1" class="rounded text-blue-500 w-5 h-5">
-                                <span class="text-gray-700 dark:text-gray-300">Idosos</span>
-                            </label>
-                            <label class="flex items-center gap-2 text-sm p-2 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
-                                <input type="checkbox" name="gestante" value="1" class="rounded text-blue-500 w-5 h-5">
-                                <span class="text-gray-700 dark:text-gray-300">Gestante</span>
-                            </label>
-                            <label class="flex items-center gap-2 text-sm p-2 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
-                                <input type="checkbox" name="lgbtqiapn" value="1" class="rounded text-blue-500 w-5 h-5">
-                                <span class="text-gray-700 dark:text-gray-300">LGBTQIAPN+</span>
-                            </label>
-                            <label class="flex items-center gap-2 text-sm p-2 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
-                                <input type="checkbox" name="deficiente" value="1" class="rounded text-blue-500 w-5 h-5">
-                                <span class="text-gray-700 dark:text-gray-300">Deficiente</span>
-                            </label>
-                            <label class="flex items-center gap-2 text-sm p-2 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
-                                <input type="checkbox" name="agrupamento_quimico" value="1" class="rounded text-blue-500 w-5 h-5">
-                                <span class="text-gray-700 dark:text-gray-300">Agrup. Químico</span>
-                            </label>
-                            <label class="flex items-center gap-2 text-sm p-2 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
-                                <input type="checkbox" name="saude_mental" value="1" class="rounded text-blue-500 w-5 h-5">
-                                <span class="text-gray-700 dark:text-gray-300">Saúde Mental</span>
-                            </label>
-                            <label class="flex items-center gap-2 text-sm p-2 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
-                                <input type="checkbox" name="cena_uso_caracterizada" value="1" class="rounded text-blue-500 w-5 h-5">
-                                <span class="text-gray-700 dark:text-gray-300">Cena de Uso</span>
-                            </label>
-
-                            <label class="flex items-center gap-2 text-sm p-2 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
-                                <input type="checkbox" name="animais" id="checkbox_animais" value="1" onchange="toggleQtdAnimais()" class="rounded text-blue-500 w-5 h-5">
-                                <span class="text-gray-700 dark:text-gray-300">Animais</span>
-                            </label>
-                            <div id="qtd_animais_container" class="hidden">
-                                <input type="number" name="qtd_animais" id="qtd_animais" min="1" value="1" placeholder="Qtd."
-                                       class="w-full px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h3 class="form-section-title">Fatores de Complexidade</h3>
+                            <div class="checkbox-grid">
+                                <label class="checkbox-card">
+                                    <input type="checkbox" name="resistencia" value="1" class="form-checkbox">
+                                    <svg class="checkbox-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                                    </svg>
+                                    <span>Resistencia</span>
+                                </label>
+                                <label class="checkbox-card">
+                                    <input type="checkbox" name="num_reduzido" value="1" class="form-checkbox">
+                                    <svg class="checkbox-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                    </svg>
+                                    <span>Num. Reduzido</span>
+                                </label>
+                                <label class="checkbox-card checkbox-card-expandable">
+                                    <input type="checkbox" name="casal" id="checkbox_casal" value="1" onchange="toggleQtdCasais()" class="form-checkbox">
+                                    <svg class="checkbox-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                    </svg>
+                                    <span>Casal</span>
+                                    <input type="number" name="qtd_casais" id="qtd_casais" min="1" value="1" placeholder="Qtd" class="form-input form-input-sm checkbox-qty-input hidden" onclick="event.stopPropagation()">
+                                </label>
+                                <label class="checkbox-card">
+                                    <input type="checkbox" name="catador_reciclados" value="1" class="form-checkbox">
+                                    <svg class="checkbox-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                    </svg>
+                                    <span>Catador</span>
+                                </label>
+                                <label class="checkbox-card">
+                                    <input type="checkbox" name="fixacao_antiga" value="1" class="form-checkbox">
+                                    <svg class="checkbox-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    </svg>
+                                    <span>Fixacao Antiga</span>
+                                </label>
+                                <label class="checkbox-card">
+                                    <input type="checkbox" name="excesso_objetos" value="1" class="form-checkbox">
+                                    <svg class="checkbox-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                                    </svg>
+                                    <span>Excesso Objetos</span>
+                                </label>
+                                <label class="checkbox-card">
+                                    <input type="checkbox" name="trafico_ilicitos" value="1" class="form-checkbox">
+                                    <svg class="checkbox-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                    </svg>
+                                    <span>Trafico/Ilicitos</span>
+                                </label>
+                                <label class="checkbox-card">
+                                    <input type="checkbox" name="crianca_adolescente" value="1" class="form-checkbox">
+                                    <svg class="checkbox-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    <span>Crianca/Adolesc.</span>
+                                </label>
+                                <label class="checkbox-card">
+                                    <input type="checkbox" name="idosos" value="1" class="form-checkbox">
+                                    <svg class="checkbox-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                                    </svg>
+                                    <span>Idosos</span>
+                                </label>
+                                <label class="checkbox-card">
+                                    <input type="checkbox" name="gestante" value="1" class="form-checkbox">
+                                    <svg class="checkbox-icon" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 2a3 3 0 100 6 3 3 0 000-6zm-1 8c-2.5 0-4 1.5-4 4v1h2v5h6v-5h2v-1c0-2.5-1.5-4-4-4h-2z"/>
+                                    </svg>
+                                    <span>Gestante</span>
+                                </label>
+                                <label class="checkbox-card">
+                                    <input type="checkbox" name="lgbtqiapn" value="1" class="form-checkbox">
+                                    <svg class="checkbox-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
+                                    </svg>
+                                    <span>LGBTQIAPN+</span>
+                                </label>
+                                <label class="checkbox-card">
+                                    <input type="checkbox" name="deficiente" value="1" class="form-checkbox">
+                                    <svg class="checkbox-icon" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 2a3 3 0 100 6 3 3 0 000-6zm-2 8l-4 4h3v6h6v-6h3l-4-4h-4z"/>
+                                    </svg>
+                                    <span>Deficiente</span>
+                                </label>
+                                <label class="checkbox-card">
+                                    <input type="checkbox" name="agrupamento_quimico" value="1" class="form-checkbox">
+                                    <svg class="checkbox-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                                    </svg>
+                                    <span>Agrup. Quimico</span>
+                                </label>
+                                <label class="checkbox-card">
+                                    <input type="checkbox" name="saude_mental" value="1" class="form-checkbox">
+                                    <svg class="checkbox-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                                    </svg>
+                                    <span>Saude Mental</span>
+                                </label>
+                                <label class="checkbox-card">
+                                    <input type="checkbox" name="cena_uso_caracterizada" value="1" class="form-checkbox">
+                                    <svg class="checkbox-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                                    </svg>
+                                    <span>Cena de Uso</span>
+                                </label>
+                                <label class="checkbox-card checkbox-card-expandable">
+                                    <input type="checkbox" name="animais" id="checkbox_animais" value="1" onchange="toggleQtdAnimais()" class="form-checkbox">
+                                    <svg class="checkbox-icon" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M4.5 9.5a2.5 2.5 0 115 0 2.5 2.5 0 01-5 0zm9 0a2.5 2.5 0 115 0 2.5 2.5 0 01-5 0zm-7.5 6a2 2 0 114 0 2 2 0 01-4 0zm7 0a2 2 0 114 0 2 2 0 01-4 0zm-3.5 2.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V16h-5v2z"/>
+                                    </svg>
+                                    <span>Animais</span>
+                                    <input type="number" name="qtd_animais" id="qtd_animais" min="1" value="1" placeholder="Qtd" class="form-input form-input-sm checkbox-qty-input hidden" onclick="event.stopPropagation()">
+                                </label>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Aba 3: Fiscalização -->
-                <div class="tab-content p-4 space-y-4 hidden" data-tab="2">
-                    <!-- Condução e Fiscalização -->
-                    <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm space-y-4">
-                        <h3 class="font-semibold text-gray-900 dark:text-gray-100">Ações de Fiscalização</h3>
-
-                        <!-- Condução pelas Forças de Segurança -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Condução pelas Forças de Segurança</label>
-                            <div class="flex gap-4">
-                                <label class="flex items-center gap-2">
-                                    <input type="radio" name="conducao_forcas_seguranca" value="1" onchange="toggleConducaoObs()" class="text-blue-500">
-                                    <span class="text-sm text-gray-700 dark:text-gray-300">Sim</span>
-                                </label>
-                                <label class="flex items-center gap-2">
-                                    <input type="radio" name="conducao_forcas_seguranca" value="0" checked onchange="toggleConducaoObs()" class="text-blue-500">
-                                    <span class="text-sm text-gray-700 dark:text-gray-300">Não</span>
-                                </label>
-                            </div>
-                            <div id="conducao_obs_container" class="mt-2 hidden">
-                                <textarea name="conducao_forcas_observacao" id="conducao_forcas_observacao" rows="2" placeholder="Observação sobre a condução..."
-                                          class="w-full px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"></textarea>
-                            </div>
-                        </div>
-
-                        <!-- Apreensão Fiscal -->
-                        <div>
-                            <label class="flex items-center gap-2 text-sm p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
-                                <input type="checkbox" name="apreensao_fiscal" value="1" class="rounded text-blue-500 w-5 h-5">
-                                <span class="text-gray-700 dark:text-gray-300">Apreensão Fiscal</span>
-                            </label>
-                        </div>
-
-                        <!-- Auto de Fiscalização Aplicado -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Auto de Fiscalização Aplicado</label>
-                            <div class="flex gap-4">
-                                <label class="flex items-center gap-2">
-                                    <input type="radio" name="auto_fiscalizacao_aplicado" value="1" onchange="toggleAutoNumero()" class="text-blue-500">
-                                    <span class="text-sm text-gray-700 dark:text-gray-300">Sim</span>
-                                </label>
-                                <label class="flex items-center gap-2">
-                                    <input type="radio" name="auto_fiscalizacao_aplicado" value="0" checked onchange="toggleAutoNumero()" class="text-blue-500">
-                                    <span class="text-sm text-gray-700 dark:text-gray-300">Não</span>
-                                </label>
-                            </div>
-                            <div id="auto_numero_container" class="mt-2 hidden">
-                                <input type="text" name="auto_fiscalizacao_numero" id="auto_fiscalizacao_numero" placeholder="Número do Auto de Fiscalização"
-                                       class="w-full px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Relatório Descritivo -->
-                    <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Relatório Descritivo da Ação</label>
-                        <div class="relative">
-                            <textarea name="observacao" id="observacao" rows="8" placeholder="Descreva detalhadamente a ação realizada..."
-                                      class="w-full px-4 py-3 pr-12 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 resize-y min-h-[200px]"></textarea>
-                            <button type="button" onclick="startVoiceInput('observacao')"
-                                    class="voice-btn absolute right-2 top-3 p-2 text-gray-500 dark:text-gray-400 hover:text-blue-500 transition-colors">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Aba 4: Moradores -->
-                <div class="tab-content p-4 space-y-4 hidden" data-tab="3">
-                    <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="font-semibold text-gray-900 dark:text-gray-100">Moradores do Ponto</h3>
-                            <button type="button" onclick="abrirModalMorador()"
-                                    class="px-3 py-1.5 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition flex items-center gap-1">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                                </svg>
-                                Adicionar
-                            </button>
-                        </div>
-
-                        <!-- Lista de moradores existentes do ponto -->
-                        @if($pontoProximo && $pontoProximo->moradores->count() > 0)
-                            <div class="mb-4">
-                                <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Moradores já cadastrados neste ponto:</p>
-                                <div id="moradores-existentes" class="space-y-2">
-                                    @foreach($pontoProximo->moradores as $morador)
-                                        <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                                            <div class="flex-shrink-0">
-                                                @if($morador->fotografia)
-                                                    <img src="{{ Storage::url($morador->fotografia) }}" class="w-10 h-10 rounded-full object-cover">
-                                                @else
-                                                    <div class="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
-                                                        <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                                                        </svg>
-                                                    </div>
-                                                @endif
-                                            </div>
-                                            <div class="flex-1 min-w-0">
-                                                <p class="font-medium text-gray-900 dark:text-gray-100 truncate">{{ $morador->nome_social }}</p>
-                                                @if($morador->apelido)
-                                                    <p class="text-xs text-gray-500 dark:text-gray-400">"{{ $morador->apelido }}"</p>
-                                                @endif
-                                            </div>
-                                            <label class="flex items-center gap-2">
-                                                <input type="checkbox" name="moradores_presentes[]" value="{{ $morador->id }}" checked
-                                                       class="rounded text-blue-500 w-5 h-5">
-                                                <span class="text-xs text-gray-600 dark:text-gray-400">Presente</span>
-                                            </label>
-                                        </div>
+                <!-- Aba 3: Relatorio da Acao -->
+                <div class="tab-content hidden" data-tab="2">
+                    <!-- Resultado da Acao -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label class="form-label required">Resultado da Acao</label>
+                                <select name="resultado_acao_id" required class="form-input form-select">
+                                    <option value="">Selecione...</option>
+                                    @foreach($resultadosAcao as $resultado)
+                                        @if($pontoProximo || !str_contains(strtolower($resultado->resultado), 'persiste'))
+                                            <option value="{{ $resultado->id }}">{{ $resultado->resultado }}</option>
+                                        @endif
                                     @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h3 class="form-section-title">Acoes Realizadas</h3>
+
+                            <!-- Conducao pelas Forcas de Seguranca -->
+                            <div class="form-group">
+                                <label class="form-label">Conducao pelas Forcas de Seguranca</label>
+                                <div class="radio-group">
+                                    <label class="radio-option">
+                                        <input type="radio" name="conducao_forcas_seguranca" value="1" onchange="toggleConducaoObs()" class="form-radio">
+                                        <span>Sim</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="conducao_forcas_seguranca" value="0" checked onchange="toggleConducaoObs()" class="form-radio">
+                                        <span>Nao</span>
+                                    </label>
+                                </div>
+                                <div id="conducao_obs_container" class="mt-2 hidden">
+                                    <textarea name="conducao_forcas_observacao" id="conducao_forcas_observacao" rows="2" placeholder="Observacao sobre a conducao..." class="form-input form-textarea"></textarea>
                                 </div>
                             </div>
-                        @else
-                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4" id="sem-moradores-msg">
-                                @if($pontoProximo)
-                                    Nenhum morador cadastrado neste ponto.
-                                @else
-                                    Os moradores serão vinculados ao novo ponto após o cadastro.
-                                @endif
-                            </p>
-                        @endif
 
-                        <!-- Novos moradores adicionados na vistoria -->
-                        <div id="novos-moradores" class="space-y-2"></div>
+                            <!-- Apreensao Fiscal -->
+                            <div class="form-group">
+                                <label class="checkbox-card">
+                                    <input type="checkbox" name="apreensao_fiscal" value="1" class="form-checkbox">
+                                    <span>Apreensao Fiscal</span>
+                                </label>
+                            </div>
 
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-3 text-center">
-                            <span id="morador-count">0</span> novo(s) morador(es) a cadastrar
-                        </p>
+                            <!-- Auto de Fiscalizacao Aplicado -->
+                            <div class="form-group">
+                                <label class="form-label">Auto de Fiscalizacao Aplicado</label>
+                                <div class="radio-group">
+                                    <label class="radio-option">
+                                        <input type="radio" name="auto_fiscalizacao_aplicado" value="1" onchange="toggleAutoNumero()" class="form-radio">
+                                        <span>Sim</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="auto_fiscalizacao_aplicado" value="0" checked onchange="toggleAutoNumero()" class="form-radio">
+                                        <span>Nao</span>
+                                    </label>
+                                </div>
+                                <div id="auto_numero_container" class="mt-2 hidden">
+                                    <input type="text" name="auto_fiscalizacao_numero" id="auto_fiscalizacao_numero" placeholder="Numero do Auto de Fiscalizacao" class="form-input">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Relatorio Descritivo -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <label class="form-label">Relatorio Descritivo da Acao</label>
+                            <div class="input-with-voice">
+                                <textarea name="observacao" id="observacao" rows="8" placeholder="Descreva detalhadamente a acao realizada..." class="form-input form-textarea" style="min-height: 200px;"></textarea>
+                                <button type="button" onclick="startVoiceInput('observacao')" class="voice-btn">
+                                    <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Aba 5: Fotos -->
-                <div class="tab-content p-4 space-y-4 hidden" data-tab="4">
-                    <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Fotos da Vistoria</label>
-
-                        <input type="file" id="camera-input-back" accept="image/*" capture="environment" class="hidden">
-                        <input type="file" id="camera-input-front" accept="image/*" capture="user" class="hidden">
-                        <input type="file" id="gallery-input" accept="image/*" multiple class="hidden">
-
-                        <div class="space-y-2">
-                            <button type="button" onclick="openCamera('back')"
-                                    class="w-full py-3 px-4 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition flex items-center justify-center gap-2">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                </svg>
-                                <span>Câmera Traseira</span>
-                            </button>
-
-                            <button type="button" onclick="openCamera('front')"
-                                    class="w-full py-3 px-4 bg-gray-500 text-white rounded-lg font-medium hover:bg-gray-600 transition flex items-center justify-center gap-2">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                </svg>
-                                <span>Câmera Frontal</span>
-                            </button>
-
-                            <button type="button" onclick="openGallery()"
-                                    class="w-full py-3 px-4 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 transition flex items-center justify-center gap-2">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                </svg>
-                                <span>Galeria</span>
-                            </button>
+                <!-- Aba 4: Encaminhamentos -->
+                <div class="tab-content hidden" data-tab="3">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h3 class="form-section-title">Encaminhamentos</h3>
+                            <p class="text-muted mb-4" style="font-size: var(--text-sm);">
+                                Selecione os encaminhamentos realizados durante esta vistoria (opcional).
+                            </p>
+                            <div class="flex flex-col gap-3">
+                                <div class="form-group">
+                                    <label class="form-label">Encaminhamento 1</label>
+                                    <select name="e1_id" class="form-input form-select">
+                                        <option value="">Nenhum</option>
+                                        @foreach($encaminhamentos as $encaminhamento)
+                                            <option value="{{ $encaminhamento->id }}">{{ $encaminhamento->encaminhamento }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Encaminhamento 2</label>
+                                    <select name="e2_id" class="form-input form-select">
+                                        <option value="">Nenhum</option>
+                                        @foreach($encaminhamentos as $encaminhamento)
+                                            <option value="{{ $encaminhamento->id }}">{{ $encaminhamento->encaminhamento }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Encaminhamento 3</label>
+                                    <select name="e3_id" class="form-input form-select">
+                                        <option value="">Nenhum</option>
+                                        @foreach($encaminhamentos as $encaminhamento)
+                                            <option value="{{ $encaminhamento->id }}">{{ $encaminhamento->encaminhamento }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Encaminhamento 4</label>
+                                    <select name="e4_id" class="form-input form-select">
+                                        <option value="">Nenhum</option>
+                                        @foreach($encaminhamentos as $encaminhamento)
+                                            <option value="{{ $encaminhamento->id }}">{{ $encaminhamento->encaminhamento }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Encaminhamento 5</label>
+                                    <select name="e5_id" class="form-input form-select">
+                                        <option value="">Nenhum</option>
+                                        @foreach($encaminhamentos as $encaminhamento)
+                                            <option value="{{ $encaminhamento->id }}">{{ $encaminhamento->encaminhamento }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Encaminhamento 6</label>
+                                    <select name="e6_id" class="form-input form-select">
+                                        <option value="">Nenhum</option>
+                                        @foreach($encaminhamentos as $encaminhamento)
+                                            <option value="{{ $encaminhamento->id }}">{{ $encaminhamento->encaminhamento }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
                         </div>
+                    </div>
+                </div>
 
-                        <div id="fotos-preview" class="mt-4 grid grid-cols-3 gap-2"></div>
+                <!-- Aba 5: Moradores -->
+                <div class="tab-content hidden" data-tab="4">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="form-section-title" style="margin-bottom: 0;">Moradores do Ponto</h3>
+                                <button type="button" onclick="abrirModalMorador()" class="btn btn-primary btn-sm">
+                                    <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                    </svg>
+                                    Adicionar
+                                </button>
+                            </div>
 
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-3 text-center">
-                            <span id="foto-count">0</span> foto(s) selecionada(s)
-                        </p>
+                            @if($pontoProximo && $pontoProximo->moradores->count() > 0)
+                                <div class="mb-4">
+                                    <p class="text-muted mb-2" style="font-size: var(--text-xs);">Moradores ja cadastrados neste ponto:</p>
+                                    <div id="moradores-existentes" class="flex flex-col gap-2">
+                                        @foreach($pontoProximo->moradores as $morador)
+                                            <div class="morador-card">
+                                                <div class="morador-avatar">
+                                                    @if($morador->fotografia)
+                                                        <img src="{{ Storage::url($morador->fotografia) }}" alt="{{ $morador->nome_social }}">
+                                                    @else
+                                                        <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                                        </svg>
+                                                    @endif
+                                                </div>
+                                                <div class="morador-info">
+                                                    <p class="morador-name">{{ $morador->nome_social }}</p>
+                                                    @if($morador->apelido)
+                                                        <p class="morador-nickname">"{{ $morador->apelido }}"</p>
+                                                    @endif
+                                                </div>
+                                                <label class="morador-presence">
+                                                    <input type="checkbox" name="moradores_presentes[]" value="{{ $morador->id }}" checked class="form-checkbox">
+                                                    <span>Presente</span>
+                                                </label>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @else
+                                <p class="text-muted mb-4" id="sem-moradores-msg" style="font-size: var(--text-sm);">
+                                    @if($pontoProximo)
+                                        Nenhum morador cadastrado neste ponto.
+                                    @else
+                                        Os moradores serao vinculados ao novo ponto apos o cadastro.
+                                    @endif
+                                </p>
+                            @endif
+
+                            <div id="novos-moradores" class="flex flex-col gap-2"></div>
+
+                            <p class="text-muted mt-3 text-center" style="font-size: var(--text-xs);">
+                                <span id="morador-count">0</span> novo(s) morador(es) a cadastrar
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Aba 6: Fotos -->
+                <div class="tab-content hidden" data-tab="5">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <label class="form-label mb-3">Fotos da Vistoria</label>
+
+                            <input type="file" id="camera-input-back" accept="image/*" capture="environment" class="hidden">
+                            <input type="file" id="camera-input-front" accept="image/*" capture="user" class="hidden">
+                            <input type="file" id="gallery-input" accept="image/*" multiple class="hidden">
+
+                            <div class="flex flex-col gap-2">
+                                <button type="button" onclick="openCamera('back')" class="btn btn-primary btn-block">
+                                    <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    </svg>
+                                    Camera Traseira
+                                </button>
+
+                                <button type="button" onclick="openCamera('front')" class="btn btn-secondary btn-block">
+                                    <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    </svg>
+                                    Camera Frontal
+                                </button>
+
+                                <button type="button" onclick="openGallery()" class="btn btn-success btn-block">
+                                    <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                    Galeria
+                                </button>
+                            </div>
+
+                            <div id="fotos-preview" class="photos-grid mt-4"></div>
+
+                            <p class="text-muted mt-3 text-center" style="font-size: var(--text-xs);">
+                                <span id="foto-count">0</span> foto(s) selecionada(s)
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Barra de Ações Fixa -->
-            <div class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4 space-y-2">
-                <!-- Navegação entre abas -->
-                <div class="flex gap-2">
-                    <button type="button" onclick="prevTab()" id="btn-prev"
-                            class="flex-1 py-2 px-4 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition hidden">
-                        <svg class="w-5 h-5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <!-- Barra de Acoes Fixa -->
+            <div class="form-actions">
+                <div class="flex gap-2 mb-2">
+                    <button type="button" onclick="prevTab()" id="btn-prev" class="btn btn-secondary flex-1 hidden">
+                        <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                         </svg>
                         Anterior
                     </button>
-                    <button type="button" onclick="nextTab()" id="btn-next"
-                            class="flex-1 py-2 px-4 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition">
-                        Próxima
-                        <svg class="w-5 h-5 inline ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <button type="button" onclick="nextTab()" id="btn-next" class="btn btn-secondary flex-1">
+                        Proxima
+                        <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                         </svg>
                     </button>
                 </div>
 
-                <button type="submit"
-                        class="w-full bg-blue-500 text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition active:scale-95">
-                    Registrar Vistoria
-                </button>
-                <a href="{{ route('mapa.index') }}"
-                   class="block w-full text-center bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 py-3 rounded-lg font-semibold hover:bg-gray-100 dark:hover:bg-gray-600 transition border border-gray-300 dark:border-gray-600">
-                    Cancelar
-                </a>
+                <button type="submit" class="btn btn-primary btn-block">Registrar Vistoria</button>
+                <a href="{{ route('mapa.index') }}" class="btn btn-ghost btn-block">Cancelar</a>
             </div>
         </form>
     </div>
 
     <script>
         let currentTab = 0;
-        const totalTabs = 5;
+        const totalTabs = 6;
+        let visitedSteps = new Set([0]);
         let recognition = null;
         let activeInput = null;
         let fotosSelecionadas = [];
         let novosMoradores = [];
         const tiposAbrigo = @json($tiposAbrigo);
 
+        const stepLabels = ['Dados', 'Caract.', 'Relatorio', 'Encam.', 'Moradores', 'Fotos'];
+        const checkmarkSVG = '<svg class="stepper-check" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>';
+
         document.addEventListener('DOMContentLoaded', function() {
             showTab(0);
         });
 
+        function updateStepper(currentIndex) {
+            visitedSteps.add(currentIndex);
+
+            document.querySelectorAll('.stepper-item').forEach((item, i) => {
+                const circle = item.querySelector('.stepper-circle');
+                item.classList.remove('active', 'visited', 'completed');
+
+                if (i === currentIndex) {
+                    item.classList.add('active');
+                    circle.innerHTML = i + 1;
+                } else if (visitedSteps.has(i)) {
+                    item.classList.add('visited');
+                    circle.innerHTML = checkmarkSVG;
+                } else {
+                    circle.innerHTML = i + 1;
+                }
+            });
+
+            document.getElementById('step-indicator').innerHTML =
+                `Etapa <span class="step-indicator-text">${currentIndex + 1}</span> de <span class="step-indicator-text">${totalTabs}</span> - ${stepLabels[currentIndex]}`;
+        }
+
         function showTab(index) {
             currentTab = index;
+            updateStepper(index);
 
             document.querySelectorAll('.tab-content').forEach((content, i) => {
                 content.classList.toggle('hidden', i !== index);
             });
 
-            document.querySelectorAll('.tab-btn').forEach((btn, i) => {
-                if (i === index) {
-                    btn.classList.add('border-blue-500', 'text-blue-500');
-                    btn.classList.remove('border-transparent', 'text-gray-500');
-                } else {
-                    btn.classList.remove('border-blue-500', 'text-blue-500');
-                    btn.classList.add('border-transparent', 'text-gray-500');
-                }
-            });
-
             document.getElementById('btn-prev').classList.toggle('hidden', index === 0);
             document.getElementById('btn-next').classList.toggle('hidden', index === totalTabs - 1);
 
-            document.querySelector('.tab-content:not(.hidden)')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            document.querySelector('.form-content')?.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function goToStep(index) {
+            showTab(index);
+        }
+
+        function checkRequiredFields(stepIndex) {
+            const stepContent = document.querySelector(`.tab-content[data-tab="${stepIndex}"]`);
+            if (!stepContent) return [];
+
+            const requiredFields = stepContent.querySelectorAll('[required]');
+            let missingFields = [];
+
+            requiredFields.forEach(field => {
+                if (!field.value || field.value === '') {
+                    const label = field.closest('.form-group')?.querySelector('.form-label');
+                    const fieldName = label ? label.textContent.replace(' *', '').trim() : 'Campo';
+                    missingFields.push(fieldName);
+                }
+            });
+
+            return missingFields;
+        }
+
+        function showToast(message, type = 'info') {
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) existingToast.remove();
+
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
         }
 
         function nextTab() {
-            if (currentTab < totalTabs - 1) showTab(currentTab + 1);
+            const missing = checkRequiredFields(currentTab);
+            if (missing.length > 0) {
+                showToast(`Campos pendentes: ${missing.join(', ')}`, 'warning');
+            }
+
+            if (currentTab < totalTabs - 1) {
+                showTab(currentTab + 1);
+            }
         }
 
         function prevTab() {
@@ -516,16 +699,16 @@
 
         function toggleQtdCasais() {
             const checkbox = document.getElementById('checkbox_casal');
-            const container = document.getElementById('qtd_casais_container');
-            container.classList.toggle('hidden', !checkbox.checked);
-            if (!checkbox.checked) document.getElementById('qtd_casais').value = 1;
+            const input = document.getElementById('qtd_casais');
+            input.classList.toggle('hidden', !checkbox.checked);
+            if (!checkbox.checked) input.value = 1;
         }
 
         function toggleQtdAnimais() {
             const checkbox = document.getElementById('checkbox_animais');
-            const container = document.getElementById('qtd_animais_container');
-            container.classList.toggle('hidden', !checkbox.checked);
-            if (!checkbox.checked) document.getElementById('qtd_animais').value = 1;
+            const input = document.getElementById('qtd_animais');
+            input.classList.toggle('hidden', !checkbox.checked);
+            if (!checkbox.checked) input.value = 1;
         }
 
         function toggleConducaoObs() {
@@ -556,8 +739,8 @@
                     const div = document.createElement('div');
                     div.className = 'flex items-center gap-2';
                     div.innerHTML = `
-                        <span class="text-sm text-gray-700 dark:text-gray-300 w-6">${i + 1}.</span>
-                        <select name="abrigos_tipos[]" class="flex-1 px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <span class="text-muted" style="width: 24px;">${i + 1}.</span>
+                        <select name="abrigos_tipos[]" class="form-input form-select flex-1">
                             <option value="">Selecione...</option>
                             ${tiposAbrigo.map(t => `<option value="${t.id}">${t.tipo_abrigo}</option>`).join('')}
                         </select>
@@ -596,14 +779,18 @@
                 video.style.objectFit = 'contain';
 
                 const modal = document.createElement('div');
-                modal.className = 'fixed inset-0 bg-black/75 z-50 flex flex-col items-center justify-center p-4';
+                modal.className = 'modal-overlay';
                 modal.innerHTML = `
-                    <div class="bg-white dark:bg-gray-800 rounded-lg p-4 w-full max-w-md">
-                        <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Tire uma foto</h3>
-                        <div id="camera-preview" class="mb-4 bg-black rounded-lg overflow-hidden"></div>
-                        <div class="flex gap-2">
-                            <button id="capture-btn" class="flex-1 bg-blue-500 text-white py-3 rounded-lg font-medium hover:bg-blue-600">Capturar</button>
-                            <button id="cancel-camera-btn" class="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 py-3 rounded-lg font-medium hover:bg-gray-300 dark:hover:bg-gray-600">Cancelar</button>
+                    <div class="modal">
+                        <div class="modal-header">
+                            <h3 class="modal-title">Tire uma foto</h3>
+                        </div>
+                        <div class="modal-body">
+                            <div id="camera-preview" style="background: black; border-radius: var(--card-radius); overflow: hidden;"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="capture-btn" class="btn btn-primary flex-1">Capturar</button>
+                            <button id="cancel-camera-btn" class="btn btn-secondary flex-1">Cancelar</button>
                         </div>
                     </div>
                 `;
@@ -690,11 +877,11 @@
             container.innerHTML = '';
             fotosSelecionadas.forEach((foto, index) => {
                 const div = document.createElement('div');
-                div.className = 'relative group aspect-square';
+                div.className = 'photo-preview';
                 div.innerHTML = `
-                    <img src="${foto.preview}" alt="Foto ${index + 1}" class="w-full h-full object-cover rounded-lg border-2 border-gray-200 dark:border-gray-700">
-                    <button type="button" onclick="removerFoto(${index})" class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-80 hover:opacity-100">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <img src="${foto.preview}" alt="Foto ${index + 1}">
+                    <button type="button" onclick="removerFoto(${index})" class="photo-remove-btn">
+                        <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                         </svg>
                     </button>
@@ -725,7 +912,7 @@
         function startVoiceInput(inputId) {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
-                alert('Seu navegador não suporta reconhecimento de voz.');
+                alert('Seu navegador nao suporta reconhecimento de voz.');
                 return;
             }
 
@@ -745,8 +932,7 @@
             const button = input.parentElement.querySelector('.voice-btn');
             activeInput = inputId;
 
-            button.classList.add('text-red-500', 'animate-pulse');
-            button.classList.remove('text-gray-500');
+            button.classList.add('recording');
 
             recognition.onresult = (event) => {
                 let transcript = '';
@@ -758,26 +944,23 @@
             };
 
             recognition.onend = () => {
-                button.classList.remove('text-red-500', 'animate-pulse');
-                button.classList.add('text-gray-500');
+                button.classList.remove('recording');
                 activeInput = null;
             };
 
             recognition.onerror = () => {
-                button.classList.remove('text-red-500', 'animate-pulse');
-                button.classList.add('text-gray-500');
+                button.classList.remove('recording');
                 activeInput = null;
             };
 
             recognition.start();
         }
 
-        // Funções para gerenciar moradores
+        // Funcoes para gerenciar moradores
         function abrirModalMorador(index = null) {
             const modal = document.getElementById('modal-morador');
             const titulo = document.getElementById('modal-morador-titulo');
 
-            // Limpar campos
             document.getElementById('morador-edit-index').value = index !== null ? index : '';
             document.getElementById('morador-nome-social').value = '';
             document.getElementById('morador-apelido').value = '';
@@ -799,27 +982,20 @@
                 titulo.textContent = 'Novo Morador';
             }
 
-            modal.style.display = 'flex';
             modal.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
-            // Esconder toda a página de fundo
-            document.getElementById('app').style.visibility = 'hidden';
-            modal.style.visibility = 'visible';
         }
 
         function fecharModalMorador() {
             const modal = document.getElementById('modal-morador');
-            modal.style.display = 'none';
             modal.classList.add('hidden');
             document.body.style.overflow = '';
-            // Mostrar página novamente
-            document.getElementById('app').style.visibility = 'visible';
         }
 
         function salvarMorador() {
             const nome = document.getElementById('morador-nome-social').value.trim();
             if (!nome) {
-                alert('Nome social é obrigatório');
+                alert('Nome social e obrigatorio');
                 return;
             }
 
@@ -857,26 +1033,26 @@
 
             novosMoradores.forEach((m, index) => {
                 const div = document.createElement('div');
-                div.className = 'flex items-center gap-3 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg';
+                div.className = 'morador-card morador-card-new';
                 div.innerHTML = `
-                    <div class="w-10 h-10 rounded-full bg-green-200 dark:bg-green-800 flex items-center justify-center flex-shrink-0">
-                        <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="morador-avatar morador-avatar-new">
+                        <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                         </svg>
                     </div>
-                    <div class="flex-1 min-w-0">
-                        <p class="font-medium text-gray-900 dark:text-gray-100 truncate">${m.nome_social}</p>
-                        ${m.apelido ? `<p class="text-xs text-gray-500 dark:text-gray-400">"${m.apelido}"</p>` : ''}
-                        <span class="text-xs text-green-600 dark:text-green-400">Novo</span>
+                    <div class="morador-info">
+                        <p class="morador-name">${m.nome_social}</p>
+                        ${m.apelido ? `<p class="morador-nickname">"${m.apelido}"</p>` : ''}
+                        <span class="badge badge-success">Novo</span>
                     </div>
-                    <div class="flex gap-1">
-                        <button type="button" onclick="abrirModalMorador(${index})" class="p-2 text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="morador-actions">
+                        <button type="button" onclick="abrirModalMorador(${index})" class="btn btn-ghost btn-icon btn-sm">
+                            <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                             </svg>
                         </button>
-                        <button type="button" onclick="removerMorador(${index})" class="p-2 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <button type="button" onclick="removerMorador(${index})" class="btn btn-ghost btn-icon btn-sm text-danger">
+                            <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                             </svg>
                         </button>
@@ -894,79 +1070,64 @@
             document.getElementById('morador-count').textContent = novosMoradores.length;
         }
     </script>
-@endsection
 
-@push('scripts')
-<!-- Modal Adicionar/Editar Morador -->
-<div id="modal-morador" onclick="if(event.target === this) fecharModalMorador()" class="fixed inset-0 bg-black/70 z-[99999] hidden items-end sm:items-center justify-center p-4" style="display: none;">
-    <div class="bg-white dark:bg-gray-800 w-full sm:max-w-md sm:rounded-lg rounded-t-2xl max-h-[85vh] overflow-y-auto shadow-2xl" onclick="event.stopPropagation()">
-        <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 flex items-center justify-between">
-            <h3 id="modal-morador-titulo" class="text-lg font-semibold text-gray-900 dark:text-gray-100">Novo Morador</h3>
-            <button type="button" onclick="fecharModalMorador()" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition">
-                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
-            </button>
-        </div>
-        <div id="form-morador" class="p-4 space-y-4">
-            <input type="hidden" id="morador-edit-index" name="morador-edit-index" value="">
-
-            <div>
-                <label for="morador-nome-social" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nome Social *</label>
-                <input type="text" id="morador-nome-social" name="morador-nome-social" placeholder="Como deseja ser chamado"
-                       class="w-full px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-            </div>
-
-            <div>
-                <label for="morador-apelido" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Apelido</label>
-                <input type="text" id="morador-apelido" name="morador-apelido" placeholder="Como é conhecido"
-                       class="w-full px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-            </div>
-
-            <div>
-                <label for="morador-genero" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Gênero</label>
-                <select id="morador-genero" name="morador-genero"
-                        class="w-full px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                    <option value="">Prefiro não informar</option>
-                    <option value="Homem cisgênero">Homem cisgênero</option>
-                    <option value="Mulher cisgênero">Mulher cisgênero</option>
-                    <option value="Homem trans">Homem trans</option>
-                    <option value="Mulher trans">Mulher trans</option>
-                    <option value="Travesti">Travesti</option>
-                    <option value="Não-binário">Não-binário</option>
-                    <option value="Outro">Outro</option>
-                </select>
-            </div>
-
-            <div>
-                <label for="morador-documento" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Documento</label>
-                <input type="text" id="morador-documento" name="morador-documento" placeholder="CPF ou RG"
-                       class="w-full px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-            </div>
-
-            <div>
-                <label for="morador-contato" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Contato</label>
-                <input type="text" id="morador-contato" name="morador-contato" placeholder="Telefone ou outro"
-                       class="w-full px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-            </div>
-
-            <div>
-                <label for="morador-observacoes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Observações</label>
-                <textarea id="morador-observacoes" name="morador-observacoes" rows="2" placeholder="Informações adicionais"
-                          class="w-full px-4 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"></textarea>
-            </div>
-
-            <div class="flex gap-3 pt-2">
-                <button type="button" onclick="salvarMorador()"
-                        class="flex-1 py-3 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition">
-                    Salvar
+    <!-- Modal Adicionar/Editar Morador -->
+    <div id="modal-morador" class="modal-overlay hidden" onclick="if(event.target === this) fecharModalMorador()">
+        <div class="modal modal-bottom" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3 id="modal-morador-titulo" class="modal-title">Novo Morador</h3>
+                <button type="button" onclick="fecharModalMorador()" class="btn btn-ghost btn-icon btn-sm">
+                    <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
                 </button>
-                <button type="button" onclick="fecharModalMorador()"
-                        class="flex-1 py-3 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg font-medium hover:bg-gray-100 dark:hover:bg-gray-600 transition border border-gray-300 dark:border-gray-600">
-                    Cancelar
-                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="morador-edit-index" value="">
+
+                <div class="form-group">
+                    <label for="morador-nome-social" class="form-label required">Nome Social</label>
+                    <input type="text" id="morador-nome-social" placeholder="Como deseja ser chamado" class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label for="morador-apelido" class="form-label">Apelido</label>
+                    <input type="text" id="morador-apelido" placeholder="Como e conhecido" class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label for="morador-genero" class="form-label">Genero</label>
+                    <select id="morador-genero" class="form-input form-select">
+                        <option value="">Prefiro nao informar</option>
+                        <option value="Homem cisgenero">Homem cisgenero</option>
+                        <option value="Mulher cisgenero">Mulher cisgenero</option>
+                        <option value="Homem trans">Homem trans</option>
+                        <option value="Mulher trans">Mulher trans</option>
+                        <option value="Travesti">Travesti</option>
+                        <option value="Nao-binario">Nao-binario</option>
+                        <option value="Outro">Outro</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="morador-documento" class="form-label">Documento</label>
+                    <input type="text" id="morador-documento" placeholder="CPF ou RG" class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label for="morador-contato" class="form-label">Contato</label>
+                    <input type="text" id="morador-contato" placeholder="Telefone ou outro" class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label for="morador-observacoes" class="form-label">Observacoes</label>
+                    <textarea id="morador-observacoes" rows="2" placeholder="Informacoes adicionais" class="form-input form-textarea"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" onclick="salvarMorador()" class="btn btn-primary flex-1">Salvar</button>
+                <button type="button" onclick="fecharModalMorador()" class="btn btn-secondary flex-1">Cancelar</button>
             </div>
         </div>
     </div>
-</div>
-@endpush
+@endsection

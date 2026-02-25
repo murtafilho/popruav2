@@ -31,19 +31,19 @@ class PermissionController extends Controller
         Permission::create(['name' => $validated['name'], 'guard_name' => 'web']);
 
         return redirect()->route('admin.permissions.index')
-            ->with('success', 'Permission criada com sucesso.');
+            ->with('success', 'Permissão criada com sucesso.');
     }
 
     public function destroy(Permission $permission): RedirectResponse
     {
         if ($permission->roles()->count() > 0) {
             return redirect()->route('admin.permissions.index')
-                ->with('error', 'Não é possível excluir uma permission associada a roles.');
+                ->with('error', 'Não é possível excluir uma permissão associada a roles.');
         }
 
         $permission->delete();
 
         return redirect()->route('admin.permissions.index')
-            ->with('success', 'Permission excluída com sucesso.');
+            ->with('success', 'Permissão excluída com sucesso.');
     }
 }

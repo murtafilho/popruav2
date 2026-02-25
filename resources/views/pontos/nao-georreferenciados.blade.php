@@ -1,220 +1,368 @@
 @extends('layouts.app')
 
-@section('title', 'Pontos Não Georreferenciados')
+@section('title', 'Pontos Nao Georreferenciados')
 
 @section('header')
-    <div class="flex items-center gap-3">
-        <a href="{{ route('dashboard') }}" class="p-2 -ml-2 rounded-lg hover:bg-white/10 transition">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-            </svg>
-        </a>
-        <h1 class="text-lg font-semibold flex-1 text-center">Pontos Não Georreferenciados</h1>
-        <div class="w-10"></div>
-    </div>
+    <a href="{{ route('dashboard') }}" class="btn btn-ghost btn-icon" style="margin-left: -8px;">
+        <svg style="width: 22px; height: 22px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+    </a>
+    <span class="mobile-header-title" style="flex: 1; text-align: center;">{{ __('Sem Georref.') }}</span>
+    <div style="width: 44px;"></div>
 @endsection
 
 @section('content')
-    <div class="h-full overflow-y-auto bg-gray-50 dark:bg-gray-900 p-4 transition-colors duration-200">
-        <!-- Mensagem de sucesso -->
+    <div class="page-content">
+        {{-- Mensagem de sucesso --}}
         @if(request('success'))
-        <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-4">
-            <div class="flex items-center gap-3">
-                <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                </svg>
-                <p class="text-sm text-green-800 dark:text-green-200">Coordenadas salvas com sucesso! O ponto agora aparece no mapa.</p>
-            </div>
-        </div>
-        @endif
-
-        <!-- Alerta informativo -->
-        <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-4">
-            <div class="flex items-start gap-3">
-                <svg class="w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                </svg>
-                <div class="flex-1">
-                    <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">Pontos sem coordenadas</h3>
-                    <p class="text-xs text-yellow-700 dark:text-yellow-300 mt-1">
-                        Estes pontos não possuem coordenadas geográficas (lat/lng) e não aparecem no mapa.
-                    </p>
+            <div class="alert alert-success mb-4">
+                <div class="alert-icon">
+                    <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
                 </div>
-            </div>
-        </div>
-
-        <!-- Filtros -->
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-gray-900/50 p-4 mb-4 transition-colors duration-200">
-            <form method="GET" action="{{ route('pontos.nao-georreferenciados') }}" class="space-y-3">
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div>
-                        <label class="block text-xs font-medium text-gray-200 dark:text-gray-300 mb-1">Bairro</label>
-                        <select name="bairro" class="w-full px-4 py-3 text-base border-2 border-gray-500 dark:border-gray-600 rounded-lg bg-[#93a6c2] text-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
-                            <option value="">Todos</option>
-                            @foreach($bairros as $bairro)
-                                <option value="{{ $bairro }}" {{ request('bairro') == $bairro ? 'selected' : '' }}>
-                                    {{ $bairro }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-200 dark:text-gray-300 mb-1">Regional</label>
-                        <select name="regional" class="w-full px-4 py-3 text-base border-2 border-gray-500 dark:border-gray-600 rounded-lg bg-[#93a6c2] text-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
-                            <option value="">Todas</option>
-                            @foreach($regionais as $regional)
-                                <option value="{{ $regional }}" {{ request('regional') == $regional ? 'selected' : '' }}>
-                                    {{ $regional }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-200 dark:text-gray-300 mb-1">Resultado</label>
-                        <select name="resultado" class="w-full px-4 py-3 text-base border-2 border-gray-500 dark:border-gray-600 rounded-lg bg-[#93a6c2] text-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
-                            <option value="">Todos</option>
-                            @foreach($resultados as $resultado)
-                                <option value="{{ $resultado->id }}" {{ request('resultado') == $resultado->id ? 'selected' : '' }}>
-                                    {{ $resultado->resultado }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-                <div class="flex gap-2">
-                    <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium hover:bg-blue-600 transition">
-                        Filtrar
-                    </button>
-                    <a href="{{ route('pontos.nao-georreferenciados') }}" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-200 dark:text-gray-200 rounded-lg text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition">
-                        Limpar
+                <div class="alert-content">
+                    <p class="alert-title">Coordenadas salvas com sucesso!</p>
+                    @if(request('ponto'))
+                        <div class="alert-details">
+                            <p><strong>Ponto:</strong> {{ request('ponto') }}@if(request('bairro')) - {{ request('bairro') }}@endif</p>
+                            @if(request('referencia'))
+                                <p><strong>Referencia:</strong> {{ request('referencia') }}</p>
+                            @endif
+                            @if(request('lat') && request('lng'))
+                                <p class="text-muted" style="font-size: var(--text-xs);">
+                                    Coordenadas: {{ number_format((float) request('lat'), 6) }}, {{ number_format((float) request('lng'), 6) }}
+                                </p>
+                            @endif
+                        </div>
+                    @endif
+                    <a href="{{ route('mapa.index', ['lat' => request('lat'), 'lng' => request('lng'), 'zoom' => 18, 'endereco' => request('ponto'), 'referencia' => request('referencia')]) }}"
+                       class="alert-link">
+                        <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+                        </svg>
+                        Ver no mapa
                     </a>
                 </div>
-            </form>
-        </div>
-
-        <!-- Tabela -->
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-gray-900/50 overflow-hidden transition-colors duration-200">
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm">
-                    <thead class="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
-                        <tr>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-200 dark:text-gray-200 uppercase">Endereço</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-200 dark:text-gray-200 uppercase hidden sm:table-cell">Bairro</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-200 dark:text-gray-200 uppercase hidden md:table-cell">Regional</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-200 dark:text-gray-200 uppercase hidden lg:table-cell">Vistorias</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-200 dark:text-gray-200 uppercase">Resultado</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-200 dark:text-gray-200 uppercase">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                        @forelse($pontos as $ponto)
-                            <tr class="odd:bg-gray-50 dark:odd:bg-gray-700/30 hover:bg-gray-100 dark:hover:bg-gray-700/50">
-                                <td class="px-4 py-3">
-                                    <div class="font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2">
-                                        <svg class="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" title="Sem coordenadas">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                                        </svg>
-                                        {{ $ponto->tipo }} {{ $ponto->logradouro }}, {{ $ponto->numero }}
-                                        @if($ponto->complemento)
-                                            <span class="text-gray-500 dark:text-gray-400">- {{ $ponto->complemento }}</span>
-                                        @endif
-                                    </div>
-                                    <button 
-                                        onclick="buscarCoordenadas({{ $ponto->id }}, '{{ addslashes($ponto->tipo) }}', '{{ addslashes($ponto->logradouro) }}', '{{ $ponto->numero }}', '{{ addslashes($ponto->bairro ?? '') }}')"
-                                        class="mt-2 text-xs px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition flex items-center gap-1"
-                                        id="btn-geocode-{{ $ponto->id }}"
-                                    >
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                        </svg>
-                                        <span class="btn-text">Buscar no mapa</span>
-                                    </button>
-                                    <div class="text-xs text-gray-500 dark:text-gray-400 sm:hidden mt-1">
-                                        {{ $ponto->bairro }} - {{ $ponto->regional }}
-                                    </div>
-                                    <div class="text-xs text-gray-500 dark:text-gray-400 lg:hidden mt-1">
-                                        @if($ponto->total_vistorias > 0)
-                                            <a href="{{ route('pontos.show', $ponto->id) }}" class="text-blue-600 dark:text-blue-400 hover:underline font-medium">
-                                                {{ $ponto->total_vistorias }} vistoria(s)
-                                            </a>
-                                        @else
-                                            {{ $ponto->total_vistorias }} vistoria(s)
-                                        @endif
-                                    </div>
-                                </td>
-                                <td class="px-4 py-3 text-gray-200 dark:text-gray-300 hidden sm:table-cell">{{ $ponto->bairro }}</td>
-                                <td class="px-4 py-3 text-gray-200 dark:text-gray-300 hidden md:table-cell">{{ $ponto->regional }}</td>
-                                <td class="px-4 py-3 text-gray-200 dark:text-gray-300 hidden lg:table-cell">
-                                    @if($ponto->total_vistorias > 0)
-                                        <a href="{{ route('pontos.show', $ponto->id) }}" class="text-blue-600 dark:text-blue-400 hover:underline font-medium">
-                                            {{ $ponto->total_vistorias }}
-                                        </a>
-                                    @else
-                                        {{ $ponto->total_vistorias }}
-                                    @endif
-                                </td>
-                                <td class="px-4 py-3">
-                                    @if($ponto->resultado_acao)
-                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
-                                            {{ $ponto->resultado_acao_id == 1 ? 'bg-red-100 text-red-800' : '' }}
-                                            {{ $ponto->resultado_acao_id == 2 ? 'bg-orange-100 text-orange-800' : '' }}
-                                            {{ $ponto->resultado_acao_id == 3 ? 'bg-gray-100 text-gray-800' : '' }}
-                                            {{ $ponto->resultado_acao_id == 4 ? 'bg-gray-100 text-gray-800' : '' }}
-                                            {{ $ponto->resultado_acao_id == 5 ? 'bg-blue-100 text-blue-800' : '' }}
-                                            {{ $ponto->resultado_acao_id == 6 ? 'bg-green-100 text-green-800' : '' }}
-                                            {{ !$ponto->resultado_acao_id ? 'bg-purple-100 text-purple-800' : '' }}
-                                        ">
-                                            {{ $ponto->resultado_acao }}
-                                        </span>
-                                    @else
-                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                                            Sem vistoria
-                                        </span>
-                                    @endif
-                                </td>
-                                <td class="px-4 py-3">
-                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300">
-                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                                        </svg>
-                                        Sem coordenadas
-                                    </span>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
-                                    Nenhum ponto não georreferenciado encontrado.
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
             </div>
+        @endif
 
-            <!-- Paginação -->
-            @if($pontos->hasPages())
-                <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700">
-                    {{ $pontos->links() }}
-                </div>
-            @endif
+        {{-- Alerta informativo --}}
+        <div class="alert alert-warning mb-4">
+            <div class="alert-icon">
+                <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+            </div>
+            <div class="alert-content">
+                <p class="alert-title">Pontos sem coordenadas</p>
+                <p class="alert-message">Estes pontos nao possuem coordenadas geograficas (lat/lng) e nao aparecem no mapa.</p>
+            </div>
         </div>
+
+        {{-- Filtros --}}
+        <div class="card mb-4">
+            <div class="card-body">
+                <form method="GET" action="{{ route('pontos.nao-georreferenciados') }}" style="display: flex; flex-direction: column; gap: var(--space-3);" id="form-filtros">
+                    {{-- Busca por Endereco --}}
+                    <div class="form-row form-row-4">
+                        <div class="form-group" style="grid-column: span 3;">
+                            <label class="form-label">Logradouro</label>
+                            <div class="autocomplete-container">
+                                <input type="text" name="logradouro" id="search-logradouro"
+                                       placeholder="Digite para buscar..." autocomplete="off"
+                                       class="form-input">
+                                <div id="logradouro-results" class="autocomplete-results hidden"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Numero</label>
+                            <input type="number" name="numero" id="search-numero"
+                                   placeholder="No" autocomplete="off"
+                                   class="form-input">
+                        </div>
+                    </div>
+
+                    <div class="form-row form-row-3">
+                        <div class="form-group">
+                            <label class="form-label">Bairro</label>
+                            <select name="bairro" class="form-input form-select">
+                                <option value="">Todos</option>
+                                @foreach($bairros as $bairro)
+                                    <option value="{{ $bairro }}" {{ request('bairro') == $bairro ? 'selected' : '' }}>
+                                        {{ $bairro }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Regional</label>
+                            <select name="regional" class="form-input form-select">
+                                <option value="">Todas</option>
+                                @foreach($regionais as $regional)
+                                    <option value="{{ $regional }}" {{ request('regional') == $regional ? 'selected' : '' }}>
+                                        {{ $regional }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Resultado</label>
+                            <select name="resultado" class="form-input form-select">
+                                <option value="">Todos</option>
+                                @foreach($resultados as $resultado)
+                                    <option value="{{ $resultado->id }}" {{ request('resultado') == $resultado->id ? 'selected' : '' }}>
+                                        {{ $resultado->resultado }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" style="flex: 1;">
+                            <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                            Filtrar
+                        </button>
+                        <a href="{{ route('pontos.nao-georreferenciados') }}" class="btn btn-secondary">
+                            Limpar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {{-- Tabela --}}
+        <div class="table-container">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Endereco</th>
+                        <th class="hide-mobile">Bairro</th>
+                        <th class="hide-mobile">Regional</th>
+                        <th class="hide-mobile text-center">Vistorias</th>
+                        <th>Resultado</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($pontos as $ponto)
+                        <tr>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: var(--space-2);">
+                                    <svg style="width: 16px; height: 16px; color: var(--status-warning); flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24" title="Sem coordenadas">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                    </svg>
+                                    <span style="font-weight: var(--font-medium);">
+                                        @if($ponto->logradouro)
+                                            {{ $ponto->tipo }} {{ $ponto->logradouro }}, {{ $ponto->numero }}
+                                            @if($ponto->complemento)
+                                                <span class="text-muted">- {{ $ponto->complemento }}</span>
+                                            @endif
+                                        @elseif($ponto->complemento)
+                                            {{ $ponto->complemento }}
+                                            @if($ponto->numero && $ponto->numero !== 's/n')
+                                                <span class="text-muted">- No {{ $ponto->numero }}</span>
+                                            @endif
+                                        @else
+                                            <span class="text-muted">Endereco nao cadastrado</span>
+                                            @if($ponto->numero)
+                                                <span class="text-muted">- No {{ $ponto->numero }}</span>
+                                            @endif
+                                        @endif
+                                    </span>
+                                </div>
+                                @if($ponto->logradouro)
+                                <button
+                                    onclick="buscarCoordenadas({{ $ponto->id }}, '{{ addslashes($ponto->tipo ?? '') }}', '{{ addslashes($ponto->logradouro ?? '') }}', '{{ $ponto->numero ?? '' }}', '{{ addslashes($ponto->bairro ?? '') }}')"
+                                    class="btn btn-primary btn-sm mt-2"
+                                    id="btn-geocode-{{ $ponto->id }}"
+                                >
+                                    <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    </svg>
+                                    <span class="btn-text">Buscar no mapa</span>
+                                </button>
+                                @endif
+                                {{-- Mobile info --}}
+                                <div class="mobile-only text-muted mt-1" style="font-size: var(--text-xs);">
+                                    @if($ponto->bairro || $ponto->regional)
+                                        {{ $ponto->bairro ?? '-' }} - {{ $ponto->regional ?? '-' }}
+                                    @else
+                                        <span class="text-warning">Sem endereco vinculado</span>
+                                    @endif
+                                    @if($ponto->total_vistorias > 0)
+                                        <span class="badge badge-info" style="margin-left: var(--space-2);">
+                                            {{ $ponto->total_vistorias }} vistoria(s)
+                                        </span>
+                                    @endif
+                                </div>
+                            </td>
+                            <td class="hide-mobile">{{ $ponto->bairro ?? '-' }}</td>
+                            <td class="hide-mobile">{{ $ponto->regional ?? '-' }}</td>
+                            <td class="hide-mobile text-center">
+                                @if($ponto->total_vistorias > 0)
+                                    <a href="{{ route('pontos.show', $ponto->id) }}">
+                                        <span class="badge badge-info">{{ $ponto->total_vistorias }}</span>
+                                    </a>
+                                @else
+                                    <span class="badge badge-default">0</span>
+                                @endif
+                            </td>
+                            <td>
+                                @if($ponto->resultado_acao)
+                                    @php
+                                        $resultadoBadge = match($ponto->resultado_acao_id) {
+                                            1 => 'badge-danger',
+                                            2 => 'badge-warning',
+                                            3, 4 => 'badge-default',
+                                            5 => 'badge-info',
+                                            6 => 'badge-success',
+                                            default => 'badge-accent',
+                                        };
+                                    @endphp
+                                    <span class="badge {{ $resultadoBadge }}">{{ $ponto->resultado_acao }}</span>
+                                @else
+                                    <span class="badge badge-accent">Sem vistoria</span>
+                                @endif
+                            </td>
+                            <td>
+                                <span class="badge badge-warning">
+                                    <svg style="width: 12px; height: 12px; margin-right: 4px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                    </svg>
+                                    Sem coords
+                                </span>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="text-center text-muted" style="padding: var(--space-6);">
+                                Nenhum ponto nao georreferenciado encontrado.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        {{-- Paginacao --}}
+        @if($pontos->hasPages())
+            <div class="pagination-wrapper">
+                {{ $pontos->links() }}
+            </div>
+        @endif
     </div>
 @endsection
 
 @push('scripts')
 <script>
+// ========== AUTOCOMPLETE DE LOGRADOUROS ==========
+const searchLogradouro = document.getElementById('search-logradouro');
+const searchNumero = document.getElementById('search-numero');
+const logradouroResults = document.getElementById('logradouro-results');
+const formFiltros = document.getElementById('form-filtros');
+let searchTimeout = null;
+
+// Debounce da busca de logradouros
+searchLogradouro.addEventListener('input', function() {
+    const termo = this.value.trim();
+
+    if (searchTimeout) clearTimeout(searchTimeout);
+
+    if (termo.length < 2) {
+        logradouroResults.classList.add('hidden');
+        return;
+    }
+
+    searchTimeout = setTimeout(() => buscarLogradouros(termo), 300);
+});
+
+// Fechar resultados ao clicar fora
+document.addEventListener('click', function(e) {
+    if (!searchLogradouro.contains(e.target) && !logradouroResults.contains(e.target)) {
+        logradouroResults.classList.add('hidden');
+    }
+});
+
+// Buscar logradouros na API (pontos nao georreferenciados)
+async function buscarLogradouros(termo) {
+    try {
+        logradouroResults.innerHTML = `
+            <div class="autocomplete-loading">
+                <svg class="spinner" style="width: 20px; height: 20px;" fill="none" viewBox="0 0 24 24">
+                    <circle style="opacity: 0.25;" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path style="opacity: 0.75;" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                </svg>
+            </div>
+        `;
+        logradouroResults.classList.remove('hidden');
+
+        const response = await fetch(`/api/pontos/nao-georreferenciados/logradouros?q=${encodeURIComponent(termo)}`);
+        const logradouros = await response.json();
+
+        if (logradouros.length === 0) {
+            logradouroResults.innerHTML = `
+                <div class="autocomplete-empty">
+                    Nenhum logradouro encontrado
+                </div>
+            `;
+        } else {
+            logradouroResults.innerHTML = logradouros.map(log => `
+                <button type="button" class="autocomplete-item" data-logradouro="${log.logradouro}">
+                    <div class="autocomplete-item-title">${log.tipo} ${log.logradouro}</div>
+                    <div class="autocomplete-item-subtitle">${log.regional}</div>
+                </button>
+            `).join('');
+
+            // Adicionar event listeners aos resultados
+            logradouroResults.querySelectorAll('button').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const logradouro = this.dataset.logradouro;
+
+                    // Preenche o campo com o logradouro selecionado
+                    searchLogradouro.value = logradouro;
+                    logradouroResults.classList.add('hidden');
+
+                    // Foca no campo de numero ou submete o formulario
+                    searchNumero.focus();
+                });
+            });
+        }
+    } catch (err) {
+        console.error('Erro na busca:', err);
+        logradouroResults.innerHTML = `
+            <div class="autocomplete-error">
+                Erro ao buscar logradouros
+            </div>
+        `;
+    }
+}
+
+// ESC fecha resultados
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        logradouroResults.classList.add('hidden');
+    }
+});
+
+// ========== GEOCODIFICACAO VIA API EXTERNA ==========
 async function buscarCoordenadas(pontoId, tipo, logradouro, numero, bairro) {
     const btn = document.getElementById(`btn-geocode-${pontoId}`);
     const btnText = btn.querySelector('.btn-text');
     const originalText = btnText.textContent;
-    
-    // Desabilita o botão e mostra loading
+
+    // Desabilita o botao e mostra loading
     btn.disabled = true;
-    btn.classList.add('opacity-50', 'cursor-not-allowed');
+    btn.style.opacity = '0.5';
+    btn.style.cursor = 'not-allowed';
     btnText.textContent = 'Buscando...';
-    
+
     try {
         const response = await fetch('/api/geocode', {
             method: 'POST',
@@ -229,25 +377,27 @@ async function buscarCoordenadas(pontoId, tipo, logradouro, numero, bairro) {
                 cidade: 'Belo Horizonte'
             })
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
             // Redireciona para o mapa com as coordenadas encontradas
             window.location.href = `/mapa?lat=${data.lat}&lng=${data.lng}&zoom=18&ponto_id=${pontoId}&geocoded=1`;
         } else {
-            alert('Não foi possível encontrar as coordenadas para este endereço.\n\n' + (data.message || 'Endereço não encontrado no OpenStreetMap.'));
-            // Restaura o botão
+            alert('Nao foi possivel encontrar as coordenadas para este endereco.\n\n' + (data.message || 'Endereco nao encontrado no OpenStreetMap.'));
+            // Restaura o botao
             btn.disabled = false;
-            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            btn.style.opacity = '1';
+            btn.style.cursor = 'pointer';
             btnText.textContent = originalText;
         }
     } catch (error) {
         console.error('Erro ao buscar coordenadas:', error);
         alert('Erro ao buscar coordenadas. Tente novamente.');
-        // Restaura o botão
+        // Restaura o botao
         btn.disabled = false;
-        btn.classList.remove('opacity-50', 'cursor-not-allowed');
+        btn.style.opacity = '1';
+        btn.style.cursor = 'pointer';
         btnText.textContent = originalText;
     }
 }

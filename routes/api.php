@@ -12,7 +12,13 @@ Route::get('/user', function (Request $request) {
 
 Route::get('/pontos', [PontoController::class, 'index']);
 Route::get('/pontos/{id}', [PontoController::class, 'show']);
+
+// Busca de endereços
+Route::get('/enderecos/logradouros', [PontoController::class, 'buscarLogradouros']);
+Route::get('/enderecos/buscar', [PontoController::class, 'buscarEndereco']);
+Route::get('/enderecos/por-coordenadas', [PontoController::class, 'buscarEnderecoPorCoordenadas']);
 Route::patch('/pontos/{id}/coordenadas', [PontoController::class, 'updateCoordenadas']);
+Route::get('/pontos/nao-georreferenciados/logradouros', [PontoController::class, 'buscarLogradourosNaoGeorreferenciados']);
 Route::get('/pontos/{ponto}/moradores', [MoradorController::class, 'porPonto']);
 
 Route::prefix('geo')->group(function () {

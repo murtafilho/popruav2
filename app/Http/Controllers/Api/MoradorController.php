@@ -24,7 +24,7 @@ class MoradorController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $query = Morador::query()->with(['pontoAtual.endereco']);
+        $query = Morador::query()->with(['pontoAtual.enderecoAtualizado']);
 
         // Filtrar por ponto
         if ($request->filled('ponto_id')) {
@@ -56,7 +56,7 @@ class MoradorController extends Controller
      */
     public function show(Morador $morador): JsonResponse
     {
-        $morador->load(['pontoAtual.endereco', 'historico.ponto.endereco']);
+        $morador->load(['pontoAtual.enderecoAtualizado', 'historico.ponto.enderecoAtualizado']);
 
         return response()->json($morador);
     }
@@ -172,7 +172,7 @@ class MoradorController extends Controller
      */
     public function arquivados(Request $request): JsonResponse
     {
-        $query = Morador::onlyTrashed()->with(['historico.ponto.endereco']);
+        $query = Morador::onlyTrashed()->with(['historico.ponto.enderecoAtualizado']);
 
         if ($request->filled('search')) {
             $termo = $request->search;

@@ -36,9 +36,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/pontos', [\App\Http\Controllers\PontoController::class, 'index'])->name('pontos.index');
     Route::get('/pontos/nao-georreferenciados', [\App\Http\Controllers\PontoController::class, 'naoGeorreferenciados'])->name('pontos.nao-georreferenciados');
     Route::get('/pontos/{id}', [\App\Http\Controllers\PontoController::class, 'show'])->name('pontos.show');
+    Route::get('/pontos/{ponto}/vistorias/create', [VistoriaController::class, 'createForPonto'])->name('pontos.vistorias.create');
     Route::get('/vistorias', [VistoriaController::class, 'index'])->name('vistorias.index');
     Route::get('/vistorias/create', [VistoriaController::class, 'create'])->name('vistorias.create');
+    Route::get('/vistorias/{vistoria}', [VistoriaController::class, 'show'])->name('vistorias.show');
+    Route::get('/vistorias/{vistoria}/relatorio', [VistoriaController::class, 'report'])->name('vistorias.report');
+    Route::get('/vistorias/{vistoria}/edit', [VistoriaController::class, 'edit'])->name('vistorias.edit');
     Route::post('/vistorias', [VistoriaController::class, 'store'])->name('vistorias.store');
+    Route::put('/vistorias/{vistoria}', [VistoriaController::class, 'update'])->name('vistorias.update');
 
     // Moradores
     Route::resource('moradores', MoradorController::class)->parameters(['moradores' => 'morador']);
