@@ -3024,14 +3024,14 @@ h6 { font-size: var(--text-sm); }
 /* Map Layers Panel */
 .map-layers-panel {
   position: absolute;
-  top: 56px;
-  right: var(--space-2);
+  bottom: 70px;
+  left: var(--space-2);
   z-index: 1000;
   background: var(--bg-secondary);
   border: 1px solid var(--border-primary);
   border-radius: var(--card-radius);
   padding: var(--space-3);
-  max-height: 80vh;
+  max-height: 60vh;
   overflow-y: auto;
   box-shadow: var(--shadow-lg);
   min-width: 200px;
@@ -3041,6 +3041,7 @@ h6 { font-size: var(--text-sm); }
   font-size: var(--text-sm);
   font-weight: var(--font-semibold);
   color: var(--text-primary);
+  margin-top: var(--space-2);
   margin-bottom: var(--space-2);
 }
 
