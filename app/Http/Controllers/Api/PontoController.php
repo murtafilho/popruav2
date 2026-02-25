@@ -92,12 +92,17 @@ class PontoController extends Controller
 
         $termo = $validated['q'];
 
-        $logradouros = DB::table('endereco_atualizados')
+        // Usar subquery para contornar limitação do PostgreSQL com DISTINCT + ORDER BY
+        $subquery = DB::table('endereco_atualizados')
             ->selectRaw('DISTINCT "SIGLA_TIPO_LOGRADOURO" as tipo, "NOME_LOGRADOURO" as logradouro, "NOME_REGIONAL" as regional')
-            ->where('NOME_LOGRADOURO', 'ilike', "%{$termo}%")
-            ->orderByRaw('CASE WHEN "NOME_LOGRADOURO" ILIKE ? THEN 0 ELSE 1 END', ["{$termo}%"])
-            ->orderBy('NOME_LOGRADOURO')
-            ->orderBy('NOME_REGIONAL')
+            ->where('NOME_LOGRADOURO', 'ilike', "%{$termo}%");
+
+        $logradouros = DB::query()
+            ->fromSub($subquery, 'sub')
+            ->select(['tipo', 'logradouro', 'regional'])
+            ->orderByRaw('CASE WHEN logradouro ILIKE ? THEN 0 ELSE 1 END', ["{$termo}%"])
+            ->orderBy('logradouro')
+            ->orderBy('regional')
             ->limit(20)
             ->get();
 
@@ -288,7 +293,8 @@ class PontoController extends Controller
 
         $termo = $validated['q'];
 
-        $logradouros = DB::table('pontos as p')
+        // Usar subquery para contornar limitação do PostgreSQL com DISTINCT + ORDER BY
+        $subquery = DB::table('pontos as p')
             ->leftJoin('endereco_atualizados as ea', 'ea.id', '=', 'p.endereco_atualizado_id')
             ->selectRaw('DISTINCT ea."SIGLA_TIPO_LOGRADOURO" as tipo, ea."NOME_LOGRADOURO" as logradouro, ea."NOME_REGIONAL" as regional')
             ->where(function ($q) {
@@ -297,10 +303,14 @@ class PontoController extends Controller
                     ->orWhere('p.lat', '=', 0)
                     ->orWhere('p.lng', '=', 0);
             })
-            ->where('ea.NOME_LOGRADOURO', 'ilike', "%{$termo}%")
-            ->orderByRaw('CASE WHEN ea."NOME_LOGRADOURO" ILIKE ? THEN 0 ELSE 1 END', ["{$termo}%"])
-            ->orderBy('ea.NOME_LOGRADOURO')
-            ->orderBy('ea.NOME_REGIONAL')
+            ->where('ea.NOME_LOGRADOURO', 'ilike', "%{$termo}%");
+
+        $logradouros = DB::query()
+            ->fromSub($subquery, 'sub')
+            ->select(['tipo', 'logradouro', 'regional'])
+            ->orderByRaw('CASE WHEN logradouro ILIKE ? THEN 0 ELSE 1 END', ["{$termo}%"])
+            ->orderBy('logradouro')
+            ->orderBy('regional')
             ->limit(20)
             ->get();
 
