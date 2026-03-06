@@ -32,6 +32,14 @@
             <div class="card-body" style="padding: var(--space-3);">
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-3);">
                     <div class="admin-nav-links">
+                    <a href="{{ route('admin.users.create') }}" class="btn btn-primary" style="margin-bottom: var(--space-2);">
+                        <svg style="width: 16px; height: 16px; margin-right: 4px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        Cadastrar Usuário
+                    </a>
+                </div>
+                <div class="admin-nav-links">
                         <a href="{{ route('admin.roles.index') }}" class="link">Roles</a>
                         <span class="text-muted">|</span>
                         <a href="{{ route('admin.permissions.index') }}" class="link">Permissions</a>

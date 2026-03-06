@@ -50,9 +50,13 @@
                     <div class="stepper-circle">6</div>
                     <span class="stepper-label">Fotos</span>
                 </div>
+                <div class="stepper-item" data-step="6" onclick="goToStep(6)">
+                    <div class="stepper-circle">7</div>
+                    <span class="stepper-label">Revisar</span>
+                </div>
             </div>
             <div class="step-indicator">
-                <span id="step-indicator">Etapa <span class="step-indicator-text">1</span> de <span class="step-indicator-text">6</span></span>
+                <span id="step-indicator">Etapa <span class="step-indicator-text">1</span> de <span class="step-indicator-text">7</span></span>
             </div>
 
             <!-- Conteudo das Abas -->
@@ -566,34 +570,43 @@
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Barra de Acoes Fixa -->
-            <div class="form-actions">
-                <div class="flex gap-2 mb-2">
-                    <button type="button" onclick="prevTab()" id="btn-prev" class="btn btn-secondary flex-1 hidden">
-                        <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                        </svg>
-                        Anterior
-                    </button>
-                    <button type="button" onclick="nextTab()" id="btn-next" class="btn btn-secondary flex-1">
-                        Proxima
-                        <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                        </svg>
-                    </button>
+                <!-- Aba 7: Revisar e Finalizar -->
+                <div class="tab-content hidden" data-tab="6">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h3 class="form-section-title">
+                                <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                Revisao da Vistoria
+                            </h3>
+                            <p class="text-muted mb-4" style="font-size: var(--text-sm);">Verifique os dados antes de finalizar.</p>
+
+                            <div id="review-checklist" class="review-checklist"></div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-body" style="text-align: center;">
+                            <div id="review-status" class="mb-4"></div>
+                            <button type="submit" id="btn-submit" class="btn btn-primary btn-block btn-lg">
+                                <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                Registrar Vistoria
+                            </button>
+                            <a href="{{ route('mapa.index') }}" class="btn btn-ghost btn-block mt-2">Cancelar</a>
+                        </div>
+                    </div>
                 </div>
-
-                <button type="submit" class="btn btn-primary btn-block">Registrar Vistoria</button>
-                <a href="{{ route('mapa.index') }}" class="btn btn-ghost btn-block">Cancelar</a>
             </div>
         </form>
     </div>
 
     <script>
         let currentTab = 0;
-        const totalTabs = 6;
+        const totalTabs = 7;
         let visitedSteps = new Set([0]);
         let recognition = null;
         let activeInput = null;
@@ -601,7 +614,7 @@
         let novosMoradores = [];
         const tiposAbrigo = @json($tiposAbrigo);
 
-        const stepLabels = ['Dados', 'Caract.', 'Relatorio', 'Encam.', 'Moradores', 'Fotos'];
+        const stepLabels = ['Dados', 'Caract.', 'Relatorio', 'Encam.', 'Moradores', 'Fotos', 'Revisar'];
         const checkmarkSVG = '<svg class="stepper-check" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>';
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -638,14 +651,106 @@
                 content.classList.toggle('hidden', i !== index);
             });
 
-            document.getElementById('btn-prev').classList.toggle('hidden', index === 0);
-            document.getElementById('btn-next').classList.toggle('hidden', index === totalTabs - 1);
+            // Ao entrar na aba de revisao, montar checklist
+            if (index === 6) {
+                buildReviewChecklist();
+            }
 
             document.querySelector('.form-content')?.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function goToStep(index) {
             showTab(index);
+        }
+
+        function buildReviewChecklist() {
+            const container = document.getElementById('review-checklist');
+            const statusEl = document.getElementById('review-status');
+            const btnSubmit = document.getElementById('btn-submit');
+
+            const checks = [
+                {
+                    label: 'Data/Hora da Abordagem',
+                    step: 0,
+                    check: () => !!document.querySelector('[name="data_abordagem"]')?.value
+                },
+                {
+                    label: 'Tipo de Abordagem',
+                    step: 0,
+                    check: () => {
+                        const v = document.querySelector('[name="tipo_abordagem_id"]')?.value;
+                        return v && v !== '';
+                    }
+                },
+                {
+                    label: 'Resultado da Acao',
+                    step: 2,
+                    check: () => {
+                        const v = document.querySelector('[name="resultado_acao_id"]')?.value;
+                        return v && v !== '';
+                    }
+                },
+                {
+                    label: 'Quantidade de Pessoas',
+                    step: 0,
+                    check: () => {
+                        const v = document.querySelector('[name="qtd_pessoas"]')?.value;
+                        return v && parseInt(v) > 0;
+                    },
+                    optional: true
+                },
+                {
+                    label: 'Observacoes preenchidas',
+                    step: 2,
+                    check: () => !!document.querySelector('[name="observacoes"]')?.value?.trim(),
+                    optional: true
+                },
+                {
+                    label: 'Fotos anexadas',
+                    step: 5,
+                    check: () => fotosSelecionadas.length > 0,
+                    optional: true
+                }
+            ];
+
+            let html = '';
+            let allRequiredOk = true;
+
+            checks.forEach(item => {
+                const ok = item.check();
+                if (!item.optional && !ok) allRequiredOk = false;
+
+                const icon = ok
+                    ? '<svg style="width:20px;height:20px;color:var(--color-success);flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>'
+                    : item.optional
+                        ? '<svg style="width:20px;height:20px;color:var(--text-muted);flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>'
+                        : '<svg style="width:20px;height:20px;color:var(--color-danger);flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>';
+
+                const tag = !ok && !item.optional
+                    ? `<span class="badge badge-danger" style="font-size:10px;cursor:pointer;" onclick="goToStep(${item.step})">Ir para etapa ${item.step + 1}</span>`
+                    : item.optional && !ok
+                        ? '<span class="badge" style="font-size:10px;">Opcional</span>'
+                        : '';
+
+                html += `
+                    <div class="review-item ${ok ? 'ok' : (!item.optional ? 'missing' : 'optional')}">
+                        ${icon}
+                        <span class="review-item-label">${item.label}</span>
+                        ${tag}
+                    </div>`;
+            });
+
+            container.innerHTML = html;
+
+            if (allRequiredOk) {
+                statusEl.innerHTML = '<div class="alert alert-success" style="margin:0;"><strong>Tudo certo!</strong> A vistoria esta pronta para ser registrada.</div>';
+                btnSubmit.disabled = false;
+                btnSubmit.classList.remove('btn-disabled');
+            } else {
+                statusEl.innerHTML = '<div class="alert alert-danger" style="margin:0;"><strong>Campos obrigatorios pendentes.</strong> Corrija antes de finalizar.</div>';
+                btnSubmit.disabled = true;
+                btnSubmit.classList.add('btn-disabled');
+            }
         }
 
         function checkRequiredFields(stepIndex) {
@@ -680,21 +785,6 @@
                 toast.classList.remove('show');
                 setTimeout(() => toast.remove(), 300);
             }, 3000);
-        }
-
-        function nextTab() {
-            const missing = checkRequiredFields(currentTab);
-            if (missing.length > 0) {
-                showToast(`Campos pendentes: ${missing.join(', ')}`, 'warning');
-            }
-
-            if (currentTab < totalTabs - 1) {
-                showTab(currentTab + 1);
-            }
-        }
-
-        function prevTab() {
-            if (currentTab > 0) showTab(currentTab - 1);
         }
 
         function toggleQtdCasais() {

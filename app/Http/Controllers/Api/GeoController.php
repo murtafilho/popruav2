@@ -21,11 +21,11 @@ class GeoController extends Controller
                 ->map(fn ($b) => [
                     'type' => 'Feature',
                     'properties' => [
-                        'id'         => $b->id,
-                        'codigo'     => $b->codigo,
-                        'nome'       => $b->nome,
-                        'area_km2'   => $b->area_km2,
-                        'perimetro_m'=> $b->perimetro_m,
+                        'id' => $b->id,
+                        'codigo' => $b->codigo,
+                        'nome' => $b->nome,
+                        'area_km2' => $b->area_km2,
+                        'perimetro_m' => $b->perimetro_m,
                     ],
                     'geometry' => json_decode($b->geometry),
                 ]);
@@ -43,12 +43,12 @@ class GeoController extends Controller
                 ->map(fn ($r) => [
                     'type' => 'Feature',
                     'properties' => [
-                        'id'         => $r->id,
-                        'codigo'     => $r->codigo,
-                        'sigla'      => $r->sigla,
-                        'nome'       => $r->nome,
-                        'area_km2'   => $r->area_km2,
-                        'perimetro_m'=> $r->perimetro_m,
+                        'id' => $r->id,
+                        'codigo' => $r->codigo,
+                        'sigla' => $r->sigla,
+                        'nome' => $r->nome,
+                        'area_km2' => $r->area_km2,
+                        'perimetro_m' => $r->perimetro_m,
                     ],
                     'geometry' => json_decode($r->geometry),
                 ]);
@@ -64,14 +64,16 @@ class GeoController extends Controller
                 ->select('id', 'area_km2', 'perimetro_m', 'geometry')
                 ->first();
 
-            if (! $limite) return null;
+            if (! $limite) {
+                return null;
+            }
 
             return [[
                 'type' => 'Feature',
                 'properties' => [
-                    'id'         => $limite->id,
-                    'area_km2'   => $limite->area_km2,
-                    'perimetro_m'=> $limite->perimetro_m,
+                    'id' => $limite->id,
+                    'area_km2' => $limite->area_km2,
+                    'perimetro_m' => $limite->perimetro_m,
                 ],
                 'geometry' => json_decode($limite->geometry),
             ]];

@@ -59,11 +59,16 @@ class PontoController extends Controller
             return response()->json(['error' => 'Ponto não encontrado'], 404);
         }
 
+        /** @var \App\Models\EnderecoAtualizado|null $endereco */
         $endereco = $ponto->enderecoAtualizado;
+        /** @var \App\Models\CaracteristicaAbrigo|null $caracteristica */
+        $caracteristica = $ponto->caracteristicaAbrigo;
+        /** @var \App\Models\Vistoria|null $ultimaVistoria */
+        $ultimaVistoria = $ponto->ultimaVistoria;
 
         return response()->json([
             'id' => $ponto->id,
-            'numero' => $endereco?->NUMERO_IMOVEL ?? $ponto->numero,
+            'numero' => $endereco->NUMERO_IMOVEL ?? $ponto->numero,
             'complemento' => $ponto->complemento,
             'logradouro' => $endereco?->NOME_LOGRADOURO,
             'bairro' => $endereco?->NOME_BAIRRO_POPULAR,
@@ -71,12 +76,12 @@ class PontoController extends Controller
             'tipo' => $endereco?->SIGLA_TIPO_LOGRADOURO,
             'lat' => $ponto->lat,
             'lng' => $ponto->lng,
-            'caracteristica_abrigo' => $ponto->caracteristicaAbrigo?->nome,
+            'caracteristica_abrigo' => $caracteristica?->nome,
             'contador' => $ponto->contador ?? 0,
             'soma_kg' => $ponto->vistorias_sum_qtd_kg ?? 0,
             'complexidade' => $ponto->complexidade,
-            'resultado' => $ponto->ultimaVistoria?->resultadoAcao?->nome,
-            'resultado_acao_id' => $ponto->ultimaVistoria?->resultado_acao_id,
+            'resultado' => $ultimaVistoria?->resultadoAcao?->nome,
+            'resultado_acao_id' => $ultimaVistoria?->resultado_acao_id,
         ]);
     }
 
@@ -88,9 +93,11 @@ class PontoController extends Controller
     {
         $validated = $request->validate([
             'q' => 'required|string|min:2|max:100',
+            'numero' => 'nullable|integer|min:1',
         ]);
 
         $termo = $validated['q'];
+        $numero = $validated['numero'] ?? null;
 
         // Usar subquery para contornar limitação do PostgreSQL com DISTINCT + ORDER BY
         $subquery = DB::table('endereco_atualizados')
@@ -103,8 +110,39 @@ class PontoController extends Controller
             ->orderByRaw('CASE WHEN logradouro ILIKE ? THEN 0 ELSE 1 END', ["{$termo}%"])
             ->orderBy('logradouro')
             ->orderBy('regional')
-            ->limit(20)
+            ->limit(10)
             ->get();
+
+        // Se número informado, buscar números próximos para cada logradouro
+        if ($numero !== null) {
+            $resultados = [];
+
+            foreach ($logradouros as $log) {
+                $proximos = DB::table('endereco_atualizados')
+                    ->selectRaw('DISTINCT CAST("NUMERO_IMOVEL" AS INTEGER) as num')
+                    ->where('NOME_LOGRADOURO', $log->logradouro)
+                    ->where('NOME_REGIONAL', $log->regional)
+                    ->whereNotNull('lat')
+                    ->whereNotNull('lng')
+                    ->whereRaw("\"NUMERO_IMOVEL\" ~ '^[0-9]+$'")
+                    ->orderByRaw('ABS(CAST("NUMERO_IMOVEL" AS INTEGER) - ?)', [$numero])
+                    ->limit(3)
+                    ->pluck('num')
+                    ->sort()
+                    ->values();
+
+                foreach ($proximos as $num) {
+                    $resultados[] = [
+                        'tipo' => $log->tipo,
+                        'logradouro' => $log->logradouro,
+                        'regional' => $log->regional,
+                        'numero' => (int) $num,
+                    ];
+                }
+            }
+
+            return response()->json($resultados);
+        }
 
         return response()->json($logradouros);
     }

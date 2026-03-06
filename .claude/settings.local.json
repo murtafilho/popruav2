@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "Bash(find:*)",
-      "Bash(vendor/bin/pint:*)"
+      "Bash(vendor/bin/pint:*)",
+      "Bash(php artisan:*)",
+      "Bash(ssh sufis:*)",
+      "WebSearch",
+      "Bash(node:*)"
     ]
   },
   "enabledMcpjsonServers": [

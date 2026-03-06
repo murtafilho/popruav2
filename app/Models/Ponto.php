@@ -24,43 +24,37 @@ class Ponto extends Model
         'lng',
     ];
 
+    /** @return BelongsTo<EnderecoAtualizado, $this> */
     public function enderecoAtualizado(): BelongsTo
     {
         return $this->belongsTo(EnderecoAtualizado::class, 'endereco_atualizado_id');
     }
 
+    /** @return HasMany<Vistoria, $this> */
     public function vistorias(): HasMany
     {
         return $this->hasMany(Vistoria::class, 'ponto_id');
     }
 
-    /**
-     * Última vistoria realizada neste ponto
-     */
+    /** @return HasOne<Vistoria, $this> */
     public function ultimaVistoria(): HasOne
     {
         return $this->hasOne(Vistoria::class, 'ponto_id')->latestOfMany();
     }
 
-    /**
-     * Característica do abrigo (lookup table)
-     */
+    /** @return BelongsTo<CaracteristicaAbrigo, $this> */
     public function caracteristicaAbrigo(): BelongsTo
     {
         return $this->belongsTo(CaracteristicaAbrigo::class, 'caracteristica_abrigo_id');
     }
 
-    /**
-     * Moradores atualmente neste ponto
-     */
+    /** @return HasMany<Morador, $this> */
     public function moradores(): HasMany
     {
         return $this->hasMany(Morador::class, 'ponto_atual_id');
     }
 
-    /**
-     * Histórico de todos moradores que já passaram por este ponto
-     */
+    /** @return HasMany<MoradorHistorico, $this> */
     public function historicoMoradores(): HasMany
     {
         return $this->hasMany(MoradorHistorico::class, 'ponto_id')->orderByDesc('data_entrada');
@@ -144,7 +138,7 @@ class Ponto extends Model
      */
     public function getNumeroEnderecoAttribute(): ?string
     {
-        if ($this->relationLoaded('enderecoAtualizado') && $this->enderecoAtualizado) {
+        if ($this->relationLoaded('enderecoAtualizado') && $this->enderecoAtualizado instanceof EnderecoAtualizado) {
             return (string) $this->enderecoAtualizado->numero;
         }
 
@@ -157,7 +151,10 @@ class Ponto extends Model
     public function getEnderecoAttribute(): ?EnderecoAtualizado
     {
         if ($this->relationLoaded('enderecoAtualizado')) {
-            return $this->enderecoAtualizado;
+            /** @var EnderecoAtualizado|null */
+            $endereco = $this->enderecoAtualizado;
+
+            return $endereco;
         }
 
         return null;
@@ -180,6 +177,7 @@ class Ponto extends Model
      */
     public function getComplexidadeAttribute(): int
     {
+        /** @var Vistoria|null $vistoria */
         $vistoria = $this->relationLoaded('ultimaVistoria')
             ? $this->ultimaVistoria
             : $this->ultimaVistoria()->first();
@@ -211,11 +209,14 @@ class Ponto extends Model
      */
     public function getEnderecoCompletoAttribute(): string
     {
-        if (! $this->relationLoaded('enderecoAtualizado') || ! $this->enderecoAtualizado) {
+        /** @var EnderecoAtualizado|null $enderecoAtualizado */
+        $enderecoAtualizado = $this->relationLoaded('enderecoAtualizado') ? $this->enderecoAtualizado : null;
+
+        if (! $enderecoAtualizado) {
             return $this->complemento ?? '';
         }
 
-        $endereco = $this->enderecoAtualizado->endereco_completo;
+        $endereco = $enderecoAtualizado->endereco_completo;
 
         if ($this->complemento) {
             $endereco .= " ({$this->complemento})";

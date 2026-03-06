@@ -29,6 +29,20 @@ Route::prefix('geo')->group(function () {
 
 Route::post('/geocode', [\App\Http\Controllers\Api\GeocodingController::class, 'geocode']);
 
+// Vistorias - autocomplete de logradouros
+Route::middleware(['web', 'auth'])->group(function () {
+    Route::get('/vistorias/logradouros', [\App\Http\Controllers\VistoriaController::class, 'buscarLogradouros']);
+});
+
+// Fotos de Vistorias (upload offline-first via Service Worker)
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/vistorias/fotos', [\App\Http\Controllers\Api\VistoriaFotoController::class, 'store']);
+    Route::get('/vistorias/{vistoria}/fotos/status', [\App\Http\Controllers\Api\VistoriaFotoController::class, 'status']);
+});
+
+// Client logs (debug mobile)
+Route::post('/client-logs', [\App\Http\Controllers\Api\ClientLogController::class, 'store']);
+
 // Moradores
 Route::prefix('moradores')->group(function () {
     Route::get('/', [MoradorController::class, 'index']);

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/** @property-read string $nome */
 class TipoAbordagem extends Model
 {
     protected $table = 'tipo_abordagem';

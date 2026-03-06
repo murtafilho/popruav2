@@ -1,6 +1,6 @@
 # POPRUA v2 - Sistema de Gestão de População em Situação de Rua
 
-**Data atual: Fevereiro de 2026**
+**Data atual: Março de 2026**
 
 Sistema para gestão de vistorias e monitoramento de população em situação de rua em Belo Horizonte.
 
@@ -10,23 +10,43 @@ Sistema para gestão de vistorias e monitoramento de população em situação d
 |------------|--------|
 | PHP | 8.4 |
 | Laravel | 12 |
-| PostgreSQL | 16 |
-| PostGIS | 3.4 |
+| PostgreSQL | 17 |
+| PostGIS | 3.5 |
 | Redis | - |
 | Node.js | - |
 
 ## Banco de Dados
 
-O sistema utiliza **PostgreSQL 16 com PostGIS 3.4** para suporte completo a dados geoespaciais.
+O sistema utiliza **PostgreSQL 17 com PostGIS 3.5** para suporte completo a dados geoespaciais.
+
+### Infraestrutura (Docker em `vlcp-sufis01`)
+
+| Container | Imagem | Porta Host |
+|-----------|--------|------------|
+| `pg17-poprua-geo` | `postgis/postgis:17-3.5` | 5433 |
+| `redis-poprua-geo` | `redis:7-alpine` | 6379 |
+| `php84-poprua-geo` | `php84-poprua-geo:local` | 9084 |
 
 ### Conexão Principal (PostgreSQL)
+
+**Produção (dentro do container):**
+```
+DB_CONNECTION=pgsql
+DB_HOST=pg17-poprua-geo
+DB_PORT=5432
+DB_DATABASE=poprua_geo
+DB_USERNAME=poprua
+DB_PASSWORD=poprua_secret
+```
+
+**Desenvolvimento local (acesso via host):**
 ```
 DB_CONNECTION=pgsql
 DB_HOST=localhost
-DB_PORT=5432
-DB_DATABASE=popruav2
-DB_USERNAME=postgres
-DB_PASSWORD=xman74102
+DB_PORT=5433
+DB_DATABASE=poprua_geo
+DB_USERNAME=poprua
+DB_PASSWORD=poprua_secret
 ```
 
 ### Tabelas com Dados Espaciais
@@ -91,7 +111,7 @@ The Laravel Boost guidelines are specifically curated by Laravel maintainers for
 ## Foundational Context
 - php - 8.4
 - laravel/framework (LARAVEL) - v12
-- PostgreSQL - 16 com PostGIS 3.4
+- PostgreSQL - 17 com PostGIS 3.5
 - phpunit/phpunit (PHPUNIT) - v11
 
 ## Conventions

@@ -51,6 +51,7 @@
                 <thead>
                     <tr>
                         <th>Nome</th>
+                        <th class="hide-mobile">Descricao</th>
                         <th class="text-center">Usuarios</th>
                         <th class="text-center hide-mobile">Permissions</th>
                         <th class="text-right">Acoes</th>
@@ -61,6 +62,9 @@
                         <tr>
                             <td>
                                 <span class="font-medium">{{ $role->name }}</span>
+                            </td>
+                            <td class="hide-mobile text-muted">
+                                {{ $role->description ?? '-' }}
                             </td>
                             <td class="text-center">
                                 <span class="badge badge-secondary">{{ $role->users_count }}</span>
@@ -91,7 +95,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="text-center text-muted" style="padding: var(--space-8);">
+                            <td colspan="5" class="text-center text-muted" style="padding: var(--space-8);">
                                 Nenhuma role cadastrada.
                             </td>
                         </tr>

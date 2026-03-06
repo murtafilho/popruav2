@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\EnderecoAtualizado;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\DB;
 
 /**
  * @extends Factory<EnderecoAtualizado>
@@ -35,6 +36,18 @@ class EnderecoAtualizadoFactory extends Factory
             'lat' => $lat,
             'lng' => $lng,
         ];
+    }
+
+    public function configure(): static
+    {
+        return $this->afterCreating(function (EnderecoAtualizado $endereco) {
+            if ($endereco->lat !== null && $endereco->lng !== null) {
+                DB::statement(
+                    'UPDATE endereco_atualizados SET geom = ST_SetSRID(ST_MakePoint(?, ?), 4326) WHERE id = ?',
+                    [$endereco->lng, $endereco->lat, $endereco->id]
+                );
+            }
+        });
     }
 
     public function semCoordenadas(): static

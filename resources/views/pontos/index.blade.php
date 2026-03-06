@@ -19,11 +19,19 @@
             <div class="card-body">
                 <form method="GET" action="{{ route('pontos.index') }}" style="display: flex; flex-direction: column; gap: var(--space-3);">
                     {{-- Busca por endereco --}}
-                    <div class="form-group">
-                        <label class="form-label">Logradouro</label>
-                        <input type="text" name="logradouro" value="{{ request('logradouro') }}"
-                            placeholder="Digite o nome do logradouro..."
-                            class="form-input">
+                    <div class="form-row form-row-2">
+                        <div class="form-group" style="flex: 3;">
+                            <label class="form-label">Logradouro</label>
+                            <input type="text" name="logradouro" value="{{ request('logradouro') }}"
+                                placeholder="Ex: AFONSO PENA"
+                                class="form-input">
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label class="form-label">Numero</label>
+                            <input type="text" name="numero" value="{{ request('numero') }}"
+                                placeholder="Ex: 1000"
+                                class="form-input">
+                        </div>
                     </div>
                     <div class="form-row form-row-3">
                         <div class="form-group">

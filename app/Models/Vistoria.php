@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -14,6 +15,7 @@ class Vistoria extends Model implements HasMedia
 {
     use HasFactory;
     use InteractsWithMedia;
+    use SoftDeletes;
 
     protected $table = 'vistorias';
 
@@ -92,26 +94,31 @@ class Vistoria extends Model implements HasMedia
         ];
     }
 
+    /** @return BelongsTo<Ponto, $this> */
     public function ponto(): BelongsTo
     {
         return $this->belongsTo(Ponto::class, 'ponto_id');
     }
 
+    /** @return BelongsTo<User, $this> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    /** @return BelongsTo<TipoAbordagem, $this> */
     public function tipoAbordagem(): BelongsTo
     {
         return $this->belongsTo(TipoAbordagem::class, 'tipo_abordagem_id');
     }
 
+    /** @return BelongsTo<TipoAbrigoDesmontado, $this> */
     public function tipoAbrigoDesmontado(): BelongsTo
     {
         return $this->belongsTo(TipoAbrigoDesmontado::class, 'tipo_abrigo_desmontado_id');
     }
 
+    /** @return BelongsTo<ResultadoAcao, $this> */
     public function resultadoAcao(): BelongsTo
     {
         return $this->belongsTo(ResultadoAcao::class, 'resultado_acao_id');

@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'google_drive' => [
+        'client_id' => env('GOOGLE_DRIVE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_DRIVE_CLIENT_SECRET'),
+        'folder_id' => env('GOOGLE_DRIVE_FOLDER_ID', '150so7yLUR23dwesO3xc6lCaClMjeVN5U'),
+    ],
+
 ];

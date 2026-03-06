@@ -16,105 +16,40 @@
         transform: translate(-50%, -50%);
         pointer-events: none;
     }
-    /* Indicador de Zoom no Footer */
-    .footer-zoom-indicator {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 2px;
-        font-size: var(--text-xs);
-        cursor: default;
+    .map-search-field-icon {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        pointer-events: none;
+        z-index: 2;
     }
-    .footer-zoom-icon {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        transition: background-color 0.3s ease, color 0.3s ease;
-    }
-    .footer-zoom-icon-danger {
-        background-color: var(--color-danger);
-        color: white;
-    }
-    .footer-zoom-icon-success {
-        background-color: var(--color-success);
-        color: white;
-    }
-    .footer-zoom-indicator span:last-child {
-        color: var(--text-secondary);
-    }
-    .footer-zoom-indicator span:last-child strong {
-        color: var(--text-primary);
-    }
-    /* Badge de Zoom no Bottom Sheet */
-    .sheet-zoom-badge {
-        display: inline-block;
-        padding: var(--space-1) var(--space-3);
-        border-radius: var(--radius-full);
-        font-weight: var(--font-semibold);
-        font-size: var(--text-sm);
-        transition: background-color 0.3s ease, color 0.3s ease;
-    }
-    .sheet-zoom-danger {
-        background-color: var(--color-danger);
-        color: white;
-    }
-    .sheet-zoom-success {
-        background-color: var(--color-success);
-        color: white;
-    }
+
 </style>
 @endpush
 
 @section('header')
     <div style="display: flex; align-items: center; gap: var(--space-2); flex: 1;">
-        <!-- Campos de Busca -->
+        <!-- Campo de Busca Unificado -->
         <div class="map-search-bar">
-            <!-- Logradouro -->
             <div class="map-search-field">
-                <input
-                    type="text"
-                    id="search-logradouro"
-                    placeholder="Logradouro"
-                    autocomplete="off"
-                    class="form-input form-input-sm"
-                >
-                <div id="logradouro-results" class="map-search-results hidden"></div>
-            </div>
-            <!-- Numero -->
-            <div class="map-search-numero">
-                <input
-                    type="number"
-                    id="search-numero"
-                    placeholder="No"
-                    autocomplete="off"
-                    class="form-input form-input-sm"
-                >
-            </div>
-            <!-- Botao Buscar -->
-            <button
-                type="button"
-                id="btn-buscar-endereco"
-                class="btn btn-ghost btn-icon btn-sm"
-                title="Buscar endereco"
-            >
-                <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="map-search-field-icon" style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                 </svg>
-            </button>
+                <input
+                    type="text"
+                    id="search-endereco"
+                    placeholder="Buscar endereco..."
+                    autocomplete="off"
+                    class="form-input form-input-sm"
+                    style="padding-left: 32px;"
+                >
+                <div id="search-results" class="map-search-results hidden"></div>
+            </div>
         </div>
     </div>
     <div style="display: flex; align-items: center; gap: var(--space-2);">
-        <!-- Badge de Zoom -->
-        <span id="zoom-badge" class="badge badge-danger" title="Zoom atual">
-            <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"/>
-            </svg>
-            <span id="zoom-level">12</span>
-            <span id="zoom-warning" style="font-weight: bold; margin-left: 4px;">Zoom insuficiente</span>
-        </span>
         <button id="btn-menu" class="btn btn-ghost btn-icon">
             <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
@@ -126,6 +61,12 @@
 @section('content')
     <!-- Map Container -->
     <div id="map"></div>
+
+    <!-- Crosshair no centro do mapa -->
+    <div class="map-crosshair">
+        <div class="map-crosshair-h"></div>
+        <div class="map-crosshair-v"></div>
+    </div>
 
     <!-- FAB - Minha Localizacao -->
     <button
@@ -145,9 +86,18 @@
         </svg>
     </button>
 
+
     <!-- Layers Panel (abre pelo menu) -->
     <div id="layers-panel" class="map-layers-panel hidden">
-        <h4 class="layers-panel-title">Mapa Base</h4>
+        <div class="layers-panel-header">
+            <h4 class="layers-panel-title">Camadas</h4>
+            <button type="button" id="layers-panel-close" class="btn btn-ghost btn-icon" style="margin: -8px -8px -8px 0;">
+                <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        <h4 class="layers-panel-title layers-panel-divider">Mapa Base</h4>
         <div class="layers-panel-group">
             <label class="layers-panel-option">
                 <input type="radio" name="base-layer" id="base-street" class="form-checkbox">
@@ -220,9 +170,17 @@
     </div>
 
     <!-- Bottom Sheet - Point Info -->
-    <div id="bottom-sheet" class="bottom-sheet">
-        <div class="bottom-sheet-content">
+    <div id="bottom-sheet-overlay" class="bottom-sheet-overlay"></div>
+    <div id="bottom-sheet" class="bottom-sheet translate-y-full">
+        <div class="bottom-sheet-header" id="bottom-sheet-header">
             <div class="bottom-sheet-handle"></div>
+            <button class="bottom-sheet-close" id="bottom-sheet-close" aria-label="Fechar">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        <div class="bottom-sheet-content">
             <div id="sheet-content">
                 <!-- Content will be dynamically inserted -->
             </div>
@@ -252,37 +210,6 @@
 
 @endsection
 
-@section('footer')
-    <div class="footer-nav">
-        <button class="footer-nav-item active">
-            <svg style="width: 24px; height: 24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
-            </svg>
-            <span>Mapa</span>
-        </button>
-        <button id="btn-vistoria" class="footer-nav-item">
-            <svg style="width: 24px; height: 24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-            </svg>
-            <span>Nova Vistoria</span>
-        </button>
-        <!-- Indicador de Zoom no Footer -->
-        <div id="footer-zoom-indicator" class="footer-nav-item footer-zoom-indicator" title="Zoom minimo para vistoria: 19">
-            <span id="footer-zoom-icon" class="footer-zoom-icon footer-zoom-icon-danger">
-                <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"/>
-                </svg>
-            </span>
-            <span>Zoom: <strong id="footer-zoom-level">12</strong></span>
-        </div>
-        <a href="{{ route('dashboard') }}" class="footer-nav-item">
-            <svg style="width: 24px; height: 24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-            </svg>
-            <span>Home</span>
-        </a>
-    </div>
-@endsection
 
 @push('scripts')
 <script>
@@ -305,108 +232,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize map
     const map = L.map('map', {
-        zoomControl: false
+        zoomControl: false,
+        attributionControl: false
     });
 
-    // Add zoom control to bottom-left (better for mobile)
-    L.control.zoom({ position: 'bottomleft' }).addTo(map);
 
-    // Atualizar indicador de zoom com badge colorido (header e footer)
-    const zoomLevel = document.getElementById('zoom-level');
-    const zoomBadge = document.getElementById('zoom-badge');
-    const zoomWarning = document.getElementById('zoom-warning');
-    const footerZoomLevel = document.getElementById('footer-zoom-level');
-    const footerZoomIcon = document.getElementById('footer-zoom-icon');
-
-    function updateZoomBadge() {
-        const currentZoom = map.getZoom();
-
-        // Atualiza header
-        zoomLevel.textContent = currentZoom;
-
-        // Atualiza footer
-        if (footerZoomLevel) {
-            footerZoomLevel.textContent = currentZoom;
-        }
-
-        // Atualiza bottom sheet (se estiver aberto com aviso de zoom)
-        const sheetZoomLevel = document.getElementById('sheet-zoom-level');
-        const sheetZoomStatus = document.getElementById('sheet-zoom-status');
-        const sheetZoomTitle = document.getElementById('sheet-zoom-title');
-        const sheetZoomActions = document.getElementById('sheet-zoom-actions');
-
-        if (sheetZoomLevel) {
-            sheetZoomLevel.textContent = currentZoom;
-
-            // Atualiza o badge e mensagem quando zoom atinge o mínimo
-            if (currentZoom >= MIN_ZOOM_VISTORIA && sheetZoomStatus) {
-                sheetZoomStatus.classList.remove('sheet-zoom-danger');
-                sheetZoomStatus.classList.add('sheet-zoom-success');
-                sheetZoomStatus.textContent = 'Zoom OK';
-
-                if (sheetZoomTitle) {
-                    sheetZoomTitle.textContent = 'Pronto para vistoria!';
-                }
-
-                // Atualiza botões para mostrar opção de criar vistoria
-                if (sheetZoomActions && window.pendingVistoriaCoords) {
-                    const coords = window.pendingVistoriaCoords;
-                    sheetZoomActions.innerHTML = `
-                        <button onclick="hideBottomSheet()" class="btn btn-secondary" style="flex: 1;">Fechar</button>
-                        <a href="${APP_BASE}/vistorias/create?lat=${coords.lat}&lng=${coords.lng}" class="btn btn-success" style="flex: 1;">
-                            <svg style="width: 16px; height: 16px; margin-right: 4px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                            </svg>
-                            Nova Vistoria
-                        </a>
-                    `;
-                }
-            } else if (currentZoom < MIN_ZOOM_VISTORIA && sheetZoomStatus) {
-                sheetZoomStatus.classList.remove('sheet-zoom-success');
-                sheetZoomStatus.classList.add('sheet-zoom-danger');
-                sheetZoomStatus.textContent = 'Zoom insuficiente';
-
-                if (sheetZoomTitle) {
-                    sheetZoomTitle.textContent = 'Aproxime mais o mapa';
-                }
-
-                // Restaura botões originais
-                if (sheetZoomActions && window.pendingVistoriaCoords) {
-                    const coords = window.pendingVistoriaCoords;
-                    sheetZoomActions.innerHTML = `
-                        <button onclick="hideBottomSheet()" class="btn btn-secondary" style="flex: 1;">Fechar</button>
-                        <button onclick="window.zoomAndCloseSheet(${coords.lat}, ${coords.lng})" class="btn btn-primary" style="flex: 1;">Aproximar</button>
-                    `;
-                }
-            }
-        }
-
-        // Muda cor: vermelho com aviso até 18, verde de 19 em diante
-        if (currentZoom >= MIN_ZOOM_VISTORIA) {
-            zoomBadge.classList.remove('badge-danger');
-            zoomBadge.classList.add('badge-success');
-            zoomWarning.style.display = 'none';
-
-            // Footer: verde quando zoom suficiente
-            if (footerZoomIcon) {
-                footerZoomIcon.classList.remove('footer-zoom-icon-danger');
-                footerZoomIcon.classList.add('footer-zoom-icon-success');
-            }
-        } else {
-            zoomBadge.classList.remove('badge-success');
-            zoomBadge.classList.add('badge-danger');
-            zoomWarning.style.display = 'inline';
-
-            // Footer: vermelho quando zoom insuficiente
-            if (footerZoomIcon) {
-                footerZoomIcon.classList.remove('footer-zoom-icon-success');
-                footerZoomIcon.classList.add('footer-zoom-icon-danger');
-            }
-        }
-    }
-
-    updateZoomBadge();
-    map.on('zoomend', updateZoomBadge);
 
     // Camadas base
     const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -845,6 +675,10 @@ document.addEventListener('DOMContentLoaded', function() {
         layersPanel.classList.toggle('hidden');
     });
 
+    document.getElementById('layers-panel-close').addEventListener('click', () => {
+        layersPanel.classList.add('hidden');
+    });
+
     // Alternância de camada base
     document.getElementById('base-street').addEventListener('change', function() {
         if (this.checked) {
@@ -915,6 +749,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Bottom sheet functions
     const bottomSheet = document.getElementById('bottom-sheet');
     const sheetContent = document.getElementById('sheet-content');
+    const sheetOverlay = document.getElementById('bottom-sheet-overlay');
+    const sheetHeader = document.getElementById('bottom-sheet-header');
+    const sheetCloseBtn = document.getElementById('bottom-sheet-close');
 
     function showBottomSheet(content) {
         sheetContent.innerHTML = content;
@@ -923,7 +760,60 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function hideBottomSheet() {
         bottomSheet.classList.add('translate-y-full');
+        bottomSheet.style.transform = '';
+        bottomSheet.classList.remove('dragging');
     }
+
+    // Close button & overlay tap
+    sheetCloseBtn.addEventListener('click', hideBottomSheet);
+    sheetOverlay.addEventListener('click', hideBottomSheet);
+
+    // Swipe-to-dismiss gesture
+    (function initSwipe() {
+        let startY = 0;
+        let currentY = 0;
+        let isDragging = false;
+
+        function onTouchStart(e) {
+            // Only swipe from header or if scrolled to top
+            const contentEl = bottomSheet.querySelector('.bottom-sheet-content');
+            const isHeader = sheetHeader.contains(e.target);
+            const isScrolledTop = contentEl.scrollTop <= 0;
+            if (!isHeader && !isScrolledTop) return;
+
+            startY = e.touches[0].clientY;
+            currentY = startY;
+            isDragging = true;
+            bottomSheet.classList.add('dragging');
+        }
+
+        function onTouchMove(e) {
+            if (!isDragging) return;
+            currentY = e.touches[0].clientY;
+            const deltaY = currentY - startY;
+            if (deltaY > 0) {
+                // Dragging down — move sheet with rubber-band feel
+                bottomSheet.style.transform = `translateY(${deltaY}px)`;
+                e.preventDefault();
+            }
+        }
+
+        function onTouchEnd() {
+            if (!isDragging) return;
+            isDragging = false;
+            bottomSheet.classList.remove('dragging');
+            const deltaY = currentY - startY;
+            if (deltaY > 80) {
+                hideBottomSheet();
+            } else {
+                bottomSheet.style.transform = '';
+            }
+        }
+
+        bottomSheet.addEventListener('touchstart', onTouchStart, { passive: true });
+        bottomSheet.addEventListener('touchmove', onTouchMove, { passive: false });
+        bottomSheet.addEventListener('touchend', onTouchEnd, { passive: true });
+    })();
 
     async function showPointDetails(ponto) {
         // Limpa marcador azul de seleção se existir
@@ -941,26 +831,33 @@ document.addEventListener('DOMContentLoaded', function() {
             const response = await fetch(`/api/pontos/${ponto.id}`);
             const details = await response.json();
 
+            const complexVal = details.complexidade || 0;
+            const complexClass = complexVal >= 3 ? 'sheet-stat--warning' : complexVal >= 1 ? 'sheet-stat--accent' : '';
             showBottomSheet(`
-                <h3 class="sheet-title">${details.logradouro}, ${details.numero}</h3>
-                <p class="sheet-subtitle">${details.bairro} - ${details.regional}</p>
-                <div class="sheet-stats">
-                    <div class="sheet-stat">
-                        <div class="sheet-stat-value">${details.contador || 0}</div>
-                        <div class="sheet-stat-label">Vistorias</div>
+                <div class="sheet-animate-in">
+                    <div class="sheet-address-info">
+                        <h3 class="sheet-title">${details.logradouro}, ${details.numero}</h3>
+                        <p class="sheet-subtitle">${details.bairro} - ${details.regional}</p>
                     </div>
-                    <div class="sheet-stat">
-                        <div class="sheet-stat-value">${details.soma_kg || 0}</div>
-                        <div class="sheet-stat-label">Kg</div>
+                    <div class="sheet-stats">
+                        <div class="sheet-stat sheet-stat--accent">
+                            <div class="sheet-stat-value">${details.contador || 0}</div>
+                            <div class="sheet-stat-label">Vistorias</div>
+                        </div>
+                        <div class="sheet-stat">
+                            <div class="sheet-stat-value">${details.soma_kg || 0}</div>
+                            <div class="sheet-stat-label">Kg</div>
+                        </div>
+                        <div class="sheet-stat ${complexClass}">
+                            <div class="sheet-stat-value">${complexVal}</div>
+                            <div class="sheet-stat-label">Complex.</div>
+                        </div>
                     </div>
-                    <div class="sheet-stat">
-                        <div class="sheet-stat-value">${details.complexidade || 0}</div>
-                        <div class="sheet-stat-label">Complex.</div>
-                    </div>
+                    <a href="${APP_BASE}/pontos/${details.id}/vistorias/create" class="sheet-btn-primary">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                        Nova Vistoria
+                    </a>
                 </div>
-                <button onclick="window.location.href='${APP_BASE}/pontos/${details.id}/vistorias/create'" class="btn btn-primary btn-block">
-                    Nova Vistoria
-                </button>
             `);
         } catch (err) {
             showBottomSheet(`
@@ -988,8 +885,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const btnVistoria = document.getElementById('btn-vistoria');
 
     function enableVistoriaButton() {
-        btnVistoria.disabled = false;
-        btnVistoria.classList.add('active');
+        if (btnVistoria) {
+            btnVistoria.disabled = false;
+            btnVistoria.classList.add('active');
+        }
     }
 
     // Limpa o marcador azul de seleção de localização
@@ -1080,14 +979,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     const lat = position.coords.latitude;
                     const lng = position.coords.longitude;
 
-                    setUserLocation(lat, lng, position.coords.accuracy);
-                    map.setView([lat, lng], MIN_ZOOM_VISTORIA);
+                    map.flyTo([lat, lng], 18);
 
-                    locationMode = true; // Ativa modo de seleção
-                    
-                    // Restaura botão com cor primária
+                    // Restaura botão
                     restoreButton();
-                    btn.classList.add('active');
                 },
                 error => {
                     // Restaura botão ao estado normal
@@ -1106,57 +1001,44 @@ document.addEventListener('DOMContentLoaded', function() {
     // Armazena dados do endereço atual para uso no botão Vistoria
     let currentEndereco = null;
 
-    // Clique no mapa cria ponto provisório, busca endereço e habilita vistoria
-    map.on('click', async function(e) {
-        // Ignora se clicou em um marcador recentemente
-        if (markerClickedRecently) {
+    // Clique no mapa centraliza no ponto clicado com zoom 18
+    map.on('click', function(e) {
+        if (markerClickedRecently) return;
+        map.flyTo(e.latlng, 18);
+    });
+
+    // Atualiza o bottom sheet com o endereço do centro do mapa (crosshair)
+    let crosshairFetchController = null;
+    async function updateCrosshairAddress() {
+        const center = map.getCenter();
+        const lat = center.lat;
+        const lng = center.lng;
+        const zoom = map.getZoom();
+
+        // Só mostra endereço quando zoom >= 16
+        if (zoom < 16) {
+            hideBottomSheet();
             return;
         }
 
-        const lat = e.latlng.lat;
-        const lng = e.latlng.lng;
+        // Cancela fetch anterior se ainda pendente
+        if (crosshairFetchController) crosshairFetchController.abort();
+        crosshairFetchController = new AbortController();
 
-        // Verifica zoom mínimo para criar vistoria
-        if (map.getZoom() < MIN_ZOOM_VISTORIA) {
-            showBottomSheet(`
-                <div class="sheet-address-info">
-                    <p id="sheet-zoom-status" class="sheet-label sheet-zoom-badge sheet-zoom-danger">Zoom insuficiente</p>
-                    <h3 id="sheet-zoom-title" class="sheet-title">Aproxime mais o mapa</h3>
-                    <p class="sheet-subtitle">Zoom atual: <strong id="sheet-zoom-level">${map.getZoom()}</strong> | Minimo necessario: ${MIN_ZOOM_VISTORIA}</p>
-                </div>
-                <div id="sheet-zoom-actions" class="sheet-actions">
-                    <button onclick="hideBottomSheet()" class="btn btn-secondary" style="flex: 1;">Fechar</button>
-                    <button onclick="window.zoomAndCloseSheet(${lat}, ${lng})" class="btn btn-primary" style="flex: 1;">Aproximar</button>
-                </div>
-            `);
-            // Armazenar coordenadas para uso quando zoom atingir o mínimo
-            window.pendingVistoriaCoords = { lat, lng };
-            return;
-        }
-
-        // Cria/move o marcador provisório
-        setUserLocation(lat, lng);
-
-        // Ativa o modo de seleção
-        locationMode = true;
-
-        // Busca o endereço de porta mais próximo
         try {
-            const response = await fetch(`/api/enderecos/por-coordenadas?lat=${lat}&lng=${lng}`);
+            const response = await fetch(`${APP_BASE}/api/enderecos/por-coordenadas?lat=${lat}&lng=${lng}`, {
+                signal: crosshairFetchController.signal
+            });
             const data = await response.json();
 
             if (data.encontrado) {
                 const end = data.endereco;
                 const enderecoLabel = `${end.tipo} ${end.logradouro}, ${Math.round(end.numero)}`;
                 const distancia = data.distancia_metros;
+                const distBadgeClass = distancia <= 30 ? 'sheet-badge--distance' : distancia <= 100 ? 'sheet-badge--info' : 'sheet-badge--warning';
 
-                // Armazenar endereço para uso no botão Vistoria
-                currentEndereco = end;
-
-                // Montar URL com dados do endereço
                 const vistoriaParams = new URLSearchParams({
-                    lat: lat,
-                    lng: lng,
+                    lat, lng,
                     endereco_tipo: end.tipo || '',
                     endereco_logradouro: end.logradouro || '',
                     endereco_numero: Math.round(end.numero) || '',
@@ -1166,83 +1048,63 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
 
                 showBottomSheet(`
-                    <div class="sheet-address-info">
-                        <p class="sheet-label">Endereco de porta mais proximo (${distancia}m)</p>
-                        <h3 class="sheet-title">${enderecoLabel}</h3>
-                        <p class="sheet-subtitle">${end.bairro} - ${end.regional}</p>
-                    </div>
-                    <div class="sheet-actions">
-                        <button onclick="hideBottomSheet()" class="btn btn-secondary" style="flex: 1;">Cancelar</button>
-                        <a href="${APP_BASE}/vistorias/create?${vistoriaParams.toString()}" class="btn btn-primary" style="flex: 1;"><svg style="width: 16px; height: 16px; margin-right: 4px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>Nova Vistoria Aqui</a>
+                    <div class="sheet-animate-in">
+                        <div class="sheet-address-info">
+                            <span class="sheet-badge ${distBadgeClass}">
+                                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                ${distancia}m do endereco
+                            </span>
+                            <h3 class="sheet-title" style="margin-top: 10px;">${enderecoLabel}</h3>
+                            <p class="sheet-subtitle">${end.bairro} - ${end.regional}</p>
+                        </div>
+                        <div class="sheet-actions">
+                            <a href="${APP_BASE}/vistorias/create?${vistoriaParams.toString()}" class="sheet-btn-primary" style="flex: 1;">
+                                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                                Nova Vistoria
+                            </a>
+                        </div>
                     </div>
                 `);
             } else {
-                // Mesmo sem endereço próximo, permitir criar vistoria
-                currentEndereco = null;
-                const vistoriaParams = new URLSearchParams({
-                    lat: lat,
-                    lng: lng
-                });
-
-                showBottomSheet(`
-                    <div class="sheet-address-info">
-                        <p class="sheet-label">Nenhum endereco de porta proximo</p>
-                        <h3 class="sheet-title">Local sem referencia</h3>
-                        <p class="sheet-subtitle">Coordenadas: ${lat.toFixed(6)}, ${lng.toFixed(6)}</p>
-                    </div>
-                    <div class="sheet-actions">
-                        <button onclick="hideBottomSheet()" class="btn btn-secondary" style="flex: 1;">Cancelar</button>
-                        <a href="${APP_BASE}/vistorias/create?${vistoriaParams.toString()}" class="btn btn-primary" style="flex: 1;"><svg style="width: 16px; height: 16px; margin-right: 4px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>Nova Vistoria Aqui</a>
-                    </div>
-                `);
+                hideBottomSheet();
             }
         } catch (err) {
-            console.error('Erro ao buscar endereço:', err);
-            // Mesmo com erro, permitir criar vistoria apenas com coordenadas
-            currentEndereco = null;
-            const vistoriaParams = new URLSearchParams({
-                lat: lat,
-                lng: lng
-            });
-
-            showBottomSheet(`
-                <div class="sheet-address-info">
-                    <p class="sheet-label">Erro ao buscar endereco</p>
-                    <h3 class="sheet-title">Local sem referencia</h3>
-                    <p class="sheet-subtitle">Coordenadas: ${lat.toFixed(6)}, ${lng.toFixed(6)}</p>
-                </div>
-                <div class="sheet-actions">
-                    <button onclick="hideBottomSheet()" class="btn btn-secondary" style="flex: 1;">Cancelar</button>
-                    <a href="${APP_BASE}/vistorias/create?${vistoriaParams.toString()}" class="btn btn-primary" style="flex: 1;"><svg style="width: 16px; height: 16px; margin-right: 4px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>Nova Vistoria Aqui</a>
-                </div>
-            `);
+            if (err.name !== 'AbortError') {
+                console.error('Erro ao buscar endereço:', err);
+            }
         }
-    });
+    }
+
+    // Atualiza endereço do crosshair quando o mapa para de mover
+    map.on('moveend', updateCrosshairAddress);
 
     // Botão de vistoria
-    btnVistoria.addEventListener('click', async function() {
+    if (btnVistoria) btnVistoria.addEventListener('click', async function() {
         // Se nao tem ponto selecionado, mostrar popup informativo
         if (!currentLocation) {
             showBottomSheet(`
-                <div class="sheet-warning">
-                    <div class="sheet-warning-icon">
-                        <svg style="width: 24px; height: 24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                        </svg>
-                    </div>
-                    <h3 class="sheet-title">Selecione um Ponto</h3>
-                    <p class="sheet-text">Para registrar uma nova vistoria, voce precisa:</p>
-                    <div class="sheet-instructions">
-                        <div class="sheet-instruction">
-                            <span class="sheet-instruction-number">1.</span>
-                            <span>Clicar no mapa para criar um <strong>novo ponto</strong></span>
+                <div class="sheet-animate-in">
+                    <div class="sheet-warning">
+                        <div class="sheet-warning-icon">
+                            <svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
                         </div>
-                        <div class="sheet-instruction">
-                            <span class="sheet-instruction-number">2.</span>
-                            <span>Ou selecionar um <strong>ponto existente</strong> no mapa</span>
+                        <h3 class="sheet-title">Selecione um Local</h3>
+                        <p class="sheet-text">Para registrar uma nova vistoria:</p>
+                        <div class="sheet-instructions">
+                            <div class="sheet-instruction">
+                                <span class="sheet-instruction-number">1</span>
+                                <span>Toque no mapa para criar um <strong>novo ponto</strong></span>
+                            </div>
+                            <div class="sheet-instruction">
+                                <span class="sheet-instruction-number">2</span>
+                                <span>Ou toque em um <strong>ponto existente</strong> (marcador colorido)</span>
+                            </div>
                         </div>
+                        <button onclick="hideBottomSheet()" class="sheet-btn-primary">Entendi</button>
                     </div>
-                    <button onclick="hideBottomSheet()" class="btn btn-primary btn-block">Entendi</button>
                 </div>
             `);
             return;
@@ -1290,12 +1152,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         showBottomSheet(`
-            <h3 class="sheet-title">Nova Vistoria</h3>
-            ${enderecoHtml}
-            <p class="sheet-coords">${currentLocation.lat.toFixed(6)}, ${currentLocation.lng.toFixed(6)}</p>
-            <div class="sheet-actions-vertical">
-                <a href="${APP_BASE}/vistorias/create?${vistoriaParams.toString()}" class="btn btn-primary btn-block">Registrar Vistoria</a>
-                <button onclick="hideBottomSheet()" class="btn btn-secondary btn-block">Cancelar</button>
+            <div class="sheet-animate-in">
+                <h3 class="sheet-title">Nova Vistoria</h3>
+                ${enderecoHtml}
+                <div class="sheet-coords">${currentLocation.lat.toFixed(6)}, ${currentLocation.lng.toFixed(6)}</div>
+                <div class="sheet-divider"></div>
+                <div class="sheet-actions-vertical">
+                    <a href="${APP_BASE}/vistorias/create?${vistoriaParams.toString()}" class="sheet-btn-primary">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                        Registrar Vistoria
+                    </a>
+                    <button onclick="hideBottomSheet()" class="sheet-btn-secondary">Cancelar</button>
+                </div>
             </div>
         `);
     });
@@ -1303,11 +1171,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Expor hideBottomSheet globalmente para o onclick inline
     window.hideBottomSheet = hideBottomSheet;
 
-    // Função para aproximar zoom e fechar o bottom sheet
-    window.zoomAndCloseSheet = function(lat, lng) {
-        map.setView([lat, lng], MIN_ZOOM_VISTORIA);
-        hideBottomSheet();
-    };
 
     // Modal do Relatorio
     function abrirRelatorio(vistoriaId) {
@@ -1350,109 +1213,163 @@ document.addEventListener('DOMContentLoaded', function() {
     window.fecharRelatorio = fecharRelatorio;
 
     // ========== BUSCA DE ENDEREÇO ==========
-    const searchLogradouro = document.getElementById('search-logradouro');
-    const searchNumero = document.getElementById('search-numero');
-    const logradouroResults = document.getElementById('logradouro-results');
-    const btnBuscar = document.getElementById('btn-buscar-endereco');
+    const searchInput = document.getElementById('search-endereco');
+    const searchResults = document.getElementById('search-results');
     let searchMarker = null;
     let searchTimeout = null;
-    let selectedLogradouro = null; // Armazena o logradouro selecionado (sem tipo)
+    let selectedLogradouro = null; // { tipo, logradouro, regional }
 
-    // Prevenir que eventos do mapa afetem os inputs
-    if (searchLogradouro) {
-        searchLogradouro.addEventListener('click', e => e.stopPropagation());
-    }
-    if (searchNumero) {
-        searchNumero.addEventListener('click', e => e.stopPropagation());
+    // Prevenir que eventos do mapa afetem o input
+    if (searchInput) {
+        searchInput.addEventListener('click', e => e.stopPropagation());
     }
 
-    // Autocomplete de logradouros
-    if (searchLogradouro && logradouroResults) {
-        searchLogradouro.addEventListener('input', function(e) {
+    // Extrai logradouro e número do texto digitado
+    // Formato esperado: "AVE AFONSO PENA, 1000 - CENTRO" ou "AFONSO PENA 1000"
+    function parseEnderecoInput(valor) {
+        const trimmed = valor.trim();
+        // Formato com vírgula: "TIPO LOGRADOURO, NUMERO - REGIONAL"
+        const matchVirgula = trimmed.match(/^(.+?),\s*(\d+)\s*(?:-.*)?$/);
+        if (matchVirgula) {
+            return { texto: matchVirgula[1].trim(), numero: parseInt(matchVirgula[2]) };
+        }
+        // Formato com vírgula sem número: "TIPO LOGRADOURO, - REGIONAL" ou "TIPO LOGRADOURO,"
+        const matchVirgulaSemNum = trimmed.match(/^(.+?),\s*(?:-.*)?$/);
+        if (matchVirgulaSemNum) {
+            return { texto: matchVirgulaSemNum[1].trim(), numero: null };
+        }
+        // Formato simples: "LOGRADOURO 1000"
+        const match = trimmed.match(/^(.+?)[\s]+(\d+)\s*$/);
+        if (match) {
+            return { texto: match[1].trim(), numero: parseInt(match[2]) };
+        }
+        return { texto: trimmed, numero: null };
+    }
+
+    // Extrai logradouro puro removendo prefixo de tipo
+    function extrairLogradouro(texto) {
+        return texto.replace(/^(AVE|RUA|PCA|ALA|TRV|BEC|PRC|VIA|ROD|EST|LAD)\s+/i, '');
+    }
+
+    // Autocomplete
+    if (searchInput && searchResults) {
+        searchInput.addEventListener('input', function(e) {
             e.stopPropagation();
-            const termo = this.value.trim();
-            selectedLogradouro = null; // Limpa seleção ao digitar
 
             if (searchTimeout) {
                 clearTimeout(searchTimeout);
             }
 
-            if (termo.length < 2) {
-                logradouroResults.classList.add('hidden');
+            // Se já selecionou logradouro, só fecha o dropdown (usuário está digitando número)
+            if (selectedLogradouro) {
+                // Se apagou o texto do logradouro selecionado, reseta
+                const prefixo = `${selectedLogradouro.tipo} ${selectedLogradouro.logradouro},`;
+                if (!this.value.startsWith(prefixo)) {
+                    selectedLogradouro = null;
+                } else {
+                    searchResults.classList.add('hidden');
+                    return;
+                }
+            }
+
+            const { texto, numero } = parseEnderecoInput(this.value);
+            if (texto.length < 2) {
+                searchResults.classList.add('hidden');
                 return;
             }
 
             searchTimeout = setTimeout(() => {
-                buscarLogradouros(termo);
+                buscarLogradouros(texto, numero);
             }, 300);
         });
 
         // Fechar ao clicar fora
         document.addEventListener('click', function(e) {
-            if (!searchLogradouro.contains(e.target) && !logradouroResults.contains(e.target)) {
-                logradouroResults.classList.add('hidden');
+            if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                searchResults.classList.add('hidden');
             }
         });
     }
 
-    // Função para buscar logradouros
-    async function buscarLogradouros(termo) {
+    // Buscar logradouros para autocomplete
+    async function buscarLogradouros(termo, numero = null) {
         try {
-            logradouroResults.innerHTML = '<div style="padding: var(--space-2); text-align: center;">Carregando...</div>';
-            logradouroResults.classList.remove('hidden');
+            searchResults.innerHTML = '<div style="padding: var(--space-2); text-align: center;">Buscando...</div>';
+            searchResults.classList.remove('hidden');
 
-            const response = await fetch(`/api/enderecos/logradouros?q=${encodeURIComponent(termo)}`);
-            const logradouros = await response.json();
+            // Remove prefixo de tipo para busca
+            const termoBusca = extrairLogradouro(termo);
 
-            if (logradouros.length === 0) {
-                logradouroResults.innerHTML = '<div style="padding: var(--space-2); text-align: center; color: var(--text-muted);">Nenhum logradouro encontrado</div>';
+            let url = `/api/enderecos/logradouros?q=${encodeURIComponent(termoBusca)}`;
+            if (numero) {
+                url += `&numero=${numero}`;
+            }
+
+            const response = await fetch(url);
+            const resultados = await response.json();
+
+            if (resultados.length === 0) {
+                searchResults.innerHTML = '<div style="padding: var(--space-2); text-align: center; color: var(--text-muted);">Nenhum logradouro encontrado</div>';
             } else {
-                logradouroResults.innerHTML = logradouros.map(log => `
-                    <button type="button" class="autocomplete-item" data-tipo="${log.tipo || ''}" data-logradouro="${log.logradouro || ''}" data-regional="${log.regional || ''}">
-                        <div style="font-weight: var(--font-medium);">${log.tipo || ''} ${log.logradouro || ''}</div>
-                        <div style="font-size: var(--text-xs); color: var(--text-muted);">${log.regional || ''}</div>
-                    </button>
-                `).join('');
+                searchResults.innerHTML = resultados.map(item => {
+                    const tipo = item.tipo || '';
+                    const logr = item.logradouro || '';
+                    const reg = item.regional || '';
+                    const num = item.numero || '';
 
-                // Adicionar event listeners
-                logradouroResults.querySelectorAll('.autocomplete-item').forEach(btn => {
+                    const label = num
+                        ? `${tipo} ${logr}, ${num} - ${reg}`
+                        : `${tipo} ${logr} - ${reg}`;
+
+                    return `
+                        <button type="button" class="autocomplete-item" data-tipo="${tipo}" data-logradouro="${logr}" data-regional="${reg}" data-numero="${num}">
+                            <div style="font-weight: var(--font-medium);">${label}</div>
+                        </button>
+                    `;
+                }).join('');
+
+                searchResults.querySelectorAll('.autocomplete-item').forEach(btn => {
                     btn.addEventListener('click', function() {
                         const tipo = this.dataset.tipo;
                         const logradouro = this.dataset.logradouro;
-                        selectedLogradouro = logradouro; // Armazena o logradouro puro para busca
-                        searchLogradouro.value = `${tipo} ${logradouro}`;
-                        logradouroResults.classList.add('hidden');
-                        searchNumero.focus();
+                        const regional = this.dataset.regional;
+                        const num = this.dataset.numero;
+                        selectedLogradouro = { tipo, logradouro, regional };
+
+                        if (num) {
+                            // Com número: preenche formato completo e busca direto
+                            searchInput.value = `${tipo} ${logradouro}, ${num} - ${regional}`;
+                            searchResults.classList.add('hidden');
+                            buscarEnderecoCompleto();
+                        } else {
+                            // Sem número: preenche logradouro e espera número
+                            searchInput.value = `${tipo} ${logradouro}, `;
+                            searchResults.classList.add('hidden');
+                            searchInput.focus();
+                        }
                     });
                 });
             }
         } catch (err) {
             console.error('Erro na busca:', err);
-            logradouroResults.innerHTML = '<div style="padding: var(--space-2); text-align: center; color: var(--color-danger);">Erro ao buscar logradouros</div>';
+            searchResults.innerHTML = '<div style="padding: var(--space-2); text-align: center; color: var(--color-danger);">Erro ao buscar</div>';
         }
     }
 
-    // Buscar endereco completo (logradouro + numero opcional)
+    // Buscar endereço completo
     async function buscarEnderecoCompleto() {
-        // Usa o logradouro selecionado do autocomplete, ou extrai do campo digitado
-        let logradouro = selectedLogradouro;
-        if (!logradouro) {
-            // Se digitou manualmente, tenta extrair removendo o tipo do início
-            const valorCampo = searchLogradouro.value.trim();
-            if (!valorCampo) {
-                alert('Digite um logradouro');
-                searchLogradouro.focus();
-                return;
-            }
-            // Remove prefixos comuns de tipo (AVE, RUA, PCA, etc.)
-            logradouro = valorCampo.replace(/^(AVE|RUA|PCA|ALA|TRV|BEC|PRC|VIA|ROD|EST|LAD)\s+/i, '');
+        const { texto, numero } = parseEnderecoInput(searchInput.value);
+        if (!texto) {
+            searchInput.focus();
+            return;
         }
 
-        const numeroInput = searchNumero.value.trim();
-        const numero = numeroInput ? parseInt(numeroInput) : null;
+        const logradouro = selectedLogradouro
+            ? selectedLogradouro.logradouro
+            : extrairLogradouro(texto);
 
         try {
-            const params = new URLSearchParams({ logradouro: logradouro });
+            const params = new URLSearchParams({ logradouro });
             if (numero && numero > 0) {
                 params.append('numero', numero);
             }
@@ -1465,12 +1382,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 const lat = parseFloat(end.lat);
                 const lng = parseFloat(end.lng);
 
-                // Determina o tipo de resultado
                 const numeroInformado = result.numero_informado;
                 const isAproximado = !result.exato || !numeroInformado;
-                const enderecoLabel = `${end.tipo} ${end.logradouro}, ${Math.round(end.numero)}`;
+                const numLabel = Math.round(end.numero);
+                const enderecoLabel = `${end.tipo} ${end.logradouro}, ${numLabel} - ${end.regional}`;
 
-                // Mensagem personalizada
+                // Atualiza o input com o formato completo
+                searchInput.value = enderecoLabel;
+
                 let mensagemAproximado = null;
                 if (!numeroInformado) {
                     mensagemAproximado = 'centro';
@@ -1488,13 +1407,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Botão de buscar
-    btnBuscar.addEventListener('click', buscarEnderecoCompleto);
-
-    // Enter no campo de número dispara busca
-    searchNumero.addEventListener('keydown', function(e) {
+    // Enter dispara busca
+    searchInput.addEventListener('keydown', function(e) {
         if (e.key === 'Enter') {
             e.preventDefault();
+            searchResults.classList.add('hidden');
             buscarEnderecoCompleto();
         }
     });
@@ -1504,46 +1421,13 @@ document.addEventListener('DOMContentLoaded', function() {
         // Remove marcador anterior se existir
         if (searchMarker) {
             map.removeLayer(searchMarker);
+            searchMarker = null;
         }
 
-        // Adiciona marcador destacado (amarelo)
-        searchMarker = L.circleMarker([lat, lng], {
-            radius: 14,
-            fillColor: '#f59e0b',
-            color: '#fff',
-            weight: 3,
-            opacity: 1,
-            fillOpacity: 1
-        }).addTo(map);
+        // Centraliza no ponto com zoom 18 (mesmo comportamento do clique no mapa)
+        map.flyTo([lat, lng], 18);
 
-        // Centraliza e ajusta zoom
-        map.setView([lat, lng], 18);
-
-        // Mostra informacoes no bottom sheet
-        let avisoAproximado = '';
-        if (isAproximado && mensagemAproximado === 'centro') {
-            avisoAproximado = '<div class="alert alert-info" style="margin-bottom: var(--space-3);">Mostrando o centro do logradouro.</div>';
-        } else if (isAproximado && mensagemAproximado) {
-            avisoAproximado = `<div class="alert alert-warning" style="margin-bottom: var(--space-3);">Numero ${mensagemAproximado} nao encontrado. Mostrando o mais proximo.</div>`;
-        }
-
-        showBottomSheet(`
-            ${avisoAproximado}
-            <h3 class="sheet-title">${endereco}</h3>
-            <p class="sheet-subtitle" style="margin-bottom: var(--space-4);">${bairro} - ${regional}</p>
-            <div class="sheet-actions">
-                <button onclick="hideBottomSheet()" class="btn btn-secondary" style="flex: 1;">Cancelar</button>
-                <a href="${APP_BASE}/vistorias/create?lat=${lat}&lng=${lng}" class="btn btn-primary" style="flex: 1;"><svg style="width: 16px; height: 16px; margin-right: 4px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>Nova Vistoria Aqui</a>
-            </div>
-        `);
-
-        // Armazena localização para uso no botão Vistoria
-        currentLocation = { lat, lng };
-        enableVistoriaButton();
-
-        // Limpa campos
-        searchLogradouro.value = '';
-        searchNumero.value = '';
+        selectedLogradouro = null;
     }
 });
 </script>

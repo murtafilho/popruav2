@@ -40,6 +40,23 @@
                             @enderror
                         </div>
 
+                        <div class="form-group">
+                            <label for="description" class="form-label">Descricao</label>
+                            <input
+                                type="text"
+                                id="description"
+                                name="description"
+                                value="{{ old('description') }}"
+                                placeholder="Ex: Acesso total ao sistema"
+                                class="form-input @error('description') is-invalid @enderror"
+                            >
+                            @error('description')
+                                <div class="form-errors">
+                                    <span class="form-error">{{ $message }}</span>
+                                </div>
+                            @enderror
+                        </div>
+
                         <div class="form-actions" style="position: static; padding: var(--space-4) 0 0 0; background: transparent; border: none;">
                             <a href="{{ route('admin.roles.index') }}" class="btn btn-secondary">
                                 Cancelar

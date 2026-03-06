@@ -2,6 +2,13 @@
 
 @section('title', 'Vistorias')
 
+@push('styles')
+<style>
+    details.card summary::-webkit-details-marker { display: none; }
+    details.card[open] .details-chevron { transform: rotate(180deg); }
+</style>
+@endpush
+
 @section('header')
     <a href="{{ route('dashboard') }}" class="btn btn-ghost btn-icon" style="margin-left: -8px;">
         <svg style="width: 22px; height: 22px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -27,10 +34,71 @@
             </div>
         @endif
 
-        {{-- Filtros --}}
-        <div class="card mb-4">
+        {{-- Busca por Endereco --}}
+        <div class="card mb-4" style="overflow: visible;">
+            <div class="card-body">
+                <form method="GET" action="{{ route('vistorias.index') }}" id="form-busca-endereco">
+                    @if(request('bairro'))<input type="hidden" name="bairro" value="{{ request('bairro') }}">@endif
+                    @if(request('regional'))<input type="hidden" name="regional" value="{{ request('regional') }}">@endif
+                    @if(request('resultado'))<input type="hidden" name="resultado" value="{{ request('resultado') }}">@endif
+                    @if(request('data_inicio'))<input type="hidden" name="data_inicio" value="{{ request('data_inicio') }}">@endif
+                    @if(request('data_fim'))<input type="hidden" name="data_fim" value="{{ request('data_fim') }}">@endif
+                    @if(request('logradouro'))<input type="hidden" name="logradouro" value="{{ request('logradouro') }}">@endif
+                    @if(request('numero'))<input type="hidden" name="numero" value="{{ request('numero') }}">@endif
+                    <input type="hidden" name="endereco" id="hidden-endereco" value="{{ request('endereco') }}">
+                    <input type="hidden" name="numero_endereco" id="hidden-numero-endereco" value="{{ request('numero_endereco') }}">
+                    <div class="autocomplete-container">
+                        <svg style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-muted); pointer-events: none; z-index: 2;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                        <input
+                            type="text"
+                            id="search-endereco"
+                            placeholder="Buscar endereco..."
+                            autocomplete="off"
+                            class="form-input"
+                            style="padding-left: 38px;"
+                            value="{{ request('endereco') ? (request('numero_endereco') ? request('endereco') . ', ' . request('numero_endereco') : request('endereco')) : '' }}"
+                        >
+                        <div id="search-results" class="autocomplete-results" style="display: none;"></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {{-- Busca Avancada --}}
+        @php
+            $temFiltroAvancado = request('logradouro') || request('numero') || request('bairro') || request('regional') || request('resultado') || request('data_inicio') || request('data_fim');
+        @endphp
+        <details class="card mb-4" {{ $temFiltroAvancado ? 'open' : '' }}>
+            <summary class="card-header" style="cursor: pointer; display: flex; align-items: center; justify-content: space-between; user-select: none; list-style: none;">
+                <span style="display: flex; align-items: center; gap: var(--space-2); font-weight: var(--font-medium); font-size: var(--text-sm);">
+                    <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                    </svg>
+                    Busca Avancada
+                    @if($temFiltroAvancado)
+                        <span class="badge badge-info" style="font-size: var(--text-xs);">Ativo</span>
+                    @endif
+                </span>
+                <svg class="details-chevron" style="width: 16px; height: 16px; transition: transform 0.2s;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+            </summary>
             <div class="card-body">
                 <form method="GET" action="{{ route('vistorias.index') }}" style="display: flex; flex-direction: column; gap: var(--space-3);">
+                    @if(request('endereco'))<input type="hidden" name="endereco" value="{{ request('endereco') }}">@endif
+                    @if(request('numero_endereco'))<input type="hidden" name="numero_endereco" value="{{ request('numero_endereco') }}">@endif
+                    <div class="form-row form-row-2">
+                        <div class="form-group">
+                            <label class="form-label">Logradouro</label>
+                            <input type="text" name="logradouro" value="{{ request('logradouro') }}" placeholder="Ex: AFONSO PENA" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Numero</label>
+                            <input type="text" name="numero" value="{{ request('numero') }}" placeholder="Ex: 1000" class="form-input">
+                        </div>
+                    </div>
                     <div class="form-row form-row-3">
                         <div class="form-group">
                             <label class="form-label">Bairro</label>
@@ -87,7 +155,7 @@
                     </div>
                 </form>
             </div>
-        </div>
+        </details>
 
         {{-- Tabela de Vistorias --}}
         <div class="table-container">
@@ -96,6 +164,7 @@
                     <tr>
                         <th>Data</th>
                         <th>Endereco</th>
+                        <th class="hide-mobile">Descricao</th>
                         <th class="hide-mobile">Bairro</th>
                         <th class="hide-mobile">Regional</th>
                         <th class="hide-mobile text-center">Pessoas</th>
@@ -132,11 +201,21 @@
                                 @endif
                                 {{-- Mobile info --}}
                                 <div class="mobile-only text-muted" style="font-size: var(--text-xs); margin-top: var(--space-1);">
+                                    @if($vistoria->complemento)
+                                        <div style="margin-bottom: 2px;">{{ $vistoria->complemento }}</div>
+                                    @endif
                                     {{ $vistoria->bairro }} - {{ $vistoria->regional ?? 'N/A' }}
                                     @if($vistoria->quantidade_pessoas)
                                         <span class="badge badge-info" style="margin-left: var(--space-2);">{{ $vistoria->quantidade_pessoas }} pessoas</span>
                                     @endif
                                 </div>
+                            </td>
+                            <td class="hide-mobile">
+                                @if($vistoria->complemento)
+                                    {{ $vistoria->complemento }}
+                                @else
+                                    <span class="text-muted">-</span>
+                                @endif
                             </td>
                             <td class="hide-mobile">{{ $vistoria->bairro }}</td>
                             <td class="hide-mobile">{{ $vistoria->regional ?? 'N/A' }}</td>
@@ -202,7 +281,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="text-center text-muted" style="padding: var(--space-6);">
+                            <td colspan="9" class="text-center text-muted" style="padding: var(--space-6);">
                                 Nenhuma vistoria encontrada.
                             </td>
                         </tr>
@@ -219,3 +298,140 @@
         @endif
     </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('search-endereco');
+    const searchResults = document.getElementById('search-results');
+    const hiddenEndereco = document.getElementById('hidden-endereco');
+    const hiddenNumero = document.getElementById('hidden-numero-endereco');
+    const form = document.getElementById('form-busca-endereco');
+    let searchTimeout = null;
+    let selectedLogradouro = null;
+
+    function parseEnderecoInput(valor) {
+        const trimmed = valor.trim();
+        const matchVirgula = trimmed.match(/^(.+?),\s*(\d+)\s*(?:-.*)?$/);
+        if (matchVirgula) {
+            return { texto: matchVirgula[1].trim(), numero: parseInt(matchVirgula[2]) };
+        }
+        const matchVirgulaSemNum = trimmed.match(/^(.+?),\s*(?:-.*)?$/);
+        if (matchVirgulaSemNum) {
+            return { texto: matchVirgulaSemNum[1].trim(), numero: null };
+        }
+        const match = trimmed.match(/^(.+?)[\s]+(\d+)\s*$/);
+        if (match) {
+            return { texto: match[1].trim(), numero: parseInt(match[2]) };
+        }
+        return { texto: trimmed, numero: null };
+    }
+
+    function extrairLogradouro(texto) {
+        return texto.replace(/^(AVE|RUA|PCA|ALA|TRV|BEC|PRC|VIA|ROD|EST|LAD)\s+/i, '');
+    }
+
+    function showResults() { searchResults.style.display = ''; }
+    function hideResults() { searchResults.style.display = 'none'; }
+
+    if (searchInput && searchResults) {
+        searchInput.addEventListener('input', function() {
+            if (searchTimeout) clearTimeout(searchTimeout);
+
+            if (selectedLogradouro) {
+                const prefixo = `${selectedLogradouro.tipo} ${selectedLogradouro.logradouro},`;
+                if (!this.value.startsWith(prefixo)) {
+                    selectedLogradouro = null;
+                } else {
+                    hideResults();
+                    return;
+                }
+            }
+
+            const { texto, numero } = parseEnderecoInput(this.value);
+            if (texto.length < 2) {
+                hideResults();
+                return;
+            }
+
+            searchTimeout = setTimeout(() => {
+                buscarLogradouros(texto, numero);
+            }, 300);
+        });
+
+        searchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                hideResults();
+                submeterBusca();
+            }
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                hideResults();
+            }
+        });
+    }
+
+    async function buscarLogradouros(termo, numero = null) {
+        try {
+            searchResults.innerHTML = '<div class="autocomplete-loading">Buscando...</div>';
+            showResults();
+
+            const termoBusca = extrairLogradouro(termo);
+            let url = `/api/vistorias/logradouros?q=${encodeURIComponent(termoBusca)}`;
+            if (numero) url += `&numero=${numero}`;
+
+            const response = await fetch(url);
+            const resultados = await response.json();
+
+            if (resultados.length === 0) {
+                searchResults.innerHTML = '<div class="autocomplete-empty">Nenhuma vistoria encontrada</div>';
+            } else {
+                searchResults.innerHTML = resultados.map(item => {
+                    const tipo = item.tipo || '';
+                    const logr = item.logradouro || '';
+                    const reg = item.regional || '';
+                    const num = item.numero || '';
+                    const label = `${tipo} ${logr}, ${num} - ${reg}`;
+                    return `
+                        <button type="button" class="autocomplete-item" data-tipo="${tipo}" data-logradouro="${logr}" data-regional="${reg}" data-numero="${num}">
+                            <span class="autocomplete-item-title">${label}</span>
+                        </button>
+                    `;
+                }).join('');
+
+                searchResults.querySelectorAll('.autocomplete-item').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const logradouro = this.dataset.logradouro;
+                        const num = this.dataset.numero;
+                        hideResults();
+                        hiddenEndereco.value = logradouro;
+                        hiddenNumero.value = num;
+                        searchInput.value = this.querySelector('.autocomplete-item-title').textContent;
+                        form.submit();
+                    });
+                });
+            }
+        } catch (err) {
+            console.error('Erro na busca:', err);
+            searchResults.innerHTML = '<div class="autocomplete-error">Erro ao buscar</div>';
+        }
+    }
+
+    function submeterBusca() {
+        const { texto, numero } = parseEnderecoInput(searchInput.value);
+        if (!texto) return;
+
+        const logradouro = selectedLogradouro
+            ? selectedLogradouro.logradouro
+            : extrairLogradouro(texto);
+
+        hiddenEndereco.value = logradouro;
+        hiddenNumero.value = numero || '';
+        form.submit();
+    }
+});
+</script>
+@endpush

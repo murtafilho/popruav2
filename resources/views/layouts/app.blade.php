@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="app-base" content="{{ rtrim(url('/'), '/') }}">
     <meta name="theme-color" content="#0d1117">
 
     <title>{{ config('app.name', 'POPRUA') }} - @yield('title', 'Sistema')</title>
@@ -66,7 +67,7 @@
                             <svg class="nav-item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                             </svg>
-                            <span class="nav-item-text">Dashboard</span>
+                            <span class="nav-item-text">Home</span>
                         </a>
 
                         <a href="{{ route('mapa.index') }}" class="nav-item {{ request()->routeIs('mapa.*') ? 'active' : '' }}">
@@ -101,6 +102,13 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                             </svg>
                             <span class="nav-item-text">Power BI</span>
+                        </a>
+
+                        <a href="{{ route('discussao.index') }}" target="_blank" class="nav-item {{ request()->routeIs('discussao.*') ? 'active' : '' }}">
+                            <svg class="nav-item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                            </svg>
+                            <span class="nav-item-text">Discussao</span>
                         </a>
                     </div>
 
@@ -154,28 +162,59 @@
         <div class="main-wrapper">
             {{-- Mobile Header --}}
             <header class="mobile-header">
-                <button type="button" class="menu-toggle" id="menu-toggle" aria-label="Abrir menu">
-                    <span class="hamburger"></span>
-                </button>
-
                 @hasSection('header')
                     @yield('header')
                 @else
+                    <a href="{{ route('dashboard') }}" class="mobile-header-back" aria-label="Voltar">
+                        <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </a>
                     <span class="mobile-header-title">@yield('title', 'POPRUA')</span>
                     <div style="width: 44px;"></div>
                 @endif
             </header>
 
-            <main class="page has-mobile-header @hasSection('footer') has-mobile-footer @endif">
+            <main class="page has-mobile-header has-bottom-nav">
                 @yield('content')
             </main>
 
-            @hasSection('footer')
-                <nav class="mobile-footer-nav">
-                    @yield('footer')
-                </nav>
-            @endif
         </div>
+
+        {{-- Mobile Bottom Navigation --}}
+        <nav class="bottom-nav" id="bottom-nav">
+            <a href="{{ route('mapa.index') }}" class="bottom-nav-item {{ request()->routeIs('mapa.*') ? 'active' : '' }}">
+                <svg class="bottom-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+                </svg>
+                <span class="bottom-nav-label">Mapa</span>
+            </a>
+            <a href="{{ route('vistorias.index') }}" class="bottom-nav-item {{ request()->routeIs('vistorias.*') ? 'active' : '' }}">
+                <svg class="bottom-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                </svg>
+                <span class="bottom-nav-label">Vistorias</span>
+            </a>
+            <a href="{{ route('pontos.index') }}" class="bottom-nav-item {{ request()->routeIs('pontos.*') && !request()->routeIs('pontos.nao-georreferenciados') ? 'active' : '' }}">
+                <svg class="bottom-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                <span class="bottom-nav-label">Pontos</span>
+            </a>
+            <a href="{{ route('moradores.index') }}" class="bottom-nav-item {{ request()->routeIs('moradores.*') ? 'active' : '' }}">
+                <svg class="bottom-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                <span class="bottom-nav-label">Moradores</span>
+            </a>
+            <button type="button" class="bottom-nav-item {{ request()->routeIs('dashboard') || request()->routeIs('admin.*') || request()->routeIs('powerbi.*') ? 'active' : '' }}" id="bottom-nav-more">
+                <svg class="bottom-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+                <span class="bottom-nav-label">Mais</span>
+            </button>
+        </nav>
     </div>
 
     @if(request()->routeIs('mapa.index') && request('geocoded') == '1' && request('ponto_id'))
@@ -215,33 +254,27 @@
     {{-- Sidebar Toggle Script --}}
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const menuToggle = document.getElementById('menu-toggle');
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebar-overlay');
         const collapseToggle = document.getElementById('sidebar-collapse-toggle');
+        const bottomNavMore = document.getElementById('bottom-nav-more');
 
-        // Mobile sidebar open/close
         function openSidebar() {
             sidebar.classList.add('open');
             overlay.classList.add('active');
-            if (menuToggle) menuToggle.classList.add('active');
             document.body.style.overflow = 'hidden';
         }
 
         function closeSidebar() {
             sidebar.classList.remove('open');
             overlay.classList.remove('active');
-            if (menuToggle) menuToggle.classList.remove('active');
             document.body.style.overflow = '';
         }
 
-        if (menuToggle) {
-            menuToggle.addEventListener('click', function() {
-                if (sidebar.classList.contains('open')) {
-                    closeSidebar();
-                } else {
-                    openSidebar();
-                }
+        // Bottom nav "Mais" button opens sidebar
+        if (bottomNavMore) {
+            bottomNavMore.addEventListener('click', function() {
+                sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
             });
         }
 
@@ -251,32 +284,45 @@
 
         // Desktop sidebar collapse toggle
         if (collapseToggle) {
-            // Restore collapsed state from localStorage
             if (localStorage.getItem('sidebar-collapsed') === 'true') {
                 sidebar.classList.add('collapsed');
             }
-
             collapseToggle.addEventListener('click', function() {
                 sidebar.classList.toggle('collapsed');
-                // Save state to localStorage
                 localStorage.setItem('sidebar-collapsed', sidebar.classList.contains('collapsed'));
             });
         }
 
-        // Fechar sidebar ao pressionar Escape
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && sidebar.classList.contains('open')) {
                 closeSidebar();
             }
         });
 
-        // Fechar sidebar em telas maiores quando redimensionar
         window.addEventListener('resize', function() {
             if (window.innerWidth >= 1024 && sidebar.classList.contains('open')) {
                 closeSidebar();
             }
         });
     });
+    </script>
+
+    {{-- Android back button exit confirmation --}}
+    <script>
+    (function() {
+        // Push a dummy state so pressing back triggers popstate instead of exiting
+        if (window.history.length <= 1) {
+            window.history.pushState({ poprua: true }, '');
+        }
+        window.addEventListener('popstate', function(e) {
+            // Re-push state to keep the guard active
+            window.history.pushState({ poprua: true }, '');
+            if (confirm('Deseja sair do aplicativo?')) {
+                // Allow exit: go back twice (past our guard state)
+                window.history.go(-2);
+            }
+        });
+    })();
     </script>
 
     @stack('scripts')

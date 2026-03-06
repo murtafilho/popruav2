@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\EnderecoAtualizado;
 use App\Models\Ponto;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\DB;
 
 /**
  * @extends Factory<Ponto>
@@ -30,6 +31,18 @@ class PontoFactory extends Factory
             'endereco_atualizado_id' => null,
             'caracteristica_abrigo_id' => null,
         ];
+    }
+
+    public function configure(): static
+    {
+        return $this->afterCreating(function (Ponto $ponto) {
+            if ($ponto->lat !== null && $ponto->lng !== null) {
+                DB::statement(
+                    'UPDATE pontos SET geom = ST_SetSRID(ST_MakePoint(?, ?), 4326) WHERE id = ?',
+                    [$ponto->lng, $ponto->lat, $ponto->id]
+                );
+            }
+        });
     }
 
     public function comEndereco(): static

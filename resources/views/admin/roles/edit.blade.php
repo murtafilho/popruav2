@@ -42,6 +42,23 @@
                         </div>
 
                         <div class="form-group">
+                            <label for="description" class="form-label">Descricao</label>
+                            <input
+                                type="text"
+                                id="description"
+                                name="description"
+                                value="{{ old('description', $role->description) }}"
+                                placeholder="Ex: Acesso total ao sistema"
+                                class="form-input @error('description') is-invalid @enderror"
+                            >
+                            @error('description')
+                                <div class="form-errors">
+                                    <span class="form-error">{{ $message }}</span>
+                                </div>
+                            @enderror
+                        </div>
+
+                        <div class="form-group">
                             <label class="form-label">Permissions</label>
                             <div class="permissions-grid">
                                 @foreach($permissions as $permission)

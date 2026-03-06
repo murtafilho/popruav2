@@ -26,8 +26,6 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-
-
     // Mapa e Vistorias
     Route::get('/mapa', [MapaController::class, 'index'])->name('mapa.index');
     Route::get('/pontos', [\App\Http\Controllers\PontoController::class, 'index'])->name('pontos.index');
@@ -41,6 +39,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/vistorias/{vistoria}/edit', [VistoriaController::class, 'edit'])->name('vistorias.edit');
     Route::post('/vistorias', [VistoriaController::class, 'store'])->name('vistorias.store');
     Route::put('/vistorias/{vistoria}', [VistoriaController::class, 'update'])->name('vistorias.update');
+    Route::delete('/vistorias/{vistoria}', [VistoriaController::class, 'destroy'])->name('vistorias.destroy');
 
     // Moradores
     Route::resource('moradores', MoradorController::class)->parameters(['moradores' => 'morador']);
@@ -50,13 +49,20 @@ Route::middleware('auth')->group(function () {
         Route::resource('roles', RoleController::class)->except(['show']);
         Route::resource('permissions', PermissionController::class)->only(['index', 'create', 'store', 'destroy']);
         Route::get('users', [UserRoleController::class, 'index'])->name('users.index');
+        Route::get('users/create', [UserRoleController::class, 'create'])->name('users.create');
+        Route::post('users', [UserRoleController::class, 'store'])->name('users.store');
         Route::put('users/{user}/roles', [UserRoleController::class, 'updateRoles'])->name('users.roles.update');
     });
 });
 
 // Power BI - rota publica (sem autenticacao)
-Route::get("/powerbi", function () {
-    return view("powerbi.index");
-})->name("powerbi.index");
+Route::get('/powerbi', function () {
+    return view('powerbi.index');
+})->name('powerbi.index');
 
-require __DIR__."/auth.php";
+// Discussao - rota publica (sem autenticacao)
+Route::get('/discussao', function () {
+    return view('discussao.index');
+})->name('discussao.index');
+
+require __DIR__.'/auth.php';

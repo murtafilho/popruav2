@@ -27,7 +27,7 @@ class VerifyEmailController extends Controller
         if ($user->markEmailAsVerified()) {
             // Disparar o evento Verified mesmo que o User não implemente MustVerifyEmail
             // O Laravel permite isso e o evento será útil para listeners
-            event(new Verified($user));
+            event(new Verified($user)); // @phpstan-ignore argument.type
         }
 
         return redirect()->intended(route('dashboard', absolute: false).'?verified=1');

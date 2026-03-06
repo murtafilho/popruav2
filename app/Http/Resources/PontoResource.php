@@ -2,9 +2,11 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Ponto;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/** @mixin Ponto */
 class PontoResource extends JsonResource
 {
     /**
@@ -31,7 +33,8 @@ class PontoResource extends JsonResource
             // Dados da última vistoria
             'resultado_acao_id' => $this->whenLoaded('ultimaVistoria', fn () => $this->ultimaVistoria?->resultado_acao_id),
             'quantidade_pessoas' => $this->whenLoaded('ultimaVistoria', fn () => $this->ultimaVistoria?->quantidade_pessoas),
-            'data_ultima_vistoria' => $this->whenLoaded('ultimaVistoria', fn () => $this->ultimaVistoria?->data_abordagem?->format('Y-m-d')),
+            /** @phpstan-ignore instanceof.alwaysFalse (data_abordagem is cast to Carbon at runtime) */
+            'data_ultima_vistoria' => $this->whenLoaded('ultimaVistoria', fn () => $this->ultimaVistoria?->data_abordagem instanceof \DateTimeInterface ? $this->ultimaVistoria->data_abordagem->format('Y-m-d') : $this->ultimaVistoria?->data_abordagem),
 
             // Estatísticas
             'total_vistorias' => $this->when($this->relationLoaded('vistorias'), fn () => $this->total_vistorias),

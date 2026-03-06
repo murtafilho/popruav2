@@ -2,9 +2,11 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Vistoria;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/** @mixin Vistoria */
 class VistoriaResource extends JsonResource
 {
     /**
@@ -17,7 +19,8 @@ class VistoriaResource extends JsonResource
         return [
             'id' => $this->id,
             'ponto_id' => $this->ponto_id,
-            'data_abordagem' => $this->data_abordagem?->format('Y-m-d H:i'),
+            /** @phpstan-ignore instanceof.alwaysFalse (data_abordagem is cast to Carbon at runtime) */
+            'data_abordagem' => ($date = $this->data_abordagem) instanceof \DateTimeInterface ? $date->format('Y-m-d H:i') : $date,
             'quantidade_pessoas' => $this->quantidade_pessoas,
             'nomes_pessoas' => $this->nomes_pessoas,
             'qtd_kg' => $this->qtd_kg,

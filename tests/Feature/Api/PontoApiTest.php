@@ -106,7 +106,7 @@ class PontoApiTest extends TestCase
             'NOME_REGIONAL' => 'PAMPULHA',
         ]);
 
-        $response = $this->actingAs($this->user)->getJson('/api/pontos/buscar-logradouros?q=DA');
+        $response = $this->actingAs($this->user)->getJson('/api/enderecos/logradouros?q=DA');
 
         $response->assertOk();
         $this->assertGreaterThanOrEqual(1, count($response->json()));
@@ -114,7 +114,7 @@ class PontoApiTest extends TestCase
 
     public function test_buscar_logradouros_requer_minimo_caracteres(): void
     {
-        $response = $this->actingAs($this->user)->getJson('/api/pontos/buscar-logradouros?q=D');
+        $response = $this->actingAs($this->user)->getJson('/api/enderecos/logradouros?q=D');
 
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['q']);
@@ -129,7 +129,7 @@ class PontoApiTest extends TestCase
             'lng' => -43.94,
         ]);
 
-        $response = $this->actingAs($this->user)->getJson('/api/pontos/buscar-endereco?'.http_build_query([
+        $response = $this->actingAs($this->user)->getJson('/api/enderecos/buscar?'.http_build_query([
             'logradouro' => 'AFONSO PENA',
             'numero' => 1000,
         ]));
@@ -147,7 +147,7 @@ class PontoApiTest extends TestCase
             'lng' => -43.94,
         ]);
 
-        $response = $this->actingAs($this->user)->getJson('/api/pontos/buscar-endereco?'.http_build_query([
+        $response = $this->actingAs($this->user)->getJson('/api/enderecos/buscar?'.http_build_query([
             'logradouro' => 'AFONSO PENA',
             'numero' => 1050,
         ]));
@@ -161,7 +161,7 @@ class PontoApiTest extends TestCase
 
     public function test_buscar_endereco_nao_encontrado(): void
     {
-        $response = $this->actingAs($this->user)->getJson('/api/pontos/buscar-endereco?'.http_build_query([
+        $response = $this->actingAs($this->user)->getJson('/api/enderecos/buscar?'.http_build_query([
             'logradouro' => 'LOGRADOURO INEXISTENTE',
             'numero' => 9999,
         ]));
@@ -177,7 +177,7 @@ class PontoApiTest extends TestCase
             'lng' => -43.94,
         ]);
 
-        $response = $this->actingAs($this->user)->getJson('/api/pontos/buscar-endereco-por-coordenadas?'.http_build_query([
+        $response = $this->actingAs($this->user)->getJson('/api/enderecos/por-coordenadas?'.http_build_query([
             'lat' => -19.9201,
             'lng' => -43.9401,
         ]));
@@ -198,7 +198,7 @@ class PontoApiTest extends TestCase
             'lng' => -43.94,
         ]);
 
-        $response = $this->actingAs($this->user)->getJson('/api/pontos/buscar-endereco-por-coordenadas?'.http_build_query([
+        $response = $this->actingAs($this->user)->getJson('/api/enderecos/por-coordenadas?'.http_build_query([
             'lat' => -20.50, // Muito longe
             'lng' => -44.50,
         ]));
@@ -214,7 +214,7 @@ class PontoApiTest extends TestCase
             'lng' => null,
         ]);
 
-        $response = $this->actingAs($this->user)->putJson("/api/pontos/{$ponto->id}/coordenadas", [
+        $response = $this->actingAs($this->user)->patchJson("/api/pontos/{$ponto->id}/coordenadas", [
             'lat' => -19.92,
             'lng' => -43.94,
         ]);
@@ -231,7 +231,7 @@ class PontoApiTest extends TestCase
     {
         $ponto = Ponto::factory()->create();
 
-        $response = $this->actingAs($this->user)->putJson("/api/pontos/{$ponto->id}/coordenadas", [
+        $response = $this->actingAs($this->user)->patchJson("/api/pontos/{$ponto->id}/coordenadas", [
             'lat' => 999, // Inválido
             'lng' => -43.94,
         ]);
@@ -242,7 +242,7 @@ class PontoApiTest extends TestCase
 
     public function test_atualizar_coordenadas_ponto_inexistente(): void
     {
-        $response = $this->actingAs($this->user)->putJson('/api/pontos/99999/coordenadas', [
+        $response = $this->actingAs($this->user)->patchJson('/api/pontos/99999/coordenadas', [
             'lat' => -19.92,
             'lng' => -43.94,
         ]);
@@ -250,7 +250,7 @@ class PontoApiTest extends TestCase
         $response->assertStatus(404);
     }
 
-    public function test_api_requer_autenticacao(): void
+    public function test_api_publica_sem_autenticacao(): void
     {
         $response = $this->getJson('/api/pontos?'.http_build_query([
             'north' => -19.80,
@@ -259,7 +259,7 @@ class PontoApiTest extends TestCase
             'west' => -44.00,
         ]));
 
-        $response->assertStatus(401);
+        $response->assertOk();
     }
 
     public function test_limite_de_5000_pontos(): void

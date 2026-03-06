@@ -117,7 +117,9 @@ class MoradorService
         array $moradoresPresentes,
         array $novosMoradores = []
     ): void {
+        /** @var Ponto $ponto */
         $ponto = $vistoria->ponto;
+        /** @var \DateTimeInterface|null $dataVistoria */
         $dataVistoria = $vistoria->data_abordagem;
 
         DB::transaction(function () use ($vistoria, $ponto, $moradoresPresentes, $novosMoradores, $dataVistoria) {

@@ -2,9 +2,11 @@
 
 namespace App\Http\Resources;
 
+use App\Models\EnderecoAtualizado;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/** @mixin EnderecoAtualizado */
 class EnderecoAtualizadoResource extends JsonResource
 {
     /**

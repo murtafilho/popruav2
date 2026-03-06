@@ -27,9 +27,14 @@ class RoleController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255', 'unique:roles,name'],
+            'description' => ['nullable', 'string', 'max:255'],
         ]);
 
-        Role::create(['name' => $validated['name'], 'guard_name' => 'web']);
+        Role::create([
+            'name' => $validated['name'],
+            'guard_name' => 'web',
+            'description' => $validated['description'] ?? null,
+        ]);
 
         return redirect()->route('admin.roles.index')
             ->with('success', 'Role criada com sucesso.');
@@ -47,12 +52,19 @@ class RoleController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255', 'unique:roles,name,'.$role->id],
+            'description' => ['nullable', 'string', 'max:255'],
             'permissions' => ['nullable', 'array'],
             'permissions.*' => ['exists:permissions,id'],
         ]);
 
-        $role->update(['name' => $validated['name']]);
-        $role->syncPermissions($validated['permissions'] ?? []);
+        $role->update([
+            'name' => $validated['name'],
+            'description' => $validated['description'] ?? null,
+        ]);
+
+        $permissionIds = $validated['permissions'] ?? [];
+        $permissions = Permission::whereIn('id', $permissionIds)->get();
+        $role->syncPermissions($permissions);
 
         return redirect()->route('admin.roles.index')
             ->with('success', 'Role atualizada com sucesso.');

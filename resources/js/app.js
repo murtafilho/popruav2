@@ -1,4 +1,5 @@
 import './bootstrap';
+import './debug-panel';
 
 // Leaflet
 import L from 'leaflet';

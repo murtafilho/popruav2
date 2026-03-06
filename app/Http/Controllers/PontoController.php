@@ -37,7 +37,7 @@ class PontoController extends Controller
 
         // Filtros
         if ($request->filled('logradouro')) {
-            $query->where('ea.NOME_LOGRADOURO', 'like', '%'.$request->logradouro.'%');
+            $query->where('ea.NOME_LOGRADOURO', 'ilike', '%'.$request->logradouro.'%');
         }
 
         if ($request->filled('regional')) {
@@ -49,7 +49,7 @@ class PontoController extends Controller
         }
 
         if ($request->filled('bairro')) {
-            $query->where('ea.NOME_BAIRRO_POPULAR', 'like', '%'.$request->bairro.'%');
+            $query->where('ea.NOME_BAIRRO_POPULAR', 'ilike', '%'.$request->bairro.'%');
         }
 
         if ($request->filled('resultado')) {

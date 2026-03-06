@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 class WarmCacheCommand extends Command
 {
     protected $signature = 'cache:warm {--force : Força regeneração mesmo se cache existir}';
+
     protected $description = 'Aquece o cache com dados estáticos (geo, etc.)';
 
     private const TTL = 86400;
@@ -19,8 +20,8 @@ class WarmCacheCommand extends Command
         $start = microtime(true);
 
         $items = [
-            'geo:bairros'          => fn () => $this->loadBairros(),
-            'geo:regionais'        => fn () => $this->loadRegionais(),
+            'geo:bairros' => fn () => $this->loadBairros(),
+            'geo:regionais' => fn () => $this->loadRegionais(),
             'geo:limite-municipio' => fn () => $this->loadLimite(),
         ];
 
@@ -31,6 +32,7 @@ class WarmCacheCommand extends Command
 
             if (Cache::has($key) && ! $this->option('force')) {
                 $this->line("  <comment>SKIP</comment>  {$key} (ja em cache)");
+
                 continue;
             }
 
@@ -53,7 +55,7 @@ class WarmCacheCommand extends Command
             ->select('id', 'codigo', 'nome', 'area_km2', 'perimetro_m', 'geometry')
             ->get()
             ->map(fn ($b) => [
-                'type'       => 'Feature',
+                'type' => 'Feature',
                 'properties' => [
                     'id' => $b->id, 'codigo' => $b->codigo, 'nome' => $b->nome,
                     'area_km2' => $b->area_km2, 'perimetro_m' => $b->perimetro_m,
@@ -68,7 +70,7 @@ class WarmCacheCommand extends Command
             ->select('id', 'codigo', 'sigla', 'nome', 'area_km2', 'perimetro_m', 'geometry')
             ->get()
             ->map(fn ($r) => [
-                'type'       => 'Feature',
+                'type' => 'Feature',
                 'properties' => [
                     'id' => $r->id, 'codigo' => $r->codigo, 'sigla' => $r->sigla,
                     'nome' => $r->nome, 'area_km2' => $r->area_km2, 'perimetro_m' => $r->perimetro_m,
@@ -83,10 +85,12 @@ class WarmCacheCommand extends Command
             ->select('id', 'area_km2', 'perimetro_m', 'geometry')
             ->first();
 
-        if (! $limite) return null;
+        if (! $limite) {
+            return null;
+        }
 
         return [[
-            'type'       => 'Feature',
+            'type' => 'Feature',
             'properties' => [
                 'id' => $limite->id, 'area_km2' => $limite->area_km2, 'perimetro_m' => $limite->perimetro_m,
             ],
