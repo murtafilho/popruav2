@@ -98,7 +98,7 @@ Visualmente:
 | O que | Onde | Para que |
 |---|---|---|
 | Codigo-fonte | `/var/www/html/joomla_sufis/ginfi/poprua-geo/` | Arquivos PHP, views, config |
-| Dockerfile | `/opt/docker/poprua-geo/Dockerfile` | Receita para construir a imagem |
+| Dockerfile | `/opt/docker/poprua-geo/Dockerfile` (host) / `docker/Dockerfile` (repo) | Receita para construir a imagem |
 | docker-compose.yml | `/opt/docker/poprua-geo/docker-compose.yml` | Definicao da stack (3 containers) |
 | .env (compose) | `/opt/docker/poprua-geo/.env` | Senha do PostgreSQL |
 | Dados PostgreSQL | `/opt/docker/poprua-geo/postgres-data/` | Volume persistente do banco |
@@ -125,10 +125,25 @@ Visualmente:
 FROM serversideup/php:8.4-fpm-nginx
 
 USER root
+
+# Extensoes PHP
 RUN docker-php-ext-install exif
+
+# GitHub CLI
+RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+        -o /usr/share/keyrings/githubcli-archive-keyring.gpg \
+    && chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+        > /etc/apt/sources.list.d/github-cli.list \
+    && apt-get update -qq \
+    && apt-get install -y --no-install-recommends gh \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 USER www-data
 ```
+
+O Dockerfile tambem esta versionado em `docker/Dockerfile` no repositorio.
 
 **Particularidade**: usa a imagem `serversideup/php` que inclui **Nginx + PHP-FPM no mesmo container**. Diferente dos outros containers que usam apenas FPM.
 
