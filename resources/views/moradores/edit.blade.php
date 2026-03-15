@@ -3,160 +3,259 @@
 @section('title', 'Editar Morador')
 
 @section('header')
-    <div class="flex items-center gap-3">
-        <a href="{{ route('moradores.show', $morador) }}" class="p-2 -ml-2 rounded-lg hover:bg-white/10 transition">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div class="flex items-center gap-3 flex-1">
+        <a href="{{ route('moradores.show', $morador) }}" class="btn btn-ghost btn-icon" style="margin-left: -8px;">
+            <svg style="width: 22px; height: 22px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
             </svg>
         </a>
-        <h1 class="text-lg font-semibold flex-1 text-center">Editar Morador</h1>
-        <div class="w-10"></div>
+        <span class="mobile-header-title flex-1 text-center">Editar Morador</span>
+        <div style="width: 44px;"></div>
     </div>
 @endsection
 
 @section('content')
-    <div class="h-full overflow-y-auto bg-gray-50 dark:bg-gray-900 p-4 transition-colors duration-200">
-        <div class="max-w-2xl mx-auto">
-            <form action="{{ route('moradores.update', $morador) }}" method="POST" enctype="multipart/form-data"
-                  class="bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-gray-900/50 p-6 transition-colors duration-200">
-                @csrf
-                @method('PUT')
+    <div class="form-page">
+        <form action="{{ route('moradores.update', $morador) }}" method="POST" enctype="multipart/form-data" class="form-container">
+            @csrf
+            @method('PUT')
 
-                <!-- Foto -->
-                <div class="mb-6">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Foto</label>
-                    <div class="flex items-center gap-4">
-                        <div id="foto-preview" class="w-24 h-24 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
-                            @if($morador->fotografia)
-                                <img src="{{ Storage::url($morador->fotografia) }}" class="w-full h-full object-cover">
-                            @else
-                                <svg class="w-12 h-12 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                                </svg>
-                            @endif
+            <div class="form-content">
+                <!-- Foto do Morador -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h3 class="form-section-title">Foto</h3>
+                        <div class="flex items-center gap-4">
+                            <div id="foto-preview" class="avatar avatar-xl">
+                                @if($morador->fotografia)
+                                    <img src="{{ Storage::url($morador->fotografia) }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;">
+                                @else
+                                    <svg style="width: 32px; height: 32px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                    </svg>
+                                @endif
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <input type="file" id="camera-input" accept="image/*" capture="user" class="hidden">
+                                <input type="file" id="gallery-input" name="fotografia" accept="image/*" class="hidden">
+
+                                <button type="button" onclick="document.getElementById('camera-input').click()" class="btn btn-primary btn-sm">
+                                    <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    </svg>
+                                    Tirar Foto
+                                </button>
+                                <button type="button" onclick="document.getElementById('gallery-input').click()" class="btn btn-secondary btn-sm">
+                                    <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                    Galeria
+                                </button>
+                            </div>
                         </div>
-                        <div>
-                            <input type="file" name="fotografia" accept="image/*" id="foto-input"
-                                   class="text-sm text-gray-600 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900/30 dark:file:text-blue-300">
-                            @if($morador->fotografia)
-                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Selecione uma nova foto para substituir a atual</p>
-                            @endif
+                        @if($morador->fotografia)
+                            <p class="text-muted" style="font-size: var(--text-xs); margin-top: 8px;">Selecione uma nova foto para substituir a atual</p>
+                        @endif
+                        @error('fotografia')
+                            <p class="form-error">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                <!-- Identificacao -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h3 class="form-section-title">Identificacao</h3>
+
+                        <div class="form-group">
+                            <label for="nome_social" class="form-label required">Nome Social</label>
+                            <div class="input-with-voice">
+                                <input type="text" name="nome_social" id="nome_social" value="{{ old('nome_social', $morador->nome_social) }}" required
+                                       class="form-input @error('nome_social') is-invalid @enderror"
+                                       placeholder="Nome pelo qual deseja ser chamado">
+                                <button type="button" onclick="startVoiceInput('nome_social')" class="voice-btn">
+                                    <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            @error('nome_social')
+                                <p class="form-error">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="form-group">
+                            <label for="nome_registro" class="form-label">Nome de Registro</label>
+                            <div class="input-with-voice">
+                                <input type="text" name="nome_registro" id="nome_registro" value="{{ old('nome_registro', $morador->nome_registro) }}"
+                                       class="form-input"
+                                       placeholder="Nome civil (se diferente)">
+                                <button type="button" onclick="startVoiceInput('nome_registro')" class="voice-btn">
+                                    <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="apelido" class="form-label">Apelido</label>
+                            <div class="input-with-voice">
+                                <input type="text" name="apelido" id="apelido" value="{{ old('apelido', $morador->apelido) }}"
+                                       class="form-input"
+                                       placeholder="Como e conhecido">
+                                <button type="button" onclick="startVoiceInput('apelido')" class="voice-btn">
+                                    <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="genero" class="form-label">Genero</label>
+                            <select name="genero" id="genero" class="form-input form-select">
+                                <option value="">Prefiro nao informar</option>
+                                <option value="Homem cisgenero" {{ old('genero', $morador->genero) == 'Homem cisgenero' ? 'selected' : '' }}>Homem cisgenero</option>
+                                <option value="Mulher cisgenero" {{ old('genero', $morador->genero) == 'Mulher cisgenero' ? 'selected' : '' }}>Mulher cisgenero</option>
+                                <option value="Homem trans" {{ old('genero', $morador->genero) == 'Homem trans' ? 'selected' : '' }}>Homem trans</option>
+                                <option value="Mulher trans" {{ old('genero', $morador->genero) == 'Mulher trans' ? 'selected' : '' }}>Mulher trans</option>
+                                <option value="Travesti" {{ old('genero', $morador->genero) == 'Travesti' ? 'selected' : '' }}>Travesti</option>
+                                <option value="Nao-binario" {{ old('genero', $morador->genero) == 'Nao-binario' ? 'selected' : '' }}>Nao-binario</option>
+                                <option value="Outro" {{ old('genero', $morador->genero) == 'Outro' ? 'selected' : '' }}>Outro</option>
+                            </select>
                         </div>
                     </div>
-                    @error('fotografia')
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                    @enderror
                 </div>
 
-                <!-- Nome Social -->
-                <div class="mb-4">
-                    <label for="nome_social" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Nome Social <span class="text-red-500">*</span>
-                    </label>
-                    <input type="text" name="nome_social" id="nome_social" value="{{ old('nome_social', $morador->nome_social) }}" required
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition @error('nome_social') border-red-500 @enderror"
-                           placeholder="Nome pelo qual deseja ser chamado">
-                    @error('nome_social')
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                    @enderror
-                </div>
+                <!-- Contato e Documentos -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h3 class="form-section-title">Contato e Documentos</h3>
 
-                <!-- Nome de Registro -->
-                <div class="mb-4">
-                    <label for="nome_registro" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Nome de Registro
-                    </label>
-                    <input type="text" name="nome_registro" id="nome_registro" value="{{ old('nome_registro', $morador->nome_registro) }}"
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                           placeholder="Nome civil (se diferente)">
-                </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="form-group">
+                                <label for="documento" class="form-label">Documento</label>
+                                <input type="text" name="documento" id="documento" value="{{ old('documento', $morador->documento) }}"
+                                       class="form-input"
+                                       placeholder="CPF ou RG">
+                            </div>
 
-                <!-- Apelido -->
-                <div class="mb-4">
-                    <label for="apelido" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Apelido
-                    </label>
-                    <input type="text" name="apelido" id="apelido" value="{{ old('apelido', $morador->apelido) }}"
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                           placeholder="Como e conhecido">
-                </div>
-
-                <!-- Genero -->
-                <div class="mb-4">
-                    <label for="genero" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Genero
-                    </label>
-                    <select name="genero" id="genero"
-                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                        <option value="">Prefiro nao informar</option>
-                        <option value="Homem cisgenero" {{ old('genero', $morador->genero) == 'Homem cisgenero' ? 'selected' : '' }}>Homem cisgenero</option>
-                        <option value="Mulher cisgenero" {{ old('genero', $morador->genero) == 'Mulher cisgenero' ? 'selected' : '' }}>Mulher cisgenero</option>
-                        <option value="Homem trans" {{ old('genero', $morador->genero) == 'Homem trans' ? 'selected' : '' }}>Homem trans</option>
-                        <option value="Mulher trans" {{ old('genero', $morador->genero) == 'Mulher trans' ? 'selected' : '' }}>Mulher trans</option>
-                        <option value="Travesti" {{ old('genero', $morador->genero) == 'Travesti' ? 'selected' : '' }}>Travesti</option>
-                        <option value="Nao-binario" {{ old('genero', $morador->genero) == 'Nao-binario' ? 'selected' : '' }}>Nao-binario</option>
-                        <option value="Outro" {{ old('genero', $morador->genero) == 'Outro' ? 'selected' : '' }}>Outro</option>
-                    </select>
-                </div>
-
-                <!-- Documento -->
-                <div class="mb-4">
-                    <label for="documento" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Documento (CPF/RG)
-                    </label>
-                    <input type="text" name="documento" id="documento" value="{{ old('documento', $morador->documento) }}"
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                           placeholder="Numero do documento">
-                </div>
-
-                <!-- Contato -->
-                <div class="mb-4">
-                    <label for="contato" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Contato
-                    </label>
-                    <input type="text" name="contato" id="contato" value="{{ old('contato', $morador->contato) }}"
-                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                           placeholder="Telefone ou outro contato">
+                            <div class="form-group">
+                                <label for="contato" class="form-label">Contato</label>
+                                <input type="text" name="contato" id="contato" value="{{ old('contato', $morador->contato) }}"
+                                       class="form-input"
+                                       placeholder="Telefone">
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Observacoes -->
-                <div class="mb-6">
-                    <label for="observacoes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Observacoes
-                    </label>
-                    <textarea name="observacoes" id="observacoes" rows="3"
-                              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                              placeholder="Informacoes adicionais">{{ old('observacoes', $morador->observacoes) }}</textarea>
-                </div>
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h3 class="form-section-title">Observacoes</h3>
 
-                <!-- Botoes -->
-                <div class="flex gap-3">
-                    <button type="submit"
-                            class="flex-1 py-3 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition">
-                        Salvar
-                    </button>
-                    <a href="{{ route('moradores.show', $morador) }}"
-                       class="flex-1 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg font-medium text-center hover:bg-gray-300 dark:hover:bg-gray-600 transition">
-                        Cancelar
-                    </a>
+                        <div class="form-group">
+                            <div class="input-with-voice">
+                                <textarea name="observacoes" id="observacoes" rows="3"
+                                          class="form-input form-textarea"
+                                          placeholder="Informacoes adicionais relevantes...">{{ old('observacoes', $morador->observacoes) }}</textarea>
+                                <button type="button" onclick="startVoiceInput('observacoes')" class="voice-btn">
+                                    <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </form>
-        </div>
+            </div>
+
+            {{-- Botoes fixos --}}
+            <div class="form-actions">
+                <a href="{{ route('moradores.show', $morador) }}" class="btn btn-secondary">
+                    Cancelar
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Salvar
+                </button>
+            </div>
+        </form>
     </div>
 @endsection
 
 @push('scripts')
 <script>
-document.getElementById('foto-input').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const preview = document.getElementById('foto-preview');
-            preview.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover">`;
-        };
-        reader.readAsDataURL(file);
-    }
+// Preview de foto da camera ou galeria
+['camera-input', 'gallery-input'].forEach(function(inputId) {
+    document.getElementById(inputId).addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            // Copiar arquivo para o input hidden de envio
+            if (inputId === 'camera-input') {
+                const galleryInput = document.getElementById('gallery-input');
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                galleryInput.files = dataTransfer.files;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('foto-preview');
+                preview.innerHTML = `<img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;">`;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
 });
+
+// Voice input
+let recognition = null;
+let currentField = null;
+
+function startVoiceInput(fieldId) {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        alert('Reconhecimento de voz nao suportado neste navegador.');
+        return;
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SpeechRecognition();
+    recognition.lang = 'pt-BR';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    currentField = document.getElementById(fieldId);
+    const voiceBtn = currentField.parentElement.querySelector('.voice-btn');
+
+    recognition.onstart = function() {
+        voiceBtn.classList.add('recording');
+    };
+
+    recognition.onend = function() {
+        voiceBtn.classList.remove('recording');
+    };
+
+    recognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        if (currentField.tagName === 'TEXTAREA') {
+            currentField.value += (currentField.value ? '\n' : '') + transcript;
+        } else {
+            currentField.value = transcript;
+        }
+    };
+
+    recognition.onerror = function(event) {
+        voiceBtn.classList.remove('recording');
+        console.error('Erro no reconhecimento de voz:', event.error);
+    };
+
+    recognition.start();
+}
 </script>
 @endpush

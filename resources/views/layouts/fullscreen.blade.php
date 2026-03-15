@@ -6,6 +6,11 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="app-base" content="{{ rtrim(url('/'), '/') }}">
     <meta name="theme-color" content="#0d1117">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="POPRUA">
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
+    <link rel="apple-touch-icon" href="{{ asset('icons/icon-192x192.png') }}">
 
     <title>{{ config('app.name', 'POPRUA') }} - @yield('title', 'Sistema')</title>
 
@@ -214,5 +219,11 @@
     </script>
 
     @stack('scripts')
+
+    <script>
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('{{ asset("sw.js") }}', { scope: '{{ asset("/") }}' });
+    }
+    </script>
 </body>
 </html>

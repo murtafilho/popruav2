@@ -6,6 +6,11 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="app-base" content="{{ rtrim(url('/'), '/') }}">
     <meta name="theme-color" content="#0d1117">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="POPRUA">
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
+    <link rel="apple-touch-icon" href="{{ asset('icons/icon-192x192.png') }}">
 
     <title>{{ config('app.name', 'POPRUA') }} - @yield('title', 'Sistema')</title>
 
@@ -43,11 +48,18 @@
                     <div class="nav-section">
                         <span class="nav-section-title">Operacional</span>
 
-                        <a href="{{ route('vistorias.index') }}" class="nav-item {{ request()->routeIs('vistorias.*') ? 'active' : '' }}">
+                        <a href="{{ route('vistorias.index') }}" class="nav-item {{ request()->routeIs('vistorias.index') || (request()->routeIs('vistorias.*') && !request()->routeIs('vistorias.minhas')) ? 'active' : '' }}">
                             <svg class="nav-item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
                             </svg>
                             <span class="nav-item-text">Vistorias</span>
+                        </a>
+
+                        <a href="{{ route('vistorias.minhas') }}" class="nav-item {{ request()->routeIs('vistorias.minhas') ? 'active' : '' }}">
+                            <svg class="nav-item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                            </svg>
+                            <span class="nav-item-text">Minhas Vistorias</span>
                         </a>
 
                         <a href="{{ route('pontos.nao-georreferenciados') }}" class="nav-item {{ request()->routeIs('pontos.nao-georreferenciados') ? 'active' : '' }}">
@@ -56,6 +68,14 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                             </svg>
                             <span class="nav-item-text">Pontos nao georreferenciados</span>
+                        </a>
+
+                        <a href="#" id="nav-sync-fotos" class="nav-item" onclick="event.preventDefault(); syncAllPendingPhotos();">
+                            <svg class="nav-item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                            </svg>
+                            <span class="nav-item-text">Sincronizar Imagens</span>
+                            <span id="sync-badge" class="hidden" style="background: var(--color-warning); color: #000; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 10px; margin-left: auto;">0</span>
                         </a>
                     </div>
 
@@ -67,7 +87,7 @@
                             <svg class="nav-item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                             </svg>
-                            <span class="nav-item-text">Home</span>
+                            <span class="nav-item-text">Dashboard</span>
                         </a>
 
                         <a href="{{ route('mapa.index') }}" class="nav-item {{ request()->routeIs('mapa.*') ? 'active' : '' }}">
@@ -183,24 +203,23 @@
 
         {{-- Mobile Bottom Navigation --}}
         <nav class="bottom-nav" id="bottom-nav">
+            <a href="{{ route('dashboard') }}" class="bottom-nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                <svg class="bottom-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                </svg>
+                <span class="bottom-nav-label">Dashboard</span>
+            </a>
             <a href="{{ route('mapa.index') }}" class="bottom-nav-item {{ request()->routeIs('mapa.*') ? 'active' : '' }}">
                 <svg class="bottom-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
                 </svg>
                 <span class="bottom-nav-label">Mapa</span>
             </a>
-            <a href="{{ route('vistorias.index') }}" class="bottom-nav-item {{ request()->routeIs('vistorias.*') ? 'active' : '' }}">
+            <a href="{{ route('vistorias.minhas') }}" class="bottom-nav-item {{ request()->routeIs('vistorias.minhas') ? 'active' : '' }}">
                 <svg class="bottom-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
                 </svg>
-                <span class="bottom-nav-label">Vistorias</span>
-            </a>
-            <a href="{{ route('pontos.index') }}" class="bottom-nav-item {{ request()->routeIs('pontos.*') && !request()->routeIs('pontos.nao-georreferenciados') ? 'active' : '' }}">
-                <svg class="bottom-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                </svg>
-                <span class="bottom-nav-label">Pontos</span>
+                <span class="bottom-nav-label">Minhas</span>
             </a>
             <a href="{{ route('moradores.index') }}" class="bottom-nav-item {{ request()->routeIs('moradores.*') ? 'active' : '' }}">
                 <svg class="bottom-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -208,7 +227,7 @@
                 </svg>
                 <span class="bottom-nav-label">Moradores</span>
             </a>
-            <button type="button" class="bottom-nav-item {{ request()->routeIs('dashboard') || request()->routeIs('admin.*') || request()->routeIs('powerbi.*') ? 'active' : '' }}" id="bottom-nav-more">
+            <button type="button" class="bottom-nav-item {{ request()->routeIs('admin.*') || request()->routeIs('powerbi.*') || request()->routeIs('pontos.*') || (request()->routeIs('vistorias.*') && !request()->routeIs('vistorias.minhas')) ? 'active' : '' }}" id="bottom-nav-more">
                 <svg class="bottom-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 6h16M4 12h16M4 18h16"/>
                 </svg>
@@ -325,6 +344,107 @@
     })();
     </script>
 
+    {{-- Sincronização global de fotos --}}
+    <script>
+    (function() {
+        const APP_BASE = document.querySelector('meta[name="app-base"]').content;
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+        function openFotosDB() {
+            return new Promise((resolve, reject) => {
+                const req = indexedDB.open('poprua_fotos', 1);
+                req.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains('pendentes')) {
+                        db.createObjectStore('pendentes', { keyPath: 'id', autoIncrement: true });
+                    }
+                };
+                req.onsuccess = (e) => resolve(e.target.result);
+                req.onerror = (e) => reject(e.target.error);
+            });
+        }
+
+        async function countPendingPhotos() {
+            try {
+                const db = await openFotosDB();
+                return new Promise((resolve) => {
+                    const tx = db.transaction('pendentes', 'readonly');
+                    const req = tx.objectStore('pendentes').count();
+                    req.onsuccess = () => resolve(req.result);
+                    req.onerror = () => resolve(0);
+                });
+            } catch { return 0; }
+        }
+
+        async function updateSyncBadge() {
+            const count = await countPendingPhotos();
+            const badge = document.getElementById('sync-badge');
+            if (badge) {
+                badge.textContent = count;
+                badge.classList.toggle('hidden', count === 0);
+            }
+        }
+
+        window.syncAllPendingPhotos = async function() {
+            const db = await openFotosDB();
+            const tx = db.transaction('pendentes', 'readonly');
+            const req = tx.objectStore('pendentes').getAll();
+
+            req.onsuccess = async () => {
+                const fotos = req.result;
+                if (fotos.length === 0) {
+                    alert('Nenhuma foto pendente para sincronizar.');
+                    return;
+                }
+
+                if (!confirm(`Enviar ${fotos.length} foto(s) pendente(s)?`)) return;
+
+                let enviadas = 0;
+                let erros = 0;
+
+                for (const foto of fotos) {
+                    try {
+                        const blob = new Blob([foto.data], { type: foto.type });
+                        const file = new File([blob], foto.name, { type: foto.type });
+                        const formData = new FormData();
+                        formData.append('vistoria_id', foto.vistoria_id);
+                        formData.append('foto', file);
+
+                        const resp = await fetch(`${APP_BASE}/api/vistorias/fotos`, {
+                            method: 'POST',
+                            headers: { 'X-CSRF-TOKEN': csrfToken },
+                            body: formData
+                        });
+
+                        if (resp.ok) {
+                            const delTx = db.transaction('pendentes', 'readwrite');
+                            delTx.objectStore('pendentes').delete(foto.id);
+                            await new Promise(r => { delTx.oncomplete = r; });
+                            enviadas++;
+                        } else {
+                            erros++;
+                        }
+                    } catch {
+                        erros++;
+                    }
+                }
+
+                await updateSyncBadge();
+                alert(`${enviadas} foto(s) enviada(s)` + (erros > 0 ? `, ${erros} erro(s)` : ''));
+            };
+        };
+
+        // Atualiza badge ao carregar
+        updateSyncBadge();
+    })();
+    </script>
+
     @stack('scripts')
+
+    <script>
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('{{ asset("sw.js") }}', { scope: '{{ asset("/") }}' });
+    }
+    </script>
 </body>
 </html>

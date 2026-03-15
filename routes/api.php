@@ -35,7 +35,7 @@ Route::middleware(['web', 'auth'])->group(function () {
 });
 
 // Fotos de Vistorias (upload offline-first via Service Worker)
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['web', 'auth'])->group(function () {
     Route::post('/vistorias/fotos', [\App\Http\Controllers\Api\VistoriaFotoController::class, 'store']);
     Route::get('/vistorias/{vistoria}/fotos/status', [\App\Http\Controllers\Api\VistoriaFotoController::class, 'status']);
 });

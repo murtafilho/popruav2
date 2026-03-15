@@ -205,7 +205,7 @@ class VistoriaController extends Controller
             }
         }
 
-        return redirect()->route('vistorias.index')->with('success', 'Vistoria atualizada com sucesso!');
+        return redirect()->route('vistorias.show', $vistoria)->with('success', 'Vistoria atualizada com sucesso!');
     }
 
     public function destroy(Vistoria $vistoria): RedirectResponse
@@ -342,6 +342,58 @@ class VistoriaController extends Controller
         }
 
         return response()->json($resultados);
+    }
+
+    public function minhas(Request $request): View
+    {
+        $query = DB::table('vistorias as v')
+            ->join('pontos as p', 'p.id', '=', 'v.ponto_id')
+            ->leftJoin('endereco_atualizados as ea', 'ea.id', '=', 'p.endereco_atualizado_id')
+            ->leftJoin('tipo_abordagem as ta', 'ta.id', '=', 'v.tipo_abordagem_id')
+            ->leftJoin('resultados_acoes as ra', 'ra.id', '=', 'v.resultado_acao_id')
+            ->whereNull('v.deleted_at')
+            ->where('v.user_id', auth()->id())
+            ->select([
+                'v.id',
+                'v.data_abordagem',
+                'v.quantidade_pessoas',
+                'v.qtd_kg',
+                'v.observacao',
+                DB::raw('ea."NOME_LOGRADOURO" as logradouro'),
+                DB::raw('ea."SIGLA_TIPO_LOGRADOURO" as tipo'),
+                DB::raw('COALESCE(ea."NUMERO_IMOVEL", p.numero) as numero'),
+                'p.lat',
+                'p.lng',
+                DB::raw('ea."NOME_BAIRRO_POPULAR" as bairro'),
+                DB::raw('ea."NOME_REGIONAL" as regional'),
+                'ta.tipo as tipo_abordagem',
+                'ra.resultado as resultado_acao',
+                'p.complemento',
+            ]);
+
+        if ($request->filled('data_inicio')) {
+            $query->whereDate('v.data_abordagem', '>=', $request->data_inicio);
+        }
+
+        if ($request->filled('data_fim')) {
+            $query->whereDate('v.data_abordagem', '<=', $request->data_fim);
+        }
+
+        if ($request->filled('resultado')) {
+            $query->where('v.resultado_acao_id', $request->resultado);
+        }
+
+        $vistorias = $query->orderBy('v.data_abordagem', 'desc')
+            ->paginate(10);
+
+        $resultados = DB::table('resultados_acoes')
+            ->orderBy('id')
+            ->get();
+
+        return view('vistorias.minhas', [
+            'vistorias' => $vistorias,
+            'resultados' => $resultados,
+        ]);
     }
 
     public function index(Request $request): View
@@ -582,6 +634,6 @@ class VistoriaController extends Controller
             );
         }
 
-        return redirect()->route('mapa.index')->with('success', 'Vistoria registrada com sucesso!');
+        return redirect()->route('vistorias.show', $vistoria)->with('success', 'Vistoria registrada com sucesso!');
     }
 }

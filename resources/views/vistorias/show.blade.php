@@ -392,26 +392,296 @@
             $fotos = $vistoria->getMedia('fotos');
         @endphp
 
-        @if($fotos->count() > 0)
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h3 style="font-size: var(--text-sm); font-weight: var(--font-semibold); margin-bottom: var(--space-3); display: flex; align-items: center; gap: var(--space-2);">
-                        <svg style="width: 18px; height: 18px; color: var(--accent-primary);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                        </svg>
-                        Fotos ({{ $fotos->count() }})
-                    </h3>
+        <div class="card mb-4" id="fotos-section">
+            <div class="card-body">
+                <h3 style="font-size: var(--text-sm); font-weight: var(--font-semibold); margin-bottom: var(--space-3); display: flex; align-items: center; gap: var(--space-2);">
+                    <svg style="width: 18px; height: 18px; color: var(--accent-primary);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    Fotos (<span id="fotos-count">{{ $fotos->count() }}</span>)
+                </h3>
 
-                    <div class="photo-grid">
-                        @foreach($fotos as $foto)
-                            <a href="{{ $foto->getUrl() }}" target="_blank" class="photo-item">
-                                <img src="{{ $foto->getUrl('thumb') }}" alt="Foto da vistoria" loading="lazy">
-                            </a>
-                        @endforeach
+                <div class="photo-grid" id="fotos-grid">
+                    @foreach($fotos as $index => $foto)
+                        <div class="photo-item" onclick="openSlideshow({{ $index }})" style="cursor: pointer;">
+                            <img src="{{ $foto->hasGeneratedConversion('thumb') ? $foto->getUrl('thumb') : $foto->getUrl() }}" alt="Foto da vistoria" loading="lazy" onerror="this.src='{{ $foto->getUrl() }}'">
+                        </div>
+                    @endforeach
+                </div>
+
+                {{-- Slideshow Modal --}}
+                <div id="slideshow-overlay" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.92); z-index:9999; align-items:center; justify-content:center; flex-direction:column;">
+                    {{-- Fechar --}}
+                    <button onclick="closeSlideshow()" style="position:absolute; top:16px; right:16px; background:none; border:none; color:#fff; cursor:pointer; z-index:10001; padding:8px;">
+                        <svg style="width:28px; height:28px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+
+                    {{-- Contador --}}
+                    <div id="slide-counter" style="position:absolute; top:20px; left:50%; transform:translateX(-50%); color:#fff; font-size:14px; z-index:10001;"></div>
+
+                    {{-- Seta esquerda --}}
+                    <button id="slide-prev" onclick="slideMove(-1)" style="position:absolute; left:8px; top:50%; transform:translateY(-50%); background:rgba(255,255,255,0.15); border:none; color:#fff; cursor:pointer; border-radius:50%; width:44px; height:44px; display:flex; align-items:center; justify-content:center; z-index:10001; transition: background 0.2s;" onmouseenter="this.style.background='rgba(255,255,255,0.3)'" onmouseleave="this.style.background='rgba(255,255,255,0.15)'">
+                        <svg style="width:24px; height:24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+
+                    {{-- Imagem --}}
+                    <img id="slide-image" src="" alt="Foto" style="max-width:90vw; max-height:85vh; object-fit:contain; border-radius:4px; user-select:none;">
+
+                    {{-- Seta direita --}}
+                    <button id="slide-next" onclick="slideMove(1)" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:rgba(255,255,255,0.15); border:none; color:#fff; cursor:pointer; border-radius:50%; width:44px; height:44px; display:flex; align-items:center; justify-content:center; z-index:10001; transition: background 0.2s;" onmouseenter="this.style.background='rgba(255,255,255,0.3)'" onmouseleave="this.style.background='rgba(255,255,255,0.15)'">
+                        <svg style="width:24px; height:24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                </div>
+
+                {{-- Fotos pendentes (local) --}}
+                <div id="fotos-pendentes" class="hidden" style="margin-top: var(--space-3);">
+                    <div style="display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-2);">
+                        <svg style="width: 16px; height: 16px; color: var(--color-warning);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span style="font-size: var(--text-sm); color: var(--color-warning); font-weight: var(--font-medium);">
+                            <span id="pendentes-count">0</span> foto(s) pendente(s) no dispositivo
+                        </span>
+                    </div>
+                    <div id="pendentes-preview" class="photo-grid" style="margin-bottom: var(--space-3);"></div>
+                    <button type="button" id="btn-sync-fotos" class="btn btn-primary btn-block">
+                        <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                        Sincronizar Fotos
+                    </button>
+                    <div id="sync-progress" class="hidden" style="margin-top: var(--space-2);">
+                        <div style="background: var(--bg-tertiary); border-radius: var(--radius-full); height: 6px; overflow: hidden;">
+                            <div id="sync-bar" style="height: 100%; background: var(--accent-primary); border-radius: var(--radius-full); transition: width 300ms ease; width: 0%;"></div>
+                        </div>
+                        <p id="sync-status" style="font-size: var(--text-xs); color: var(--text-muted); margin-top: var(--space-1);"></p>
                     </div>
                 </div>
             </div>
-        @endif
+        </div>
+
+        <script>
+        // Slideshow
+        const slideshowUrls = @json($fotos->map(fn($f) => $f->getUrl())->values());
+        let slideIndex = 0;
+
+        function openSlideshow(index) {
+            slideIndex = index;
+            const overlay = document.getElementById('slideshow-overlay');
+            overlay.style.display = 'flex';
+            updateSlide();
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSlideshow() {
+            document.getElementById('slideshow-overlay').style.display = 'none';
+            document.body.style.overflow = '';
+        }
+
+        function slideMove(dir) {
+            slideIndex = (slideIndex + dir + slideshowUrls.length) % slideshowUrls.length;
+            updateSlide();
+        }
+
+        function updateSlide() {
+            document.getElementById('slide-image').src = slideshowUrls[slideIndex];
+            document.getElementById('slide-counter').textContent = (slideIndex + 1) + ' / ' + slideshowUrls.length;
+            document.getElementById('slide-prev').style.visibility = slideshowUrls.length > 1 ? 'visible' : 'hidden';
+            document.getElementById('slide-next').style.visibility = slideshowUrls.length > 1 ? 'visible' : 'hidden';
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (document.getElementById('slideshow-overlay').style.display === 'none') return;
+            if (e.key === 'ArrowLeft') slideMove(-1);
+            else if (e.key === 'ArrowRight') slideMove(1);
+            else if (e.key === 'Escape') closeSlideshow();
+        });
+
+        // Swipe para mobile
+        (function() {
+            const overlay = document.getElementById('slideshow-overlay');
+            let touchStartX = 0;
+            overlay.addEventListener('touchstart', function(e) { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+            overlay.addEventListener('touchend', function(e) {
+                const diff = e.changedTouches[0].screenX - touchStartX;
+                if (Math.abs(diff) > 50) {
+                    slideMove(diff > 0 ? -1 : 1);
+                }
+            }, { passive: true });
+        })();
+        </script>
+
+        <script>
+        (function() {
+            const VISTORIA_ID = {{ $vistoria->id }};
+            const APP_BASE = document.querySelector('meta[name="app-base"]').content;
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+            function openFotosDB() {
+                return new Promise((resolve, reject) => {
+                    const req = indexedDB.open('poprua_fotos', 1);
+                    req.onupgradeneeded = (e) => {
+                        const db = e.target.result;
+                        if (!db.objectStoreNames.contains('pendentes')) {
+                            db.createObjectStore('pendentes', { keyPath: 'id', autoIncrement: true });
+                        }
+                    };
+                    req.onsuccess = (e) => resolve(e.target.result);
+                    req.onerror = (e) => reject(e.target.error);
+                });
+            }
+
+            async function getFotosPendentes() {
+                const db = await openFotosDB();
+                return new Promise((resolve, reject) => {
+                    const tx = db.transaction('pendentes', 'readonly');
+                    const store = tx.objectStore('pendentes');
+                    const req = store.getAll();
+                    req.onsuccess = () => {
+                        // Filtra fotos desta vistoria ou do tempId da sessão
+                        const tempId = sessionStorage.getItem('poprua_fotos_temp_id');
+                        const fotos = req.result.filter(f =>
+                            f.vistoria_id === VISTORIA_ID || f.vistoria_id === tempId
+                        );
+                        resolve(fotos);
+                    };
+                    req.onerror = () => reject(req.error);
+                });
+            }
+
+            async function vincularTempId() {
+                const tempId = sessionStorage.getItem('poprua_fotos_temp_id');
+                if (!tempId) return;
+                const db = await openFotosDB();
+                const tx = db.transaction('pendentes', 'readwrite');
+                const store = tx.objectStore('pendentes');
+                const req = store.getAll();
+                req.onsuccess = () => {
+                    req.result.forEach(f => {
+                        if (f.vistoria_id === tempId) {
+                            f.vistoria_id = VISTORIA_ID;
+                            store.put(f);
+                        }
+                    });
+                };
+                await new Promise((resolve) => { tx.oncomplete = resolve; });
+                sessionStorage.removeItem('poprua_fotos_temp_id');
+            }
+
+            async function removerFotoLocal(id) {
+                const db = await openFotosDB();
+                const tx = db.transaction('pendentes', 'readwrite');
+                tx.objectStore('pendentes').delete(id);
+                return new Promise((resolve) => { tx.oncomplete = resolve; });
+            }
+
+            async function renderPendentes() {
+                const fotos = await getFotosPendentes();
+                const container = document.getElementById('fotos-pendentes');
+                const preview = document.getElementById('pendentes-preview');
+                const countEl = document.getElementById('pendentes-count');
+
+                if (fotos.length === 0) {
+                    container.classList.add('hidden');
+                    return;
+                }
+
+                container.classList.remove('hidden');
+                countEl.textContent = fotos.length;
+                preview.innerHTML = '';
+
+                fotos.forEach(foto => {
+                    const blob = new Blob([foto.data], { type: foto.type });
+                    const url = URL.createObjectURL(blob);
+                    const div = document.createElement('div');
+                    div.className = 'photo-item';
+                    div.style.position = 'relative';
+                    div.innerHTML = `
+                        <img src="${url}" alt="${foto.name}" style="opacity: 0.7;">
+                        <span style="position: absolute; bottom: 4px; left: 4px; background: var(--color-warning); color: #000; font-size: 10px; padding: 1px 6px; border-radius: 4px; font-weight: 600;">Pendente</span>
+                    `;
+                    preview.appendChild(div);
+                });
+            }
+
+            async function sincronizarFotos() {
+                const fotos = await getFotosPendentes();
+                if (fotos.length === 0) return;
+
+                const btn = document.getElementById('btn-sync-fotos');
+                const progress = document.getElementById('sync-progress');
+                const bar = document.getElementById('sync-bar');
+                const status = document.getElementById('sync-status');
+
+                btn.disabled = true;
+                btn.textContent = 'Sincronizando...';
+                progress.classList.remove('hidden');
+
+                let enviadas = 0;
+                for (const foto of fotos) {
+                    status.textContent = `Enviando ${enviadas + 1} de ${fotos.length}...`;
+                    bar.style.width = `${(enviadas / fotos.length) * 100}%`;
+
+                    try {
+                        const blob = new Blob([foto.data], { type: foto.type });
+                        const file = new File([blob], foto.name, { type: foto.type });
+                        const formData = new FormData();
+                        formData.append('vistoria_id', VISTORIA_ID);
+                        formData.append('foto', file);
+
+                        const resp = await fetch(`${APP_BASE}/api/vistorias/fotos`, {
+                            method: 'POST',
+                            headers: { 'X-CSRF-TOKEN': csrfToken },
+                            body: formData
+                        });
+
+                        if (resp.ok) {
+                            await removerFotoLocal(foto.id);
+                            enviadas++;
+
+                            // Adiciona thumb ao grid
+                            const data = await resp.json();
+                            const grid = document.getElementById('fotos-grid');
+                            const a = document.createElement('a');
+                            a.href = data.url;
+                            a.target = '_blank';
+                            a.className = 'photo-item';
+                            a.innerHTML = `<img src="${data.thumb || data.url}" alt="Foto" loading="lazy">`;
+                            grid.appendChild(a);
+                        } else {
+                            console.error('Erro ao enviar foto:', await resp.text());
+                        }
+                    } catch (err) {
+                        console.error('Erro ao sincronizar:', err);
+                    }
+                }
+
+                bar.style.width = '100%';
+                status.textContent = `${enviadas} de ${fotos.length} foto(s) enviada(s)`;
+                document.getElementById('fotos-count').textContent =
+                    parseInt(document.getElementById('fotos-count').textContent) + enviadas;
+
+                btn.disabled = false;
+                btn.textContent = 'Sincronizar Fotos';
+
+                await renderPendentes();
+                if (enviadas === fotos.length) {
+                    setTimeout(() => { progress.classList.add('hidden'); }, 2000);
+                }
+            }
+
+            document.getElementById('btn-sync-fotos').addEventListener('click', sincronizarFotos);
+
+            // Inicialização
+            vincularTempId().then(renderPendentes);
+        })();
+        </script>
 
         {{-- Link para o Ponto --}}
         @if($vistoria->ponto)

@@ -28,10 +28,14 @@ class VistoriaFotoController extends Controller
             UploadMediaToDriveJob::dispatch($media->id);
         }
 
+        $thumb = $media->hasGeneratedConversion('thumb')
+            ? $media->getUrl('thumb')
+            : $media->getUrl();
+
         return response()->json([
             'id' => $media->id,
             'url' => $media->getUrl(),
-            'thumb' => $media->getUrl('thumb'),
+            'thumb' => $thumb,
         ], 201);
     }
 

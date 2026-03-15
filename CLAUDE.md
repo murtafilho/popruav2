@@ -180,3 +180,10 @@ The Laravel Boost guidelines are specifically curated by Laravel maintainers for
 - All tests must be PHPUnit classes.
 - Run `php artisan test --filter=testName` after changes.
 </laravel-boost-guidelines>
+
+## Documentacao
+
+| Documento | Descricao |
+|-----------|-----------|
+| [docs/ARQUITETURA_DOCKER.md](docs/ARQUITETURA_DOCKER.md) | Arquitetura Docker completa: fluxo de requisicoes, containers, rede isolada, operacoes do dia a dia |
+| [docs/Identificacao de Pessoas em Situacao de Rua.md](docs/Identificação%20de%20Pessoas%20em%20Situação%20de%20Rua.md) | Documento de referencia do projeto PopRua |

@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserRoleController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MapaController;
 use App\Http\Controllers\MoradorController;
 use App\Http\Controllers\ProfileController;
@@ -17,9 +18,7 @@ Route::middleware('auth')->group(function () {
     });
 
     // Dashboard
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', DashboardController::class)->name('dashboard');
 
     // Perfil
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -32,6 +31,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/pontos/nao-georreferenciados', [\App\Http\Controllers\PontoController::class, 'naoGeorreferenciados'])->name('pontos.nao-georreferenciados');
     Route::get('/pontos/{id}', [\App\Http\Controllers\PontoController::class, 'show'])->name('pontos.show');
     Route::get('/pontos/{ponto}/vistorias/create', [VistoriaController::class, 'createForPonto'])->name('pontos.vistorias.create');
+    Route::get('/minhas-vistorias', [VistoriaController::class, 'minhas'])->name('vistorias.minhas');
     Route::get('/vistorias', [VistoriaController::class, 'index'])->name('vistorias.index');
     Route::get('/vistorias/create', [VistoriaController::class, 'create'])->name('vistorias.create');
     Route::get('/vistorias/{vistoria}', [VistoriaController::class, 'show'])->name('vistorias.show');

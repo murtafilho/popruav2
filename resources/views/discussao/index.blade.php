@@ -822,13 +822,64 @@
         }
 
         /* ── Responsive ── */
+        /* ── Toggle e overlay ── */
+        .toc-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .toc-toggle:hover {
+            color: var(--gold-light);
+            background: rgba(255,255,255,0.08);
+        }
+
+        .toc-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 90;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .toc-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
         @media (max-width: 900px) {
+            .toc-toggle {
+                display: flex;
+            }
+
             .page-wrapper {
                 grid-template-columns: 1fr;
             }
+
             .toc-sidebar {
-                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 280px;
+                height: 100vh;
+                z-index: 95;
+                transform: translateX(-100%);
+                transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+                border-right: 3px solid var(--gold);
+                padding-top: 1rem;
             }
+
+            .toc-sidebar.open {
+                transform: translateX(0);
+            }
+
             .content-area {
                 padding: 2rem 1.5rem 4rem;
             }
@@ -866,11 +917,21 @@
 </head>
 <body>
 
+    {{-- Overlay do menu mobile --}}
+    <div class="toc-overlay" id="toc-overlay"></div>
+
     {{-- Top Bar --}}
     <header class="top-bar">
-        <div>
-            <span class="top-bar-brand">POPRUA v2</span>
-            <span class="top-bar-label" style="margin-left: 1rem;">Documento de Discussao</span>
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <button class="toc-toggle" id="toc-toggle" aria-label="Abrir indice">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+            </button>
+            <div>
+                <span class="top-bar-brand">POPRUA v2</span>
+                <span class="top-bar-label" style="margin-left: 0.75rem;">Documento de Discussao</span>
+            </div>
         </div>
         <div class="top-bar-actions">
             <button class="btn-print" onclick="window.print()">Imprimir</button>
@@ -2060,6 +2121,36 @@
 
         window.addEventListener('scroll', updateActiveToc);
         updateActiveToc();
+
+        // Mobile TOC toggle
+        var tocSidebar = document.querySelector('.toc-sidebar');
+        var tocOverlay = document.getElementById('toc-overlay');
+        var tocToggle = document.getElementById('toc-toggle');
+
+        function openToc() {
+            tocSidebar.classList.add('open');
+            tocOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeToc() {
+            tocSidebar.classList.remove('open');
+            tocOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        tocToggle.addEventListener('click', function() {
+            tocSidebar.classList.contains('open') ? closeToc() : openToc();
+        });
+
+        tocOverlay.addEventListener('click', closeToc);
+
+        // Fechar menu ao clicar em um link do índice (mobile)
+        tocLinks.forEach(function(link) {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 900) closeToc();
+            });
+        });
     });
     </script>
 </body>

@@ -27,105 +27,423 @@
 @endsection
 
 @section('content')
-    <div class="page-content">
-        <div class="container">
-            <div class="grid grid-cols-2 grid-mobile-1 gap-3">
-
-                {{-- Mapa --}}
-                <a href="{{ route('mapa.index') }}" class="card card-interactive dashboard-card animate-slide-up stagger-1">
-                    <div class="dashboard-card-icon" style="background: var(--color-info);">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
-                        </svg>
+    <div class="page-content" style="display: flex; flex-direction: column; height: 100%;">
+        <div class="container" style="flex: 1; display: flex; flex-direction: column;">
+            {{-- Indicadores --}}
+            <div class="grid grid-cols-3 grid-mobile-1 gap-3" style="margin-top: var(--space-4);">
+                <div class="card" style="text-align: center;">
+                    <div class="card-body">
+                        <p class="text-muted" style="font-size: var(--text-xs); margin-bottom: var(--space-1);">Total de Pontos</p>
+                        <p style="font-size: var(--text-2xl); font-weight: var(--font-bold); color: var(--accent-primary);">{{ number_format($totalPontos, 0, ',', '.') }}</p>
                     </div>
-                    <span class="dashboard-card-title">{{ __('Mapa') }}</span>
-                </a>
-
-                {{-- Nova Vistoria --}}
-                <a href="{{ route('mapa.index', ['nova_vistoria' => '1']) }}" class="card card-interactive dashboard-card animate-slide-up stagger-2">
-                    <div class="dashboard-card-icon" style="background: var(--color-success);">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                        </svg>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <div class="card-body">
+                        <p class="text-muted" style="font-size: var(--text-xs); margin-bottom: var(--space-1);">Pontos Vistoriados</p>
+                        <p style="font-size: var(--text-2xl); font-weight: var(--font-bold); color: var(--status-info);">{{ number_format($totais->pontos_vistoriados, 0, ',', '.') }}</p>
                     </div>
-                    <span class="dashboard-card-title">{{ __('Nova Vistoria') }}</span>
-                </a>
-
-                {{-- Pontos --}}
-                <a href="{{ route('pontos.index') }}" class="card card-interactive dashboard-card animate-slide-up stagger-3">
-                    <div class="dashboard-card-icon" style="background: #6366f1;">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
-                        </svg>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <div class="card-body">
+                        <p class="text-muted" style="font-size: var(--text-xs); margin-bottom: var(--space-1);">Total de Vistorias</p>
+                        <p style="font-size: var(--text-2xl); font-weight: var(--font-bold); color: var(--status-success);">{{ number_format($totais->vistorias, 0, ',', '.') }}</p>
                     </div>
-                    <span class="dashboard-card-title">Pontos</span>
-                </a>
+                </div>
+            </div>
 
-                {{-- Pontos Não Georreferenciados --}}
-                <a href="{{ route('pontos.nao-georreferenciados') }}" class="card card-interactive dashboard-card animate-slide-up stagger-4">
-                    <div class="dashboard-card-icon" style="background: var(--color-warning);">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                        </svg>
+            {{-- Grafico: Evolucao do Fenomeno --}}
+            <div class="card" style="margin-top: var(--space-4); flex: 1; display: flex; flex-direction: column;">
+                <div class="card-body" style="flex: 1; display: flex; flex-direction: column;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4); flex-wrap: wrap; gap: var(--space-2);">
+                        <h3 style="font-size: var(--text-sm); font-weight: var(--font-semibold); display: flex; align-items: center; gap: var(--space-2);">
+                            <svg style="width: 18px; height: 18px; color: var(--accent-primary);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                            </svg>
+                            Evolucao do Fenomeno
+                        </h3>
+
+                        {{-- Filtro por resultado --}}
+                        <div style="display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap;">
+                            <label class="text-muted" style="font-size: var(--text-xs);">Filtrar:</label>
+                            <div style="display: flex; gap: var(--space-1); flex-wrap: wrap;">
+                                <button type="button" class="btn btn-sm chart-filter active" data-series="all" style="font-size: 11px;">Todos</button>
+                                <button type="button" class="btn btn-sm chart-filter" data-series="ativos" style="font-size: 11px; border-color: #8b5cf6; color: #8b5cf6;">Ativos</button>
+                                <button type="button" class="btn btn-sm chart-filter" data-series="persiste" style="font-size: 11px; border-color: #ef4444; color: #ef4444;">Persiste</button>
+                                <button type="button" class="btn btn-sm chart-filter" data-series="impactado_parcial" style="font-size: 11px; border-color: #f59e0b; color: #f59e0b;">Impactado</button>
+                                <button type="button" class="btn btn-sm chart-filter" data-series="deixou_ocorrer" style="font-size: 11px; border-color: #22c55e; color: #22c55e;">Extinto</button>
+                                <button type="button" class="btn btn-sm chart-filter" data-series="ausente" style="font-size: 11px; border-color: #94a3b8; color: #94a3b8;">Ausente</button>
+                                <button type="button" class="btn btn-sm chart-filter" data-series="nao_constatado" style="font-size: 11px; border-color: #3b82f6; color: #3b82f6;">Nao constatado</button>
+                                <button type="button" class="btn btn-sm chart-filter" data-series="conformidade" style="font-size: 11px; border-color: #10b981; color: #10b981;">Conformidade</button>
+                                <button type="button" class="btn btn-sm chart-filter" data-series="sem_vistoria" style="font-size: 11px; border-color: #cbd5e1; color: #cbd5e1;">Sem vistoria</button>
+                            </div>
+                        </div>
                     </div>
-                    <span class="dashboard-card-title">Sem Coordenadas</span>
-                </a>
 
-                {{-- Vistorias --}}
-                <a href="{{ route('vistorias.index') }}" class="card card-interactive dashboard-card animate-slide-up stagger-5">
-                    <div class="dashboard-card-icon" style="background: var(--accent-primary);">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div style="position: relative; flex: 1; min-height: 300px;">
+                        <canvas id="chart-evolucao"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Legenda: Como cada linha e calculada --}}
+            <div style="margin-top: var(--space-4); display: flex; flex-direction: column; gap: var(--space-4);">
+
+                {{-- Regra geral --}}
+                <div class="card" style="border-left: 3px solid var(--accent-primary);">
+                    <div class="card-body" style="padding: var(--space-3);">
+                        <p style="font-weight: var(--font-semibold); font-size: var(--text-sm); margin-bottom: var(--space-1);">Como ler o grafico</p>
+                        <p class="text-muted" style="font-size: var(--text-xs); line-height: 1.5;">Cada ponto possui um unico status por mes, definido pelo <strong>resultado da ultima vistoria</strong> (por data_abordagem) ate o final daquele mes. Se nao recebe nova vistoria, mantem o status anterior. Os status sao <strong>mutuamente excludentes</strong> — um ponto so aparece em uma categoria por vez. A linha "Pontos Ativos" e a soma de 4 desses status.</p>
+                    </div>
+                </div>
+
+                {{-- Grupo: Ativos (somam para Pontos Ativos) --}}
+                <div class="card">
+                    <div class="card-body" style="padding: var(--space-3);">
+                        <p style="font-weight: var(--font-semibold); font-size: var(--text-sm); margin-bottom: var(--space-1); display: flex; align-items: center; gap: var(--space-2);"><span style="width: 16px; height: 3px; background: #8b5cf6; border-radius: 2px; flex-shrink: 0;"></span> Pontos Ativos (agregado)</p>
+                        <p class="text-muted" style="font-size: var(--text-xs); line-height: 1.5; margin-bottom: var(--space-3);">Soma das 4 categorias abaixo. Se esta linha sobe, o fenomeno esta crescendo; se desce, esta sob controle.</p>
+
+                        <div style="display: flex; flex-direction: column; gap: var(--space-2); padding-left: var(--space-3); border-left: 1px solid var(--border-primary);">
+                            <div style="display: flex; align-items: flex-start; gap: var(--space-2);">
+                                <span style="width: 12px; height: 3px; background: #ef4444; border-radius: 2px; margin-top: 7px; flex-shrink: 0;"></span>
+                                <div>
+                                    <p style="font-weight: var(--font-medium); font-size: var(--text-xs);">Persiste</p>
+                                    <p class="text-muted" style="font-size: var(--text-xs); line-height: 1.4;">Fenomeno continua inalterado. A acao de fiscalizacao nao produziu efeito.</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: flex-start; gap: var(--space-2);">
+                                <span style="width: 12px; height: 3px; background: #f59e0b; border-radius: 2px; margin-top: 7px; flex-shrink: 0;"></span>
+                                <div>
+                                    <p style="font-weight: var(--font-medium); font-size: var(--text-xs);">Impactado Parcialmente</p>
+                                    <p class="text-muted" style="font-size: var(--text-xs); line-height: 1.4;">A acao produziu efeito mas o fenomeno nao foi eliminado.</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: flex-start; gap: var(--space-2);">
+                                <span style="width: 12px; height: 3px; background: #94a3b8; border-radius: 2px; margin-top: 7px; flex-shrink: 0;"></span>
+                                <div>
+                                    <p style="font-weight: var(--font-medium); font-size: var(--text-xs);">PSR Ausente</p>
+                                    <p class="text-muted" style="font-size: var(--text-xs); line-height: 1.4;">Nao havia pessoas no momento da vistoria, mas o ponto permanece ativo.</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: flex-start; gap: var(--space-2);">
+                                <span style="width: 12px; height: 3px; background: #10b981; border-radius: 2px; margin-top: 7px; flex-shrink: 0;"></span>
+                                <div>
+                                    <p style="font-weight: var(--font-medium); font-size: var(--text-xs);">Em Conformidade</p>
+                                    <p class="text-muted" style="font-size: var(--text-xs); line-height: 1.4;">Regularizado conforme Portaria Conjunta, mas permanece sob monitoramento.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Grupo: Extintos (subtraem do total) --}}
+                <div>
+                    <p style="font-size: var(--text-xs); font-weight: var(--font-semibold); color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: var(--space-2);">
+                        Fenomeno resolvido — subtraem do total
+                    </p>
+                    <div class="grid grid-cols-2 grid-mobile-1 gap-3">
+                        <div class="card">
+                            <div class="card-body" style="padding: var(--space-3);">
+                                <p style="font-weight: var(--font-semibold); font-size: var(--text-sm); margin-bottom: var(--space-1); display: flex; align-items: center; gap: var(--space-2);"><span style="width: 12px; height: 3px; background: #22c55e; border-radius: 2px; flex-shrink: 0;"></span> Deixou de Ocorrer</p>
+                                <p class="text-muted" style="font-size: var(--text-xs); line-height: 1.5;">O fenomeno foi eliminado. O ponto sai da contagem de ativos.</p>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-body" style="padding: var(--space-3);">
+                                <p style="font-weight: var(--font-semibold); font-size: var(--text-sm); margin-bottom: var(--space-1); display: flex; align-items: center; gap: var(--space-2);"><span style="width: 12px; height: 3px; background: #3b82f6; border-radius: 2px; flex-shrink: 0;"></span> Nao Constatado</p>
+                                <p class="text-muted" style="font-size: var(--text-xs); line-height: 1.5;">Nao ha evidencia de fenomeno no local. O ponto sai da contagem de ativos.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Grupo: Indeterminado --}}
+                <div>
+                    <p style="font-size: var(--text-xs); font-weight: var(--font-semibold); color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: var(--space-2);">
+                        Indeterminado — nao contabilizado como ativo nem extinto
+                    </p>
+                    <div class="grid grid-cols-2 grid-mobile-1 gap-3">
+                        <div class="card">
+                            <div class="card-body" style="padding: var(--space-3);">
+                                <p style="font-weight: var(--font-semibold); font-size: var(--text-sm); margin-bottom: var(--space-1); display: flex; align-items: center; gap: var(--space-2);"><span style="width: 12px; height: 3px; background: #cbd5e1; border-radius: 2px; flex-shrink: 0;"></span> Sem Resultado</p>
+                                <p class="text-muted" style="font-size: var(--text-xs); line-height: 1.5;">Pontos cuja vistoria nao possui resultado registrado. Nao e possivel classificar.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            {{-- Interpretacao e Projecoes --}}
+            <div class="card" style="margin-top: var(--space-4);">
+                <div class="card-body">
+                    <h3 style="font-size: var(--text-sm); font-weight: var(--font-semibold); margin-bottom: var(--space-4); display: flex; align-items: center; gap: var(--space-2);">
+                        <svg style="width: 18px; height: 18px; color: var(--status-info);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
-                    </div>
-                    <span class="dashboard-card-title">Vistorias</span>
-                </a>
+                        Interpretacao e Projecoes
+                    </h3>
 
-                {{-- Moradores --}}
-                <a href="{{ route('moradores.index') }}" class="card card-interactive dashboard-card animate-slide-up stagger-6">
-                    <div class="dashboard-card-icon" style="background: #f43f5e;">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                        </svg>
-                    </div>
-                    <span class="dashboard-card-title">Moradores</span>
-                </a>
+                    <div style="font-size: var(--text-sm); color: var(--text-secondary); line-height: 1.7;">
 
-                {{-- Power BI --}}
-                @can('ver relatorios')
-                <a href="{{ route('powerbi.index') }}" class="card card-interactive dashboard-card animate-slide-up">
-                    <div class="dashboard-card-icon" style="background: #f59e0b;">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                        </svg>
-                    </div>
-                    <span class="dashboard-card-title">Power BI</span>
-                </a>
-                @endcan
+                        <h4 style="font-size: var(--text-sm); font-weight: var(--font-semibold); color: var(--text-primary); margin-bottom: var(--space-2);">Panorama Atual (Marco/2026)</h4>
+                        <p style="margin-bottom: var(--space-3);">
+                            O sistema monitora <strong>2.705 pontos</strong> de concentracao de populacao em situacao de rua em Belo Horizonte, com <strong>41.633 vistorias</strong> realizadas desde dezembro de 2018. Do total de pontos com vistoria:
+                        </p>
+                        <ul style="margin-bottom: var(--space-4); padding-left: var(--space-5);">
+                            <li><span class="badge badge-danger" style="font-size: 10px;">476 pontos</span> com fenomeno que <strong>persiste</strong> (17,8%)</li>
+                            <li><span class="badge badge-warning" style="font-size: 10px;">710 pontos</span> <strong>impactados parcialmente</strong> (26,5%)</li>
+                            <li><span class="badge badge-success" style="font-size: 10px;">1.003 pontos</span> onde o fenomeno <strong>deixou de ocorrer</strong> (37,5%)</li>
+                            <li><span class="badge badge-info" style="font-size: 10px;">241 pontos</span> com fenomeno <strong>nao constatado</strong> (9,0%)</li>
+                            <li><span class="badge" style="font-size: 10px; background: var(--bg-tertiary);">158 pontos</span> <strong>em conformidade</strong> (5,9%)</li>
+                            <li><span class="badge badge-default" style="font-size: 10px;">56 pontos</span> com <strong>PSR ausente</strong> no momento (2,1%)</li>
+                        </ul>
 
-                {{-- Admin Roles --}}
-                @if(auth()->user()->hasRole('admin'))
-                <a href="{{ route('admin.roles.index') }}" class="card card-interactive dashboard-card animate-slide-up">
-                    <div class="dashboard-card-icon" style="background: #8b5cf6;">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
-                        </svg>
-                    </div>
-                    <span class="dashboard-card-title">{{ __('Admin') }}</span>
-                </a>
-                @endif
+                        <h4 style="font-size: var(--text-sm); font-weight: var(--font-semibold); color: var(--text-primary); margin-bottom: var(--space-2);">Tendencias Observadas (2020-2026)</h4>
 
-                {{-- Perfil --}}
-                <a href="{{ route('profile.edit') }}" class="card card-interactive dashboard-card animate-slide-up">
-                    <div class="dashboard-card-icon" style="background: var(--bg-elevated);">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                        </svg>
-                    </div>
-                    <span class="dashboard-card-title">{{ __('Meu Perfil') }}</span>
-                </a>
+                        <p style="margin-bottom: var(--space-2);"><strong style="color: var(--status-danger);">Queda na taxa de extincao:</strong></p>
+                        <p style="margin-bottom: var(--space-3);">
+                            A taxa de pontos extintos por semestre caiu de <strong>52,7%</strong> (1o sem/2020) para <strong>25,5%</strong> (1o sem/2025). Isso indica que os pontos remanescentes sao mais resistentes as acoes de fiscalizacao — possivelmente ligados a fixacao antiga, estruturas consolidadas ou cenas de uso caracterizadas.
+                        </p>
 
+                        <p style="margin-bottom: var(--space-2);"><strong style="color: #ef4444;">Estabilizacao do fenomeno "persiste":</strong></p>
+                        <p style="margin-bottom: var(--space-3);">
+                            A taxa de pontos com fenomeno persistente oscila entre <strong>41% e 51%</strong> desde o 2o semestre de 2021, indicando um nucleo duro de pontos que nao respondem as abordagens tradicionais. Em 2025, houve leve alta para 48-51%, sugerindo recrudescimento.
+                        </p>
+
+                        <p style="margin-bottom: var(--space-2);"><strong style="color: #f59e0b;">Crescimento de "impactado parcialmente":</strong></p>
+                        <p style="margin-bottom: var(--space-3);">
+                            Desde 2022, "impactado parcialmente" ultrapassou "persiste" como resultado mais frequente, representando entre <strong>35-48%</strong> dos pontos vistoriados. Isso sugere que as acoes produzem efeito temporario mas insuficiente para eliminar o fenomeno.
+                        </p>
+
+                        <p style="margin-bottom: var(--space-2);"><strong style="color: #22c55e;">Reducao de novos pontos extintos:</strong></p>
+                        <p style="margin-bottom: var(--space-3);">
+                            Em 2019, <strong>600 pontos</strong> deixaram de ocorrer. Em 2025, apenas <strong>106</strong>. A base de pontos "faceis de resolver" ja foi esgotada. Os pontos restantes exigem abordagens mais complexas e articuladas.
+                        </p>
+
+                        <h4 style="font-size: var(--text-sm); font-weight: var(--font-semibold); color: var(--text-primary); margin-top: var(--space-4); margin-bottom: var(--space-2);">Projecoes para 2030</h4>
+
+                        <p style="margin-bottom: var(--space-3);">
+                            Considerando as tendencias atuais e mantido o modelo operacional vigente:
+                        </p>
+
+                        <div style="display: flex; flex-direction: column; gap: var(--space-3); margin-bottom: var(--space-4);">
+                            <div style="padding: var(--space-3); background: var(--bg-tertiary); border-radius: var(--radius-md); border-left: 3px solid #ef4444;">
+                                <p style="font-weight: var(--font-semibold); color: var(--text-primary); margin-bottom: var(--space-1);">Cenario 1 — Manutencao do status quo</p>
+                                <p>Sem mudanca na estrategia, projeta-se que <strong>~1.400 pontos</strong> permanecam ativos (persiste + impactado) em 2030, com taxa de extincao estabilizada em ~20%. O fenomeno continuara presente em nivel similar ao atual, com crescimento vegetativo de novos pontos compensando parcialmente as extincoes.</p>
+                            </div>
+
+                            <div style="padding: var(--space-3); background: var(--bg-tertiary); border-radius: var(--radius-md); border-left: 3px solid #f59e0b;">
+                                <p style="font-weight: var(--font-semibold); color: var(--text-primary); margin-bottom: var(--space-1);">Cenario 2 — Intensificacao focada</p>
+                                <p>Com abordagem diferenciada para os ~476 pontos "persiste" (articulacao intersetorial, assistencia social, saude mental), e possivel reduzir este grupo em <strong>30-40%</strong> ate 2030, baixando para ~300 pontos persistentes. Requer investimento em equipes multidisciplinares e acompanhamento longitudinal.</p>
+                            </div>
+
+                            <div style="padding: var(--space-3); background: var(--bg-tertiary); border-radius: var(--radius-md); border-left: 3px solid #22c55e;">
+                                <p style="font-weight: var(--font-semibold); color: var(--text-primary); margin-bottom: var(--space-1);">Cenario 3 — Transformacao estrutural</p>
+                                <p>Com politicas habitacionais, programas de transferencia de renda e rede de acolhimento expandida, o total de pontos ativos poderia cair para <strong>~600-800</strong> em 2030 (reducao de 40-50%). Este cenario depende de fatores externos ao controle da SUFIS: politica habitacional municipal, conjuntura economica e capacidade da rede de assistencia social.</p>
+                            </div>
+                        </div>
+
+                        <h4 style="font-size: var(--text-sm); font-weight: var(--font-semibold); color: var(--text-primary); margin-bottom: var(--space-2);">Indicadores-Chave a Monitorar</h4>
+                        <ul style="padding-left: var(--space-5);">
+                            <li><strong>Taxa de extincao mensal:</strong> se cair abaixo de 15%, indica esgotamento do modelo atual</li>
+                            <li><strong>Pontos "persiste" com fixacao antiga:</strong> nucleo mais critico, requer abordagem diferenciada</li>
+                            <li><strong>Novos pontos por mes:</strong> media de 13 novos pontos/mes em 2025 — se acelerar, o fenomeno esta se expandindo</li>
+                            <li><strong>Razao impactado/persiste:</strong> atualmente 1,49 — quanto maior, mais os pontos respondem as acoes (mesmo que parcialmente)</li>
+                            <li><strong>Tempo medio entre vistorias:</strong> pontos com intervalo maior que 90 dias perdem acompanhamento efetivo</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dados = @json($dadosMensais);
+
+    const meses = dados.map(d => {
+        const [ano, mes] = d.mes.split('-');
+        const nomes = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+        return nomes[parseInt(mes) - 1] + '/' + ano.slice(2);
+    });
+
+    // Datasets com todas as series
+    const allDatasets = {
+        ativos: {
+            label: 'Pontos Ativos',
+            data: dados.map(d => d.ativos),
+            borderColor: '#8b5cf6',
+            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+            borderWidth: 3,
+            pointRadius: 2,
+            tension: 0.3,
+            fill: true,
+            order: 0,
+        },
+        persiste: {
+            label: 'Persiste',
+            data: dados.map(d => d.persiste),
+            borderColor: '#ef4444',
+            backgroundColor: '#ef4444',
+            borderWidth: 2,
+            pointRadius: 2,
+            tension: 0.3,
+            order: 1,
+        },
+        impactado_parcial: {
+            label: 'Impactado Parcialmente',
+            data: dados.map(d => d.impactado_parcial),
+            borderColor: '#f59e0b',
+            backgroundColor: '#f59e0b',
+            borderWidth: 2,
+            pointRadius: 2,
+            tension: 0.3,
+            order: 2,
+        },
+        deixou_ocorrer: {
+            label: 'Deixou de Ocorrer (extinto)',
+            data: dados.map(d => d.deixou_ocorrer),
+            borderColor: '#22c55e',
+            backgroundColor: '#22c55e',
+            borderWidth: 2,
+            pointRadius: 2,
+            tension: 0.3,
+            order: 3,
+        },
+        ausente: {
+            label: 'PSR Ausente',
+            data: dados.map(d => d.ausente),
+            borderColor: '#94a3b8',
+            backgroundColor: '#94a3b8',
+            borderWidth: 2,
+            pointRadius: 2,
+            tension: 0.3,
+            order: 4,
+        },
+        nao_constatado: {
+            label: 'Nao Constatado (extinto)',
+            data: dados.map(d => d.nao_constatado),
+            borderColor: '#3b82f6',
+            backgroundColor: '#3b82f6',
+            borderWidth: 2,
+            pointRadius: 2,
+            tension: 0.3,
+            order: 5,
+        },
+        conformidade: {
+            label: 'Em Conformidade',
+            data: dados.map(d => d.conformidade),
+            borderColor: '#10b981',
+            backgroundColor: '#10b981',
+            borderWidth: 2,
+            pointRadius: 2,
+            tension: 0.3,
+            borderDash: [5, 5],
+            order: 6,
+        },
+        sem_vistoria: {
+            label: 'Sem Vistoria',
+            data: dados.map(d => d.sem_vistoria),
+            borderColor: '#cbd5e1',
+            backgroundColor: '#cbd5e1',
+            borderWidth: 1,
+            pointRadius: 1,
+            tension: 0.3,
+            borderDash: [3, 3],
+            order: 7,
+        },
+    };
+
+    const ctx = document.getElementById('chart-evolucao').getContext('2d');
+
+    const chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: meses,
+            datasets: Object.values(allDatasets),
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        pointStyle: 'line',
+                        padding: 16,
+                        font: { size: 11 },
+                    },
+                },
+                tooltip: {
+                    callbacks: {
+                        afterBody: function(items) {
+                            const idx = items[0].dataIndex;
+                            const d = dados[idx];
+                            return [
+                                '',
+                                'Pontos existentes: ' + d.total_existentes,
+                                'Extintos (-): ' + d.extintos,
+                                'Total efetivo: ' + d.total_efetivo,
+                                '',
+                                'Ativos: ' + d.ativos,
+                                'Sem vistoria: ' + d.sem_vistoria,
+                            ];
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(0,0,0,0.06)' },
+                    ticks: { font: { size: 11 } },
+                    title: {
+                        display: true,
+                        text: 'Pontos',
+                        font: { size: 11 },
+                    },
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { font: { size: 10 }, maxRotation: 45 },
+                },
+            },
+        },
+    });
+
+    // Filtros
+    const filterButtons = document.querySelectorAll('.chart-filter');
+
+    filterButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const series = this.dataset.series;
+
+            // Toggle active
+            filterButtons.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+
+            if (series === 'all') {
+                // Mostrar todos
+                chart.data.datasets = Object.values(allDatasets);
+            } else {
+                // Mostrar apenas a serie selecionada + ativos como referencia
+                const selected = [allDatasets[series]];
+                if (series !== 'ativos') {
+                    selected.unshift(allDatasets.ativos);
+                }
+                chart.data.datasets = selected;
+            }
+            chart.update();
+        });
+    });
+});
+</script>
+@endpush

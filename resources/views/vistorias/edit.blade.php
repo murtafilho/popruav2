@@ -16,7 +16,7 @@
 
 @section('content')
     <div class="form-page">
-        <form id="vistoria-form" action="{{ route('vistorias.update', $vistoria) }}" method="POST" enctype="multipart/form-data" class="form-container">
+        <form id="vistoria-form" action="{{ route('vistorias.update', $vistoria) }}" method="POST" enctype="multipart/form-data" class="form-container" novalidate>
             @csrf
             @method('PUT')
 
@@ -114,13 +114,13 @@
                             <div class="grid grid-cols-2 gap-3">
                                 <div class="form-group">
                                     <label class="form-label">Qtd. Pessoas</label>
-                                    <input type="number" name="quantidade_pessoas" min="0"
-                                           value="{{ $vistoria->quantidade_pessoas ?? 0 }}" class="form-input">
+                                    <input type="number" name="quantidade_pessoas" min="0" placeholder="0"
+                                           value="{{ $vistoria->quantidade_pessoas ?: '' }}" class="form-input">
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Qtd. Kg</label>
-                                    <input type="number" name="qtd_kg" min="0"
-                                           value="{{ $vistoria->qtd_kg ?? 0 }}" class="form-input">
+                                    <input type="number" name="qtd_kg" min="0" placeholder="0"
+                                           value="{{ $vistoria->qtd_kg ?: '' }}" class="form-input">
                                 </div>
                             </div>
                         </div>
@@ -149,8 +149,8 @@
 
                             <div class="form-group">
                                 <label class="form-label">Qtd. Abrigos Provisorios</label>
-                                <input type="number" name="qtd_abrigos_provisorios" id="qtd_abrigos" min="0"
-                                       value="{{ $vistoria->qtd_abrigos_provisorios ?? 0 }}"
+                                <input type="number" name="qtd_abrigos_provisorios" id="qtd_abrigos" min="0" placeholder="0"
+                                       value="{{ $vistoria->qtd_abrigos_provisorios ?: '' }}"
                                        onchange="atualizarCamposAbrigos()" class="form-input">
                             </div>
 
@@ -457,31 +457,14 @@
                             @endif
 
                             <input type="file" id="camera-input-back" accept="image/*" capture="environment" class="hidden">
-                            <input type="file" id="camera-input-front" accept="image/*" capture="user" class="hidden">
-                            <input type="file" id="gallery-input" accept="image/*" multiple class="hidden">
 
                             <div class="flex flex-col gap-2">
-                                <button type="button" onclick="openCamera('back')" class="btn btn-primary btn-block">
+                                <button type="button" onclick="openCamera()" class="btn btn-primary btn-block">
                                     <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
                                     </svg>
-                                    Camera Traseira
-                                </button>
-
-                                <button type="button" onclick="openCamera('front')" class="btn btn-secondary btn-block">
-                                    <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                    </svg>
-                                    Camera Frontal
-                                </button>
-
-                                <button type="button" onclick="openGallery()" class="btn btn-success btn-block">
-                                    <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                    </svg>
-                                    Galeria
+                                    Tirar Foto
                                 </button>
                             </div>
 
@@ -531,6 +514,14 @@
     </div>
 
     <script>
+        // Impedir saída acidental sem confirmação
+        let formSubmitting = false;
+        window.addEventListener('beforeunload', function(e) {
+            if (formSubmitting) return;
+            e.preventDefault();
+            e.returnValue = '';
+        });
+
         let currentTab = 0;
         const totalTabs = 6;
         let visitedSteps = new Set([0]);
@@ -549,6 +540,13 @@
             if (parseInt(document.getElementById('qtd_abrigos').value) > 0) {
                 atualizarCamposAbrigos();
             }
+
+            // Selecionar conteúdo ao focar + forçar teclado numérico
+            document.querySelectorAll('input[type="number"]').forEach(input => {
+                input.addEventListener('focus', function() { this.select(); });
+                input.setAttribute('inputmode', 'numeric');
+                input.setAttribute('pattern', '[0-9]*');
+            });
         });
 
         function updateStepper(currentIndex) {
@@ -791,35 +789,50 @@
                    (navigator.maxTouchPoints && navigator.maxTouchPoints > 2 && /MacIntel/.test(navigator.platform));
         }
 
-        function openCameraInput(type = 'back') {
-            const inputId = type === 'back' ? 'camera-input-back' : 'camera-input-front';
-            const input = document.getElementById(inputId);
+        function openCameraInput() {
+            const input = document.getElementById('camera-input-back');
             if (input) {
                 input.value = '';
                 input.click();
             }
         }
 
-        function openCamera(type = 'back') {
-            openCameraInput(type);
-        }
-
-        function openGallery() {
-            const input = document.getElementById('gallery-input');
-            if (input) {
-                input.value = '';
-                input.click();
-            }
+        function openCamera() {
+            openCameraInput();
         }
 
         function processPhotoFile(file) {
             if (!file.type.startsWith('image/')) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                fotosSelecionadas.push({ file: file, preview: e.target.result, id: Date.now() + Math.random() });
-                renderFotosPreview();
+            const MAX_WIDTH = 1920;
+            const MAX_HEIGHT = 1920;
+            const QUALITY = 0.8;
+
+            const img = new Image();
+            img.onload = function() {
+                let w = img.width;
+                let h = img.height;
+
+                if (w > MAX_WIDTH || h > MAX_HEIGHT) {
+                    const ratio = Math.min(MAX_WIDTH / w, MAX_HEIGHT / h);
+                    w = Math.round(w * ratio);
+                    h = Math.round(h * ratio);
+                }
+
+                const canvas = document.createElement('canvas');
+                canvas.width = w;
+                canvas.height = h;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, w, h);
+
+                canvas.toBlob(function(blob) {
+                    const compressed = new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() });
+                    const preview = canvas.toDataURL('image/jpeg', 0.5);
+                    fotosSelecionadas.push({ file: compressed, preview, id: Date.now() + Math.random() });
+                    renderFotosPreview();
+                    salvarFotoLocal(compressed);
+                }, 'image/jpeg', QUALITY);
             };
-            reader.readAsDataURL(file);
+            img.src = URL.createObjectURL(file);
         }
 
         document.getElementById('camera-input-back').addEventListener('change', function(e) {
@@ -827,15 +840,6 @@
             e.target.value = '';
         });
 
-        document.getElementById('camera-input-front').addEventListener('change', function(e) {
-            if (e.target.files[0]) processPhotoFile(e.target.files[0]);
-            e.target.value = '';
-        });
-
-        document.getElementById('gallery-input').addEventListener('change', function(e) {
-            Array.from(e.target.files).forEach(file => processPhotoFile(file));
-            e.target.value = '';
-        });
 
         function renderFotosPreview() {
             const container = document.getElementById('fotos-preview');
@@ -857,21 +861,72 @@
         }
 
         function removerFoto(index) {
+            const foto = fotosSelecionadas[index];
+            if (foto) removerFotoLocal(foto.file.name);
             fotosSelecionadas.splice(index, 1);
             renderFotosPreview();
         }
 
-        document.getElementById('vistoria-form').addEventListener('submit', function(e) {
-            fotosSelecionadas.forEach((foto) => {
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.name = 'fotos[]';
-                input.style.display = 'none';
-                const dataTransfer = new DataTransfer();
-                dataTransfer.items.add(foto.file);
-                input.files = dataTransfer.files;
-                this.appendChild(input);
+        // IndexedDB para fotos pendentes
+        const vistoriaId = {{ $vistoria->id }};
+
+        function openFotosDB() {
+            return new Promise((resolve, reject) => {
+                const req = indexedDB.open('poprua_fotos', 1);
+                req.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains('pendentes')) {
+                        db.createObjectStore('pendentes', { keyPath: 'id', autoIncrement: true });
+                    }
+                };
+                req.onsuccess = (e) => resolve(e.target.result);
+                req.onerror = (e) => reject(e.target.error);
             });
+        }
+
+        // Salva foto no IndexedDB imediatamente ao tirar
+        async function salvarFotoLocal(file) {
+            try {
+                const buffer = await file.arrayBuffer();
+                const db = await openFotosDB();
+                const tx = db.transaction('pendentes', 'readwrite');
+                tx.objectStore('pendentes').add({
+                    vistoria_id: vistoriaId,
+                    name: file.name,
+                    type: file.type,
+                    data: buffer,
+                    created_at: new Date().toISOString()
+                });
+                await new Promise((resolve, reject) => {
+                    tx.oncomplete = resolve;
+                    tx.onerror = reject;
+                });
+                console.log('Foto salva no dispositivo:', file.name);
+            } catch (err) {
+                console.error('Erro ao salvar foto localmente:', err);
+            }
+        }
+
+        // Remove foto do IndexedDB ao remover do preview
+        async function removerFotoLocal(fileName) {
+            try {
+                const db = await openFotosDB();
+                const tx = db.transaction('pendentes', 'readonly');
+                const store = tx.objectStore('pendentes');
+                const all = await new Promise(r => { const req = store.getAll(); req.onsuccess = () => r(req.result); });
+                const foto = all.find(f => f.vistoria_id === vistoriaId && f.name === fileName);
+                if (foto) {
+                    const delTx = db.transaction('pendentes', 'readwrite');
+                    delTx.objectStore('pendentes').delete(foto.id);
+                }
+            } catch (err) {
+                console.error('Erro ao remover foto local:', err);
+            }
+        }
+
+        document.getElementById('vistoria-form').addEventListener('submit', function(e) {
+            formSubmitting = true;
+            // Fotos já estão no IndexedDB — form submete sem elas
         });
 
         function startVoiceInput(inputId) {

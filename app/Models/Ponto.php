@@ -18,6 +18,7 @@ class Ponto extends Model
     protected $fillable = [
         'numero',
         'complemento',
+        'observacao',
         'endereco_atualizado_id',
         'caracteristica_abrigo_id',
         'lat',
