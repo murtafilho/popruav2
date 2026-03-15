@@ -1,27 +1,23 @@
 {
     "mcpServers": {
         "laravel-boost": {
-            "command": "wsl.exe",
+            "command": "php",
             "args": [
-                "/usr/bin/php8.4",
-                "/home/murta/projects/popruav2/artisan",
+                "artisan",
                 "boost:mcp"
             ]
-        },
-        "mysql": {
-            "command": "npx",
-            "args": ["-y", "@benborla29/mcp-server-mysql"],
-            "env": {
-                "MYSQL_HOST": "127.0.0.1",
-                "MYSQL_PORT": "3306",
-                "MYSQL_USER": "root",
-                "MYSQL_PASSWORD": "xman74102",
-                "MYSQL_DATABASE": "popruav2"
-            }
         },
         "context7": {
             "command": "npx",
             "args": ["-y", "@upstash/context7-mcp"]
+        },
+        "leaflet": {
+            "command": "node",
+            "args": ["tools/leaflet-mcp-server/build/index.js"]
+        },
+        "openstreetmap": {
+            "command": "/root/.local/bin/uvx",
+            "args": ["osm-mcp-server"]
         }
     }
 }

@@ -108,9 +108,14 @@ Visualmente:
 
 | O que | Onde | Para que |
 |---|---|---|
-| PHP-FPM + Nginx | Imagem serversideup | Processa requisicoes PHP |
-| Extensoes PHP | exif, pdo_pgsql, redis, zip, etc | Funcionalidades da app |
-| Composer | `/usr/bin/composer` | Gerenciador de dependencias |
+| PHP-FPM + Nginx | Imagem serversideup (Debian 13 trixie) | Processa requisicoes PHP |
+| PHP | 8.4.19 | Runtime |
+| Nginx | 1.26.3 | Servidor web interno |
+| Extensoes PHP | ctype, curl, dom, exif, fileinfo, gd, json, mbstring, openssl, pdo, pdo_mysql, pdo_pgsql, pdo_sqlite, redis, sodium, xml, xmlreader, xmlwriter, zip, opcache | Funcionalidades da app |
+| Composer | 2.9.5 (`/usr/local/bin/composer`) | Gerenciador de dependencias |
+| Node.js | 22.22.1 | Runtime JS (build frontend) |
+| npm | 10.9.4 | Gerenciador de pacotes JS |
+| GitHub CLI | 2.88.1 | Operacoes Git/GitHub |
 | Codigo da app | `/var/www/html/.../poprua-geo/` | Bind mount do host |
 
 > **Importante**: o container app roda como **www-data** (nao-root) por padrao da imagem serversideup.
@@ -140,6 +145,16 @@ RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Claude Code (AI assistant CLI) - instalacao nativa recomendada
+# 1. Remove instalacao npm se existir (evita conflito)
+# 2. Instala via script nativo em ~/.local/bin/claude
+# 3. Adiciona ao PATH permanentemente
+RUN npm uninstall -g @anthropic-ai/claude-code 2>/dev/null || true \
+    && curl -fsSL https://claude.ai/install.sh | bash \
+    && echo 'export PATH="$HOME/.local/bin:$PATH"' >> /root/.bashrc
+
+ENV PATH="/root/.local/bin:${PATH}"
+
 USER www-data
 ```
 
@@ -147,7 +162,7 @@ O Dockerfile tambem esta versionado em `docker/Dockerfile` no repositorio.
 
 **Particularidade**: usa a imagem `serversideup/php` que inclui **Nginx + PHP-FPM no mesmo container**. Diferente dos outros containers que usam apenas FPM.
 
-Extensoes PHP disponiveis: ctype, curl, dom, exif, fileinfo, json, mbstring, openssl, pcntl, pdo, pdo_mysql, pdo_pgsql, redis, xml, zip, opcache.
+Extensoes PHP disponiveis: ctype, curl, dom, exif, fileinfo, gd, json, mbstring, openssl, pdo, pdo_mysql, pdo_pgsql, pdo_sqlite, redis, sodium, xml, xmlreader, xmlwriter, zip, opcache.
 
 ### 2. Banco (pg17-poprua-geo) — PostgreSQL 17 + PostGIS
 
@@ -232,6 +247,10 @@ services:
     volumes:
       - /var/www/html/.../poprua-geo:/var/www/html/.../poprua-geo
                                       # bind mount (so esta app)
+      - /opt/docker/poprua-geo/claude-data:/root/.claude
+                                      # persistir config/historico do Claude Code entre rebuilds
+      - /opt/docker/poprua-geo/ssh-data:/root/.ssh
+                                      # persistir chaves SSH entre rebuilds
     environment:
       PHP_MEMORY_LIMIT: 256M
       PHP_MAX_EXECUTION_TIME: 300    # scripts longos (upload fotos)
@@ -340,6 +359,7 @@ networks:
 | Leaflet MarkerCluster | 1.5 | Agrupamento de marcadores no mapa |
 | Axios | 1.x | Requisicoes HTTP |
 | Vite | 7.x | Bundler frontend |
+| Laravel Vite Plugin | 2.x | Integracao Laravel + Vite |
 
 ### Infraestrutura
 
@@ -349,7 +369,7 @@ networks:
 | Container banco | `pg17-poprua-geo` (postgis/postgis:17-3.5) |
 | Container cache | `redis-poprua-geo` (redis:7-alpine) |
 | Rede Docker | `poprua-geo` (bridge isolada) |
-| Servidor | `vlcp-sufis01` (Debian 9.13) |
+| Servidor | `vlcp-sufis01` (Debian 9.13, 8GB RAM, 8 CPUs) |
 | Apache | Proxy fcgi -> `127.0.0.1:9084` |
 
 ---
@@ -460,6 +480,42 @@ sudo docker exec pg17-poprua-geo pg_dump -U poprua poprua_geo > backup_poprua_ge
 
 ---
 
+## Persistencia de dados no rebuild
+
+Ao reconstruir o container app (`docker compose up -d --build`), tudo que esta **dentro do container** e perdido. Os volumes garantem que dados importantes sobrevivam:
+
+| Dado | Volume | Sobrevive rebuild? |
+|---|---|---|
+| Codigo-fonte PHP | bind mount do host | Sim |
+| Banco PostgreSQL | `postgres-data/` no host | Sim |
+| Skills do Claude Code (`.claude/skills/`) | Dentro do repo (bind mount) | Sim |
+| Config/historico do Claude Code (`/root/.claude/`) | `claude-data/` no host | **Sim (requer volume)** |
+| Chaves SSH (`/root/.ssh/`) | `ssh-data/` no host | **Sim (requer volume)** |
+| Pacotes Composer (`vendor/`) | Dentro do container | Nao — rodar `composer install` apos rebuild |
+| Pacotes Node (`node_modules/`) | Dentro do container | Nao — rodar `npm install` apos rebuild |
+
+> **IMPORTANTE**: Os volumes `claude-data` e `ssh-data` devem ser adicionados ao `docker-compose.yml` do host
+> para que configuracoes, memorias, historico do Claude Code e chaves SSH nao sejam perdidos em rebuilds.
+> Procedimento no host (executar ANTES do rebuild):
+> ```bash
+> ssh sufis
+> cd /opt/docker/poprua-geo
+> # criar diretorios para os volumes
+> sudo mkdir -p claude-data ssh-data
+> # copiar dados atuais do container antes do rebuild
+> sudo docker cp php84-poprua-geo:/root/.claude/. claude-data/
+> sudo docker cp php84-poprua-geo:/root/.ssh/. ssh-data/
+> sudo chmod 700 ssh-data
+> sudo chmod 600 ssh-data/id_rsa
+> # adicionar ao docker-compose.yml no servico app.volumes:
+> #   - /opt/docker/poprua-geo/claude-data:/root/.claude
+> #   - /opt/docker/poprua-geo/ssh-data:/root/.ssh
+> # recriar o container
+> sudo docker compose up -d
+> ```
+
+---
+
 ## Quando preciso fazer rebuild?
 
 | Situacao | Precisa rebuild? | Comando |
@@ -472,6 +528,7 @@ sudo docker exec pg17-poprua-geo pg_dump -U poprua poprua_geo > backup_poprua_ge
 | Mudei config Apache | Nao | `sudo systemctl reload apache2` |
 | Atualizei imagem PostGIS | **Sim** | `docker compose pull db && docker compose up -d` |
 | Perdi dados do banco | Restaurar backup | `psql < backup_poprua_geo.sql` |
+| Rebuild feito | Reinstalar deps | `docker exec php84-poprua-geo composer install` |
 
 ---
 
