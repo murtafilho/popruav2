@@ -147,10 +147,6 @@
         </div>
 
         {{-- Paginacao --}}
-        @if($moradores->hasPages())
-            <div class="pagination-wrapper">
-                {{ $moradores->links() }}
-            </div>
-        @endif
+        <x-pagination-bar :paginator="$moradores->withQueryString()" label="moradores" />
     </div>
 @endsection

@@ -30,6 +30,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/pontos', [\App\Http\Controllers\PontoController::class, 'index'])->name('pontos.index');
     Route::get('/pontos/nao-georreferenciados', [\App\Http\Controllers\PontoController::class, 'naoGeorreferenciados'])->name('pontos.nao-georreferenciados');
     Route::get('/pontos/{id}', [\App\Http\Controllers\PontoController::class, 'show'])->name('pontos.show');
+    Route::get('/pontos/{ponto}/edit', [\App\Http\Controllers\PontoController::class, 'edit'])->name('pontos.edit');
+    Route::put('/pontos/{ponto}', [\App\Http\Controllers\PontoController::class, 'update'])->name('pontos.update');
     Route::get('/pontos/{ponto}/vistorias/create', [VistoriaController::class, 'createForPonto'])->name('pontos.vistorias.create');
     Route::get('/minhas-vistorias', [VistoriaController::class, 'minhas'])->name('vistorias.minhas');
     Route::get('/vistorias', [VistoriaController::class, 'index'])->name('vistorias.index');

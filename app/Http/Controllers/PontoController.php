@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdatePontoRequest;
+use App\Models\Ponto;
+use App\Services\EnderecoService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -58,7 +62,7 @@ class PontoController extends Controller
 
         $pontos = $query->orderBy('logradouro')
             ->orderByRaw('NULLIF(regexp_replace(numero, \'[^0-9]\', \'\', \'g\'), \'\')::int NULLS LAST')
-            ->paginate(15);
+            ->paginate($request->input('per_page', 5));
 
         // Dados para filtros - usando endereco_atualizado
         $bairros = DB::table('endereco_atualizados')
@@ -142,6 +146,53 @@ class PontoController extends Controller
         ]);
     }
 
+    public function edit(Ponto $ponto): View
+    {
+        $ponto->load('enderecoAtualizado');
+
+        return view('pontos.edit', [
+            'ponto' => $ponto,
+        ]);
+    }
+
+    public function update(UpdatePontoRequest $request, Ponto $ponto, EnderecoService $enderecoService): RedirectResponse
+    {
+        $data = $request->validated();
+
+        // Se coordenadas mudaram, atualizar geometria e revincular endereço
+        $coordenadasMudaram = false;
+        if (isset($data['lat']) && isset($data['lng'])) {
+            $coordenadasMudaram = (float) $data['lat'] !== (float) $ponto->lat
+                || (float) $data['lng'] !== (float) $ponto->lng;
+        }
+
+        $ponto->update([
+            'numero' => $data['numero'],
+            'complemento' => $data['complemento'],
+            'observacao' => $data['observacao'] ?? $ponto->observacao,
+            'lat' => $data['lat'],
+            'lng' => $data['lng'],
+            'endereco_atualizado_id' => $data['endereco_atualizado_id'] ?? $ponto->endereco_atualizado_id,
+        ]);
+
+        // Atualizar geometria PostGIS
+        if ($ponto->lat && $ponto->lng) {
+            DB::statement("
+                UPDATE pontos
+                SET geom = ST_SetSRID(ST_MakePoint(lng::float, lat::float), 4326)
+                WHERE id = ?
+            ", [$ponto->id]);
+        }
+
+        // Se coordenadas mudaram e não foi selecionado endereço manualmente, revincular
+        if ($coordenadasMudaram && ! $request->filled('endereco_atualizado_id') && $ponto->lat && $ponto->lng) {
+            $enderecoService->vincularEnderecoAoPonto($ponto->id, (float) $ponto->lat, (float) $ponto->lng);
+        }
+
+        return redirect()->route('pontos.show', $ponto->id)
+            ->with('success', 'Ponto atualizado com sucesso.');
+    }
+
     public function naoGeorreferenciados(Request $request): View
     {
         $query = DB::table('pontos as p')
@@ -193,7 +244,7 @@ class PontoController extends Controller
 
         $pontos = $query->orderBy('logradouro')
             ->orderByRaw('NULLIF(regexp_replace(numero, \'[^0-9]\', \'\', \'g\'), \'\')::int NULLS LAST')
-            ->paginate(15);
+            ->paginate($request->input('per_page', 5));
 
         // Dados para filtros - usando endereco_atualizado
         $bairros = DB::table('endereco_atualizados')

@@ -270,6 +270,41 @@
     </div>
     @endif
 
+    @if(request()->routeIs('mapa.index') && request('ajustar') == '1' && request('ponto_id'))
+    {{-- Painel de Ajuste de Ponto --}}
+    <div id="ajustar-panel" class="card card-glass" style="position: fixed; bottom: 80px; left: var(--space-3); right: var(--space-3); z-index: 99999; border: 2px solid var(--accent-primary); border-radius: 16px; backdrop-filter: blur(12px);">
+        <div class="card-body" style="padding: var(--space-3);">
+            <div style="display: flex; align-items: center; gap: var(--space-3);">
+                <div style="flex-shrink: 0; width: 40px; height: 40px; border-radius: 10px; background: var(--accent-dim); display: flex; align-items: center; justify-content: center;">
+                    <svg style="width: 22px; height: 22px; color: var(--accent-primary);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="3" stroke-width="2"/>
+                        <circle cx="12" cy="12" r="7" stroke-width="2"/>
+                        <path stroke-linecap="round" stroke-width="2" d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
+                    </svg>
+                </div>
+                <div style="flex: 1; min-width: 0;">
+                    <h3 style="font-size: var(--text-sm); font-weight: var(--font-semibold); color: var(--text-primary); margin: 0;">Ajustar Localização</h3>
+                    <p id="ajustar-endereco" class="text-muted" style="font-size: var(--text-xs); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        Mova o mapa para posicionar o crosshair
+                    </p>
+                    <p id="ajustar-coords" class="text-mono" style="font-size: var(--text-xs); color: var(--accent-primary); margin-top: 2px;"></p>
+                </div>
+            </div>
+            <div style="display: flex; gap: var(--space-2); margin-top: var(--space-3);">
+                <button id="btn-confirmar-ajuste" class="btn btn-success" style="flex: 1; border-radius: 10px;">
+                    <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Salvar
+                </button>
+                <a href="{{ route('pontos.index') }}" class="btn btn-secondary" style="border-radius: 10px;">
+                    Cancelar
+                </a>
+            </div>
+        </div>
+    </div>
+    @endif
+
     {{-- Sidebar Toggle Script --}}
     <script>
     document.addEventListener('DOMContentLoaded', function() {

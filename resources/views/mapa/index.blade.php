@@ -60,12 +60,12 @@
 
 @section('content')
     <!-- Map Container -->
-    <div id="map"></div>
-
-    <!-- Crosshair no centro do mapa -->
-    <div class="map-crosshair">
-        <div class="map-crosshair-h"></div>
-        <div class="map-crosshair-v"></div>
+    <div id="map">
+        <!-- Crosshair no centro do mapa (dentro do #map para alinhar com o centro do Leaflet) -->
+        <div class="map-crosshair">
+            <div class="map-crosshair-h"></div>
+            <div class="map-crosshair-v"></div>
+        </div>
     </div>
 
     <!-- Botão Nova Ação -->
@@ -221,6 +221,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const zoom = urlParams.get('zoom') ? parseInt(urlParams.get('zoom')) : DEFAULT_ZOOM;
     const pontoId = urlParams.get('ponto_id');
     const geocoded = urlParams.get('geocoded') === '1';
+    const ajustarMode = urlParams.get('ajustar') === '1' && pontoId;
     const enderecoParam = urlParams.get('endereco');
     const referenciaParam = urlParams.get('referencia');
 
@@ -295,6 +296,92 @@ document.addEventListener('DOMContentLoaded', function() {
             if (geocodeMode) {
                 // Modo geocodificação: mostrar marcador amarelo
                 setGeocodeMarker(pointLat, pointLng, true);
+            } else if (ajustarMode) {
+                // Modo ajuste: marcador visível na posição original
+                selectedPointMarker = L.circleMarker([pointLat, pointLng], {
+                    radius: 14,
+                    fillColor: '#f59e0b',
+                    color: '#fff',
+                    weight: 3,
+                    opacity: 1,
+                    fillOpacity: 0.9
+                }).addTo(map);
+
+                // Esconde botão Nova Ação
+                const btnNovaAcaoEl = document.getElementById('btn-nova-acao');
+                if (btnNovaAcaoEl) btnNovaAcaoEl.style.display = 'none';
+
+                // Buscar info do ponto e atualizar painel + popup
+                fetch(`${APP_BASE}/api/pontos/${pontoId}`)
+                    .then(r => r.json())
+                    .then(data => {
+                        const endEl = document.getElementById('ajustar-endereco');
+                        const enderecoTexto = data.logradouro
+                            ? `${data.tipo || ''} ${data.logradouro}, ${data.numero || 'S/N'}`
+                            : 'Ponto #' + pontoId;
+                        if (endEl) {
+                            endEl.textContent = enderecoTexto;
+                        }
+                        // Popup no marcador (autoPan desabilitado para manter crosshair no ponto)
+                        selectedPointMarker.bindPopup(
+                            `<div style="font-size: var(--text-sm);">` +
+                            `<p style="font-weight: var(--font-semibold); color: var(--text-primary);">${enderecoTexto}</p>` +
+                            (data.bairro ? `<p style="font-size: var(--text-xs); color: var(--text-secondary); margin-top: 2px;">${data.bairro}${data.resultado ? ' — ' + data.resultado : ''}</p>` : '') +
+                            `<p class="text-mono" style="font-size: var(--text-xs); color: var(--text-muted); margin-top: 4px;">${pointLat.toFixed(6)}, ${pointLng.toFixed(6)}</p>` +
+                            `</div>`,
+                            { autoPan: false }
+                        ).openPopup();
+                    })
+                    .catch(() => {});
+
+                // Atualiza coordenadas no painel conforme crosshair (centro do mapa)
+                function updateAjustarCoords() {
+                    const center = map.getCenter();
+                    const coordsEl = document.getElementById('ajustar-coords');
+                    if (coordsEl) {
+                        coordsEl.textContent = `${center.lat.toFixed(6)}, ${center.lng.toFixed(6)}`;
+                    }
+                }
+                updateAjustarCoords();
+                map.on('moveend', updateAjustarCoords);
+
+                // Botão confirmar ajuste
+                const btnConfirmar = document.getElementById('btn-confirmar-ajuste');
+                if (btnConfirmar) {
+                    btnConfirmar.addEventListener('click', async function() {
+                        const center = map.getCenter();
+                        const btn = this;
+                        btn.disabled = true;
+                        btn.innerHTML = '<svg class="spinner" style="width: 16px; height: 16px;" fill="none" viewBox="0 0 24 24"><circle style="opacity: 0.25;" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path style="opacity: 0.75;" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Salvando...';
+
+                        try {
+                            const response = await fetch(`${APP_BASE}/api/pontos/${pontoId}/coordenadas`, {
+                                method: 'PATCH',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                    'Accept': 'application/json'
+                                },
+                                body: JSON.stringify({ lat: center.lat, lng: center.lng })
+                            });
+
+                            const data = await response.json();
+
+                            if (data.success) {
+                                window.location.href = `${APP_BASE}/pontos?ajuste_sucesso=1&ponto_endereco=${encodeURIComponent(data.endereco_ponto || '')}`;
+                            } else {
+                                alert('Erro ao salvar: ' + (data.message || 'Erro desconhecido'));
+                                btn.disabled = false;
+                                btn.innerHTML = '<svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Salvar';
+                            }
+                        } catch (error) {
+                            console.error('Erro:', error);
+                            alert('Erro ao salvar coordenadas. Tente novamente.');
+                            btn.disabled = false;
+                            btn.innerHTML = '<svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Salvar';
+                        }
+                    });
+                }
             } else {
                 // Modo normal: marcador azul
                 selectedPointMarker = L.circleMarker([pointLat, pointLng], {
@@ -661,8 +748,10 @@ document.addEventListener('DOMContentLoaded', function() {
         cb.addEventListener('change', applyFilters);
     });
 
-    // Load points once on startup
-    loadAllPoints();
+    // Load points once on startup (skip in ajustar mode to isolate the target ponto)
+    if (!ajustarMode) {
+        loadAllPoints();
+    }
 
     // Load limite layer by default (checked)
     loadLimite().then(() => {
@@ -806,9 +895,9 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Armazena dados do endereço atual para uso no botão Vistoria
-    // Clique no mapa centraliza no ponto clicado com zoom 18
+    // Clique no mapa centraliza no ponto clicado com zoom 18 (desabilitado no modo ajuste)
     map.on('click', function(e) {
-        if (markerClickedRecently) return;
+        if (markerClickedRecently || ajustarMode) return;
         map.flyTo(e.latlng, 18);
     });
 

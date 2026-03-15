@@ -86,6 +86,57 @@ class PontoController extends Controller
     }
 
     /**
+     * Pesquisa endereços individuais por texto livre (logradouro + numero opcional).
+     * Retorna id, tipo, logradouro, numero, bairro, regional, lat, lng.
+     */
+    public function pesquisarEndereco(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'q' => 'required|string|min:3|max:100',
+        ]);
+
+        $termo = $validated['q'];
+
+        // Separar numero do texto: "AFONSO PENA 1234" ou "AFONSO PENA, 1234"
+        $numero = null;
+        if (preg_match('/^(.+?)[,\s]+(\d+)\s*$/', $termo, $matches)) {
+            $termo = trim($matches[1]);
+            $numero = (int) $matches[2];
+        }
+
+        // Remover tipo de logradouro
+        $termo = preg_replace('/^(RUA|AVE|AVENIDA|AV|PCA|PRACA|TV|TRV|TRAVESSA|AL|ALAMEDA|VIA|ROD|RODOVIA)\s+/i', '', $termo);
+
+        $query = DB::table('endereco_atualizados')
+            ->select([
+                'id',
+                DB::raw('"SIGLA_TIPO_LOGRADOURO" as tipo'),
+                DB::raw('"NOME_LOGRADOURO" as logradouro'),
+                DB::raw('"NUMERO_IMOVEL" as numero'),
+                DB::raw('"NOME_BAIRRO_POPULAR" as bairro'),
+                DB::raw('"NOME_REGIONAL" as regional'),
+                'lat',
+                'lng',
+            ])
+            ->whereNotNull('lat')
+            ->whereNotNull('lng')
+            ->where('NOME_LOGRADOURO', 'ilike', "%{$termo}%");
+
+        if ($numero) {
+            $query->where('NUMERO_IMOVEL', (string) $numero);
+        }
+
+        $resultados = $query
+            ->orderByRaw('CASE WHEN "NOME_LOGRADOURO" ILIKE ? THEN 0 ELSE 1 END', ["{$termo}%"])
+            ->orderBy('NOME_LOGRADOURO')
+            ->orderByRaw('NULLIF(regexp_replace("NUMERO_IMOVEL", \'[^0-9]\', \'\', \'g\'), \'\')::int NULLS LAST')
+            ->limit(20)
+            ->get();
+
+        return response()->json($resultados);
+    }
+
+    /**
      * Busca logradouros distintos para autocomplete.
      * Retorna: TIPO LOGRADOURO - REGIONAL
      */
@@ -389,6 +440,7 @@ class PontoController extends Controller
             ->update([
                 'lat' => $validated['lat'],
                 'lng' => $validated['lng'],
+                'geom' => DB::raw("ST_SetSRID(ST_MakePoint(" . (float) $validated['lng'] . ", " . (float) $validated['lat'] . "), 4326)"),
                 'updated_at' => now(),
             ]);
 

@@ -265,11 +265,7 @@
         </div>
 
         {{-- Paginacao --}}
-        @if($pontos->hasPages())
-            <div class="pagination-wrapper">
-                {{ $pontos->links() }}
-            </div>
-        @endif
+        <x-pagination-bar :paginator="$pontos->withQueryString()" label="pontos" />
     </div>
 @endsection
 

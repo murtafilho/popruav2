@@ -355,6 +355,7 @@ class VistoriaController extends Controller
             ->where('v.user_id', auth()->id())
             ->select([
                 'v.id',
+                'v.ponto_id',
                 'v.data_abordagem',
                 'v.quantidade_pessoas',
                 'v.qtd_kg',
@@ -384,7 +385,7 @@ class VistoriaController extends Controller
         }
 
         $vistorias = $query->orderBy('v.data_abordagem', 'desc')
-            ->paginate(10);
+            ->paginate($request->input('per_page', 5));
 
         $resultados = DB::table('resultados_acoes')
             ->orderBy('id')
@@ -409,6 +410,7 @@ class VistoriaController extends Controller
             ->whereNull('v.deleted_at')
             ->select([
                 'v.id',
+                'v.ponto_id',
                 'v.data_abordagem',
                 'v.quantidade_pessoas',
                 'v.qtd_kg',
@@ -465,7 +467,7 @@ class VistoriaController extends Controller
         }
 
         $vistorias = $query->orderBy('v.data_abordagem', 'desc')
-            ->paginate(10);
+            ->paginate($request->input('per_page', 5));
 
         // Dados para filtros - usando endereco_atualizado
         $bairros = DB::table('endereco_atualizados')
