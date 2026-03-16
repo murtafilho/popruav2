@@ -244,6 +244,7 @@ services:
     restart: unless-stopped
     ports:
       - "127.0.0.1:9084:9000"       # Apache aponta para ca
+      - "127.0.0.1:2224:22"         # SSH direto no container
     volumes:
       - /var/www/html/.../poprua-geo:/var/www/html/.../poprua-geo
                                       # bind mount (so esta app)
@@ -413,7 +414,21 @@ sudo docker logs pg17-poprua-geo --tail=50 -f
 tail -f /var/www/html/joomla_sufis/ginfi/poprua-geo/storage/logs/laravel.log
 ```
 
-### Entrar nos containers
+### Entrar no container da app via SSH
+
+```bash
+# Acesso direto via SSH (requer porta 2224 no docker-compose.yml)
+ssh -p 2224 root@127.0.0.1
+
+# Ou configurar alias no ~/.ssh/config do host:
+# Host poprua
+#     HostName 127.0.0.1
+#     Port 2224
+#     User root
+# Depois basta: ssh poprua
+```
+
+### Entrar nos containers via docker exec
 
 ```bash
 # Container da app

@@ -5,6 +5,11 @@ Todas as alteracoes relevantes do sistema sao documentadas neste arquivo.
 ---
 
 ## [0.3.0] - 2026-03-15
+### Infraestrutura
+
+#### Corrigido
+- **Porta SSH do container** — corrigida de 2222 para 2224 no rebuild.sh e docker-compose.yml (conflito com container php82-novo-sif que ja usava 2222)
+- Documentacao ARQUITETURA_DOCKER.md atualizada com a porta correta
 
 ### Paginacao e Ajuste de Pontos
 
