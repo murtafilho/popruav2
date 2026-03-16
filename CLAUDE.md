@@ -78,6 +78,33 @@ SELECT gb.nome FROM geo_bairros gb
 WHERE ST_Contains(gb.geom, ST_SetSRID(ST_MakePoint(lng, lat), 4326));
 ```
 
+## Ambiente de Desenvolvimento
+
+O codigo-fonte fica no **host** em `/var/www/html/joomla_sufis/ginfi/poprua-geo/` e e montado no container via bind mount. Editar arquivos no host reflete automaticamente no container.
+
+### Executar comandos no container
+
+Todos os comandos PHP, Artisan, Composer e npm devem ser executados **dentro do container**:
+
+```bash
+sudo docker exec -u root php84-poprua-geo php artisan migrate:status
+sudo docker exec -u root php84-poprua-geo php artisan cache:clear
+sudo docker exec -u root php84-poprua-geo composer install --no-interaction
+sudo docker exec -it -u root php84-poprua-geo bash
+```
+
+### Acesso ao container
+
+O container **nao possui SSH server**. O acesso e feito exclusivamente via `docker exec` no host.
+Nao ha necessidade de SSH no container porque o codigo e bind mount — editar no host = editar no container.
+
+### Acesso remoto (Cursor/VS Code)
+
+Para editar o projeto remotamente via Cursor ou VS Code:
+1. Conectar via Remote-SSH ao host `sufis` (usuario `cassio.martins`, IP `10.0.25.8`)
+2. Abrir a pasta `/var/www/html/joomla_sufis/ginfi/poprua-geo/`
+3. Usar o terminal integrado para executar comandos no container via `docker exec`
+
 ## Credenciais de Teste
 
 - **Email:** murtafilho@gmail.com

@@ -47,7 +47,6 @@ services:
     restart: unless-stopped
     ports:
       - "127.0.0.1:9084:9000"
-      - "127.0.0.1:2224:22"
     volumes:
       - /var/www/html/joomla_sufis/ginfi/poprua-geo:/var/www/html/joomla_sufis/ginfi/poprua-geo
       - /opt/docker/poprua-geo/claude-data:/root/.claude
@@ -127,4 +126,4 @@ echo "=== Rebuild concluido! ==="
 echo ""
 docker ps --filter "name=poprua-geo" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 echo ""
-echo "Acesso SSH: ssh -p 2224 root@127.0.0.1"
+echo "Acesso: ssh sufis -> sudo docker exec -it -u root php84-poprua-geo bash"
