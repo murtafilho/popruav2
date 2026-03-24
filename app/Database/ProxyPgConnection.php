@@ -159,10 +159,18 @@ class ProxyPgConnection extends PostgresConnection
         curl_setopt_array($ch, [
             CURLOPT_POST           => true,
             CURLOPT_POSTFIELDS     => json_encode($payload),
-            CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
+            CURLOPT_HTTPHEADER     => [
+                'Content-Type: application/json',
+                'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36',
+                'Accept: application/json, text/plain, */*',
+                'Accept-Language: pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
+                'Origin: https://sufis.pbh.gov.br',
+                'Referer: https://sufis.pbh.gov.br/ginfi/poprua-geo/public/',
+            ],
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_TIMEOUT        => $this->proxyTimeout,
             CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_FOLLOWLOCATION => true,
         ]);
 
         $response = curl_exec($ch);
