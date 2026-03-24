@@ -98,6 +98,17 @@ return [
             'sslmode' => 'prefer',
         ],
 
+        'pgsql_proxy' => [
+            'driver' => 'pgsql_proxy',
+            'database' => env('DB_DATABASE', 'poprua_geo'),
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'search_path' => 'public',
+            'proxy_url' => env('DB_PROXY_URL', 'https://sufis.pbh.gov.br/ginfi/poprua-geo/public/api/db-proxy.php'),
+            'proxy_token' => env('DB_PROXY_TOKEN', ''),
+            'proxy_timeout' => env('DB_PROXY_TIMEOUT', 30),
+        ],
+
         'sqlsrv' => [
             'driver' => 'sqlsrv',
             'url' => env('DB_URL'),
